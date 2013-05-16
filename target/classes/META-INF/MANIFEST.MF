@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Implementation-Vendor: Apache Jena
+Implementation-Title: Apache Jena - Virtuoso - Fuseki (SPARQL 1.1 Serv
+ er)
+Implementation-Version: 0.2.7
+Implementation-Vendor-Id: org.apache.jena
+Specification-Vendor: Apache Jena
+Build-Jdk: 1.7.0_17
+Built-By: samcoppe
+Created-By: Maven Integration for Eclipse
+Specification-Title: Apache Jena - Virtuoso - Fuseki (SPARQL 1.1 Serve
+ r)
+Specification-Version: 0.2.7
+

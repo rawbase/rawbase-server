@@ -1,4 +1,4 @@
-This file lists the dependences for Apache Jena Fuseki.
+This file lists the dependences for Apache Jena Fuseki Virtuoso.
   Version numbers are given in the POM file for a particular distribution. 
 
 Apache Projects:   Apache Software License
@@ -19,3 +19,8 @@ JUnit : http://junit.org/
 Jetty: http://www.eclipse.org/jetty/
   Apache License 2.0 
   (also avilable under Eclipse Public License 1.0)
+
+OpenLink Virtuoso: 
+  virt_jena.jar --> delta_jena.jar (upgraded version of    
+  virt_jena.jar for Jena 2.10.0, to be found in MMLab`s Git -->
+  POM for more details)

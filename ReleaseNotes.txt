@@ -1,4 +1,9 @@
 ==== Fuseki
+== Fuseki - Virtuoso = Fuseki 0.2.7
++ MMLab`s Fuseki extension
++ Based on Fuseki 0.2.6
++ Extra adapter for OpenLink Virtuoso Stores
++ Uses upgraded version of Virtuoso`s Jena Provider (upgraded for Jena 2.10.0)
 
 == Fuseki 0.2.6
 

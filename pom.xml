@@ -231,12 +231,10 @@
         </exclusion>
       </exclusions> 
     </dependency>
-    
-    
     <dependency>
-    	<groupId>be.ugent.mmlab</groupId>
-    	<artifactId>delta-jena</artifactId>
-    	<version>1.0</version>
+      <groupId>be.ugent.mmlab</groupId>
+      <artifactId>delta-jena</artifactId>
+      <version>1.0</version>
     </dependency>
   </dependencies>
 

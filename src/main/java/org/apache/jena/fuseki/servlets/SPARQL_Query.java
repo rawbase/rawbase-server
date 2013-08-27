@@ -54,6 +54,7 @@ import com.hp.hpl.jena.rdf.model.Model ;
 import com.hp.hpl.jena.sparql.core.DatasetDescription ;
 import com.hp.hpl.jena.sparql.core.Prologue ;
 import com.hp.hpl.jena.sparql.resultset.SPARQLResult ;
+import org.apache.http.protocol.HttpContext;
 
 public abstract class SPARQL_Query extends SPARQL_Protocol
 {
@@ -352,7 +353,7 @@ public abstract class SPARQL_Query extends SPARQL_Protocol
         else
             errorOccurred("Unknown or invalid result type") ;
     }
-    
+
     private String formatForLog(Query query)
     {
         IndentedLineBuffer out = new IndentedLineBuffer() ;
@@ -361,9 +362,9 @@ public abstract class SPARQL_Query extends SPARQL_Protocol
         return out.asString() ;
     }
         
-    private String getRemoteString(String queryURI)
+    private String getRemoteString(String queryURI, HttpContext context)
     {
-        return HttpOp.execHttpGet(queryURI) ;
+        return HttpOp.execHttpGet(queryURI, context) ;
     }
 
 }

@@ -18,6 +18,7 @@
 
 package org.apache.jena.fuseki.server;
 
+import be.ugent.mmlab.triplestore.RawbaseStore;
 import java.lang.reflect.Method ;
 import java.util.ArrayList ;
 import java.util.Arrays ;
@@ -275,7 +276,41 @@ public class FusekiConfig
         	
         	
         	sDesc.dataset = vstore.getDatasetGraph(); 
+
+        } else if (datasetDesc.getPropertyResourceValue(RDF.type).equals(RawbaseDatasetVocab.tDataset)){
         	
+        	String jdbcurl = getOne(datasetDesc, "fuvirtext:jdbcURL").toString() ;
+        	String user = getOne(datasetDesc, "fuvirtext:user").toString() ;
+        	String password = getOne(datasetDesc, "fuvirtext:password").toString() ;
+        	String graphName = "";
+        	Boolean readAllGraphs = false;
+        	if (datasetDesc.hasProperty(RawbaseDatasetVocab.pgraphName)) {
+        		graphName = getOne(datasetDesc, "fuvirtext:graphName").toString() ;
+        	}
+        	if (datasetDesc.hasProperty(RawbaseDatasetVocab.preadAllGraphs)) {
+        		readAllGraphs = getOne(datasetDesc, "fuvirtext:readAllGraphs").asLiteral().getBoolean() ;
+        	}
+//        	if (!graphName.isEmpty() && readAllGraphs){
+//        		
+//        		 throw new FusekiConfigException("graphName and readAllGraphs seems contradictory") ;
+//        		
+//        	}
+        	
+        	RawbaseStore vstore;
+        	
+        	if (!graphName.isEmpty()){
+        		
+        		vstore = new RawbaseStore(jdbcurl, user, password, graphName, readAllGraphs);
+        		
+        	}
+        	else {
+        		
+        		vstore = new RawbaseStore(jdbcurl, user, password, readAllGraphs);
+        	}
+        	
+        	
+        	
+        	sDesc.dataset = vstore.getDatasetGraph(); 
         }
         else {
         

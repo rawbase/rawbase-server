@@ -189,7 +189,7 @@ public class SPARQLServer
             HttpServlet validateIRI = new IRIValidator() ;
             
             HttpServlet dumpService = new DumpServlet() ;
-            HttpServlet generalQueryService = new SPARQL_QueryGeneral() ;
+            HttpServlet generalQueryService = new SPARQL_QueryGeneral() ;      
             // TODO Name management 
             addServlet(context, validateQuery, validationRoot+"/query", false) ;
             addServlet(context, validateUpdate, validationRoot+"/update", false) ;
@@ -231,7 +231,8 @@ public class SPARQLServer
         DatasetRegistry.get().put(datasetPath, sDesc) ;
         serverLog.info(format("Dataset path = %s", datasetPath)) ;
         
-        HttpServlet sparqlQuery     = new SPARQL_QueryDataset(verboseLogging) ;
+        //HttpServlet sparqlQuery     = new SPARQL_QueryDataset(verboseLogging) ;
+        HttpServlet sparqlQuery     = new SPARQL_QueryRawbase(verboseLogging) ;
         HttpServlet sparqlUpdate    = new SPARQL_Update(verboseLogging) ;
         HttpServlet sparqlUpload    = new SPARQL_Upload(verboseLogging) ;
         HttpServlet sparqlHttpR     = new SPARQL_REST_R(verboseLogging) ;  

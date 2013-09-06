@@ -58,7 +58,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         String hash = "";
 	
         Integer[] vPath;
-
+        
         for (String graph : query.getGraphURIs()) {
             int i = -1;
 
@@ -69,14 +69,15 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
             } else {
                 i = graph.lastIndexOf("/") + 1;
             }
-            hash = graph.substring(i);
+            //hash = graph.substring(i);
+            hash = graph;
             String newGraph = graph.substring(0, i);
 	    System.out.println("Resolving version " + hash + " from graph "+ newGraph);
 
             queryString = queryString.replaceAll(graph, newGraph);
         }
         query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
-
+        
         if (hash.isEmpty()) {
             vPath = index.resolveLastVersion(); //This is not best solution, make better
         } else {

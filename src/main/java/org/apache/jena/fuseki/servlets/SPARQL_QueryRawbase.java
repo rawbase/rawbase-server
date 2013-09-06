@@ -56,17 +56,22 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         //1. Extract the version from the graphs
         String queryString = query.toString(Syntax.syntaxSPARQL);
         String hash = "";
+	
         Integer[] vPath;
 
         for (String graph : query.getGraphURIs()) {
             int i = -1;
-            if (graph.lastIndexOf("#") >= 0) {
-                i = graph.lastIndexOf('#') + 1;
+
+            if (graph.lastIndexOf("#/") >= 0) {
+                i = graph.lastIndexOf("#/") + 1;
+            } else if (graph.lastIndexOf("#") >= 0) {
+                i = graph.lastIndexOf("#") + 1;
             } else {
-                i = graph.lastIndexOf('/') + 1;
+                i = graph.lastIndexOf("/") + 1;
             }
             hash = graph.substring(i);
             String newGraph = graph.substring(0, i);
+	    System.out.println("Resolving version " + hash + " from graph "+ newGraph);
 
             queryString = queryString.replaceAll(graph, newGraph);
         }
@@ -76,7 +81,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
             vPath = index.resolveLastVersion(); //This is not best solution, make better
         } else {
             try {
-                vPath = index.resolveVersion(hash);
+		vPath = index.resolveVersion(hash);
             } catch (Exception ex) {
                 throw new QueryException("Version hash does not exist");
             }

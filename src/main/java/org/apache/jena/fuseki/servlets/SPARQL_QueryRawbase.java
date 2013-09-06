@@ -57,7 +57,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         String queryString = query.toString(Syntax.syntaxSPARQL);
         String hash = "";
         Integer[] vPath;
-
+        
         for (String graph : query.getGraphURIs()) {
             int i = -1;
             if (graph.lastIndexOf("#") >= 0) {
@@ -65,7 +65,8 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
             } else {
                 i = graph.lastIndexOf('/') + 1;
             }
-            hash = graph.substring(i);
+            //hash = graph.substring(i);
+            hash = graph;
             String newGraph = graph.substring(0, i);
 
             queryString = queryString.replaceAll(graph, newGraph);

@@ -71,7 +71,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
             queryString = queryString.replaceAll(graph, newGraph);
         }
         query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
-
+        
         if (hash.isEmpty()) {
             vPath = index.resolveLastVersion(); //This is not best solution, make better
         } else {

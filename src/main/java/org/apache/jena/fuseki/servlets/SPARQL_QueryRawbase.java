@@ -17,9 +17,9 @@
  */
 package org.apache.jena.fuseki.servlets;
 
-import be.ugent.mmlab.jena.rawbase.ProvenanceVersionIndex;
+import be.ugent.mmlab.jena.rawbase.RawbaseCommitManager;
 import be.ugent.mmlab.jena.rawbase.RawbaseQueryExecutionFactory;
-import be.ugent.mmlab.jena.rawbase.VersionIndex;
+import be.ugent.mmlab.jena.rawbase.RawbaseCommitIndex;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryException;
@@ -35,7 +35,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         super(verbose);
     }
 
-    public SPARQL_QueryRawbase(VersionIndex index) {
+    public SPARQL_QueryRawbase(RawbaseCommitIndex index) {
         this(false);
     }
 
@@ -50,8 +50,8 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
     @Override
     protected QueryExecution createQueryExecution(Query query, Dataset dataset) {
 
-        VersionIndex index;
-        index = ProvenanceVersionIndex.getInstance();
+        RawbaseCommitIndex index;
+        index = RawbaseCommitManager.getInstance().getIndex();
        
         //1. Extract the version from the graphs
         String queryString = query.toString(Syntax.syntaxSPARQL);
@@ -59,25 +59,28 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         Integer[] vPath;
         
         for (String graph : query.getGraphURIs()) {
-            int i = -1;
+            int i;
+            
+            //A version hash is identified by being the last part of the graph URI
+            //seperated by a # or /
             if (graph.lastIndexOf("#") >= 0) {
                 i = graph.lastIndexOf('#') + 1;
             } else {
                 i = graph.lastIndexOf('/') + 1;
             }
-            //hash = graph.substring(i);
-            hash = graph;
-            String newGraph = graph.substring(0, i);
 
-            queryString = queryString.replaceAll(graph, newGraph);
+            hash = graph;
+            //Replace graph in FROM clause with real graph
+            queryString = queryString.replaceAll(graph, graph.substring(0, i));
         }
         query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
         
         if (hash.isEmpty()) {
-            vPath = index.resolveLastVersion(); //This is not best solution, make better
+            //Temp. This needs to be replaced with the current set masterbranch
+            vPath = index.resolveLastCommit(); 
         } else {
             try {
-                vPath = index.resolveVersion(hash);
+                vPath = index.resolveCommit(hash);
             } catch (Exception ex) {
                 throw new QueryException("Version hash does not exist");
             }

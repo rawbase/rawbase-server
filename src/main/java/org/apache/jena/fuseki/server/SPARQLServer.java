@@ -231,6 +231,7 @@ public class SPARQLServer
         DatasetRegistry.get().put(datasetPath, sDesc) ;
         serverLog.info(format("Dataset path = %s", datasetPath)) ;
         
+        //MVS:
         //HttpServlet sparqlQuery     = new SPARQL_QueryDataset(verboseLogging) ;
         HttpServlet sparqlQuery     = new SPARQL_QueryRawbase(verboseLogging) ;
         HttpServlet sparqlUpdate    = new SPARQL_Update(verboseLogging) ;

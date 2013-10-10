@@ -12,11 +12,11 @@ import com.hp.hpl.jena.sparql.core.DatasetGraph;
  */
 public class VirtuosoStore {
 
-    private String virtURL;
-    private String user;
-    private String pass;
-    private String graphName = null;
-    private Boolean readFromAllGraphs = false;
+    protected String virtURL;
+    protected String user;
+    protected String pass;
+    protected String graphName = null;
+    protected Boolean readFromAllGraphs = false;
     private VirtGraph graph;
     private VirtModel model;
 
@@ -50,7 +50,7 @@ public class VirtuosoStore {
 
     public VirtGraph getGraph() {
 
-        if (graphName == null || graphName == "") {
+        if (graphName == null || graphName.isEmpty()) {
 
             graph = new VirtGraph(virtURL, user, pass);
             graph.setReadFromAllGraphs(readFromAllGraphs);

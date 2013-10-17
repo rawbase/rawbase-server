@@ -236,49 +236,53 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol
     
     private void execute(HttpActionUpdate action, InputStream input)
     {
-        
-        /*
-         * Miel: Hack into this!
-         */
-        
-        //Start Commit + start transaction
-
-        
-        UsingList usingList = processProtocol(action.request) ;
-        
-        // If the dsg is transactional, then we can parse and execute the update in a streaming fashion.
-        // If it isn't, we need to read the entire update request before performing any updates, because
-        // we have to attempt to make the request atomic in the face of malformed queries
-        UpdateRequest req = null ;
-        if (!action.isTransactional())
-        {
+        try {
+            /*
+             * Miel: Hack into this!
+             */
+            
+            //Start Commit + start transaction
+            RawbaseCommitManager.getInstance().startCommit("", "", "", "");
+            
+            UsingList usingList = processProtocol(action.request) ;
+            
+            // If the dsg is transactional, then we can parse and execute the update in a streaming fashion.
+            // If it isn't, we need to read the entire update request before performing any updates, because
+            // we have to attempt to make the request atomic in the face of malformed queries
+            UpdateRequest req = null ;
+            if (!action.isTransactional())
+            {
+                try
+                {
+                    // TODO implement a spill-to-disk version of this
+                    req = UpdateFactory.read(usingList, input, Syntax.syntaxARQ);
+                }
+                catch (UpdateException ex) { errorBadRequest(ex.getMessage()) ; return ; }
+                catch (QueryParseException ex)  { errorBadRequest(messageForQPE(ex)) ; return ; }
+            }
+            
+            action.beginWrite() ;
             try
             {
-                // TODO implement a spill-to-disk version of this
-                req = UpdateFactory.read(usingList, input, Syntax.syntaxARQ);
-            }
-            catch (UpdateException ex) { errorBadRequest(ex.getMessage()) ; return ; }
-            catch (QueryParseException ex)  { errorBadRequest(messageForQPE(ex)) ; return ; }
-        }
-        
-        action.beginWrite() ;
-        try
-        {
-            if (action.isTransactional())
-                UpdateAction.parseExecute(usingList, action.getActiveDSG(), input, Syntax.syntaxARQ);
-            else
-                UpdateAction.execute(req, action.getActiveDSG()) ;
+                if (action.isTransactional())
+                    UpdateAction.parseExecute(usingList, action.getActiveDSG(), input, Syntax.syntaxARQ);
+                else
+                    UpdateAction.execute(req, action.getActiveDSG()) ;
+                
+                action.commit() ;
+                //SAM
+                //action.abort();
+                action.endWrite();
+            } 
+            catch (UpdateException ex) { action.abort(); errorBadRequest(ex.getMessage()) ; }
+            catch (QueryParseException ex)  { action.abort(); errorBadRequest(messageForQPE(ex)) ; }
+            finally {  }
             
-            action.commit() ;
-            //SAM
-            //action.abort();
-            action.endWrite();
-        } 
-        catch (UpdateException ex) { action.abort(); errorBadRequest(ex.getMessage()) ; }
-        catch (QueryParseException ex)  { action.abort(); errorBadRequest(messageForQPE(ex)) ; }
-        finally {  }
-        
-        RawbaseCommitManager.getInstance().endCommit();
+            RawbaseCommitManager.getInstance().endCommit();
+            
+        } catch (RawbaseException ex) {
+            Logger.getLogger(SPARQL_UpdateRawbase.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /* [It is an error to supply the using-graph-uri or using-named-graph-uri parameters 

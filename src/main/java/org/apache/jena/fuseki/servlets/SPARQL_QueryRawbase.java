@@ -17,9 +17,9 @@
  */
 package org.apache.jena.fuseki.servlets;
 
+import be.ugent.mmlab.jena.rawbase.RawbaseCommitIndex;
 import be.ugent.mmlab.jena.rawbase.RawbaseCommitManager;
 import be.ugent.mmlab.jena.rawbase.RawbaseQueryExecutionFactory;
-import be.ugent.mmlab.jena.rawbase.RawbaseCommitIndex;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryException;
@@ -50,8 +50,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
     @Override
     protected QueryExecution createQueryExecution(Query query, Dataset dataset) {
 
-        RawbaseCommitIndex index;
-        index = RawbaseCommitManager.getInstance().getIndex();
+        RawbaseCommitIndex index = RawbaseCommitManager.getInstance().getIndex();
        
         //1. Extract the version from the graphs
         String queryString = query.toString(Syntax.syntaxSPARQL);

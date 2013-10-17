@@ -234,7 +234,8 @@ public class SPARQLServer
         //MVS:
         //HttpServlet sparqlQuery     = new SPARQL_QueryDataset(verboseLogging) ;
         HttpServlet sparqlQuery     = new SPARQL_QueryRawbase(verboseLogging) ;
-        HttpServlet sparqlUpdate    = new SPARQL_Update(verboseLogging) ;
+        //HttpServlet sparqlUpdate    = new SPARQL_Update(verboseLogging) ;
+        HttpServlet sparqlUpdate    = new SPARQL_UpdateRawbase(verboseLogging) ;
         HttpServlet sparqlUpload    = new SPARQL_Upload(verboseLogging) ;
         HttpServlet sparqlHttpR     = new SPARQL_REST_R(verboseLogging) ;  
         HttpServlet sparqlHttpRW    = new SPARQL_REST_RW(verboseLogging) ;

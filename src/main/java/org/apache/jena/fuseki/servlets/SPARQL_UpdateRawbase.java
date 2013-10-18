@@ -18,9 +18,8 @@
 
 package org.apache.jena.fuseki.servlets;
 
-import be.ugent.mmlab.jena.rawbase.RawbaseCommit;
 import be.ugent.mmlab.jena.rawbase.RawbaseCommitManager;
-import be.ugent.mmlab.jena.rawbase.RawbaseException;
+import be.ugent.mmlab.jena.rawbase.exceptions.RawbaseException;
 import static java.lang.String.format ;
 import static org.apache.jena.fuseki.Fuseki.requestLog ;
 import static org.apache.jena.fuseki.HttpNames.paramRequest ;
@@ -236,13 +235,15 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol
     
     private void execute(HttpActionUpdate action, InputStream input)
     {
-        try {
-            /*
+        /*
              * Miel: Hack into this!
              */
-            
-            //Start Commit + start transaction
-            RawbaseCommitManager.getInstance().startCommit("", "", "", "");
+            try {    
+                //Start Commit + start transaction
+                RawbaseCommitManager.getInstance().startCommit("http://example.com/sparqlupdate", "http://example.com/sparqlupdate", "This is a commit!",null);
+            } catch (RawbaseException ex) {
+                errorBadRequest(ex.getMessage()); return;
+            }
             
             UsingList usingList = processProtocol(action.request) ;
             
@@ -273,16 +274,16 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol
                 //SAM
                 //action.abort();
                 action.endWrite();
+                RawbaseCommitManager.getInstance().storeCommit();
             } 
             catch (UpdateException ex) { action.abort(); errorBadRequest(ex.getMessage()) ; }
             catch (QueryParseException ex)  { action.abort(); errorBadRequest(messageForQPE(ex)) ; }
-            finally {  }
-            
-            RawbaseCommitManager.getInstance().endCommit();
-            
-        } catch (RawbaseException ex) {
-            Logger.getLogger(SPARQL_UpdateRawbase.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            catch (RawbaseException ex) {action.abort(); errorBadRequest(ex.getMessage())  ;}
+            catch (Exception ex) {action.abort(); errorBadRequest(ex.getMessage());}
+            finally { 
+                RawbaseCommitManager.getInstance().discardCommit();
+            }
+
     }
 
     /* [It is an error to supply the using-graph-uri or using-named-graph-uri parameters 

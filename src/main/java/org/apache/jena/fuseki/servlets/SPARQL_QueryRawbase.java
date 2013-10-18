@@ -35,10 +35,6 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         super(verbose);
     }
 
-    public SPARQL_QueryRawbase(RawbaseCommitIndex index) {
-        this(false);
-    }
-
     @Override
     protected void validateRequest(HttpServletRequest request) {
     }

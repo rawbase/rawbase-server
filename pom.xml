@@ -242,6 +242,7 @@
       <artifactId>delta-jena</artifactId>
       <version>1.0</version>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -399,6 +400,8 @@
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
+      
+      
       
 
     </plugins>

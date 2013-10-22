@@ -59,6 +59,7 @@ import com.hp.hpl.jena.update.UpdateFactory ;
 import com.hp.hpl.jena.update.UpdateRequest ;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.http.HttpRequest;
 
 public class SPARQL_UpdateRawbase extends SPARQL_Protocol
 {
@@ -235,12 +236,20 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol
     
     private void execute(HttpActionUpdate action, InputStream input)
     {
+            HttpServletRequest request = action.request;
+            String currentCommit = request.getParameter("rwb-version");
+            String user = request.getParameter("rwb-user");
+            
+            if (user == null){
+                user = "Anonymous";
+            }
+            
         /*
              * Miel: Hack into this!
              */
             try {    
                 //Start Commit + start transaction
-                RawbaseCommitManager.getInstance().startCommit("http://example.com/sparqlupdate", "http://example.com/sparqlupdate", "This is a commit!",null);
+                RawbaseCommitManager.getInstance().startCommit(user, user, "This is a commit!",currentCommit);
             } catch (RawbaseException ex) {
                 errorBadRequest(ex.getMessage()); return;
             }

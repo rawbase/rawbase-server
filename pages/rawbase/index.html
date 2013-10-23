@@ -1,0 +1,170 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+        <head>
+                <title></title>
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                <script type="text/javascript" src="rawbase/js/jquery-1.10.2.min.js"></script>
+                <script type="text/javascript" src="rawbase/js/jquery-ui-1.10.3/ui/minified/jquery-ui.min.js"></script>
+                <script type="text/javascript" src="https://ajax.googleapis.com/jsapi"></script>
+                <script type="text/javascript" src="rawbase/js/n3.js"></script>
+                <script type="text/javascript" src="rawbase/js/d3/d3.min.js"></script>
+                <script type="text/javascript">
+                        var host = "http://localhost:3030/rawbase/"
+                        
+                        var prov = {
+                                entity: 'http://www.w3.org/ns/prov#Entity',
+                                generated: 'http://www.w3.org/ns/prov#generated'
+                        }
+                        
+                        var current = null;
+                        
+                        function load() {
+                                //google.load("identitytoolkit", "1.0", {packages: ["ac"], callback: callback});
+                                
+                                
+                                
+                                
+                                
+                                getProvGraph();
+                        }
+                        function callback() {
+                                window.google.identitytoolkit.setConfig({
+                                        developerKey: "AIzaSyAiHOpJX6TflPOj3-uocNCN7JlW9eZTA6g",
+                                        companyName: "Your company",
+                                        callbackUrl: "https://yoursite.com/callback", // must be a full URL
+                                        userStatusUrl: "/userStatus", // these can just be partial paths
+                                        loginUrl: "/login",
+                                        signupUrl: "/signup",
+                                        homeUrl: "/home",
+                                        logoutUrl: "/logout",
+                                        realm: "", // optional
+                                        language: "en",
+                                        idps: ["Gmail", "AOL", "Hotmail", "Yahoo"],
+                                        tryFederatedFirst: true,
+                                        useCachedUserStatus: false
+                                });
+                                jQuery('#navbar').accountChooser();
+                        }
+                        
+                        function getProvGraph(){
+                                var url = host + "get";
+                                
+                                /*var width = 960,
+                                height = 2200;
+
+                                var cluster = d3.layout.cluster()
+                                .size([height, width - 160]);
+
+                                var diagonal = d3.svg.diagonal()
+                                .projection(function(d) { return [d.y, d.x]; });
+
+                                var svg = d3.select("#network").append("svg")
+                                .attr("width", width)
+                                .attr("height", height)
+                                .append("g")
+                                .attr("transform", "translate(40,0)");*/
+                                
+                                
+                                $.ajax({
+                                        url: url,
+                                        beforeSend: function(xhrObj){
+                                                
+                                                xhrObj.setRequestHeader("Accept","text/turtle");
+                                                
+                                        },
+                                        accept: {},
+                                        data: {
+                                                graph: 'urn:rawbase:provenance' 
+                                        },
+                                        success: function(data){
+                                                parseProv(data);
+                                        },
+                                        error: function(){
+                                                
+                                        }
+                                });
+                                
+                        }
+                        
+                        function parseProv(prov){
+                               
+                                var $list = $("<ul />").appendTo($("#network"));
+                                
+                                var parser = new N3.Parser();
+                                parser.parse(prov,
+                                function (error, triple) {
+                                        if (triple){
+                                                console.log(triple.subject, triple.predicate, triple.object, '.');
+                                        
+                                                if (triple.predicate == 'http://www.w3.org/ns/prov#generated'){
+                                                        
+                                                        $("<li />")
+                                                        .appendTo($list)
+                                                        .on('click',function(){
+                                                             current = $(this).text();
+                                                             getResource();
+                                                        })
+                                                        .text(triple.object);
+                                                }
+                                        
+                                        }else{
+                                                console.log("# That's all, folks!");
+                                        }
+                                });
+                                
+                                
+                                
+                        }
+                        
+                        function getCurrentVersion(){
+                                return current;
+                        }
+                        
+                        function getUser(){
+                                return "anonymous";
+                        }
+                        
+                        function getResource(){
+                                //var query = 'SELECT ?p ?o WHERE { <' + subject + '> ?p ?o }';
+                                var query = 'SELECT ?p ?o FROM <'+getCurrentVersion()+'>WHERE { ?s ?p ?o }';
+                                
+                                var url = host + "sparql";
+                                
+                                $.ajax({
+                                        url: url,
+                                        beforeSend: function(xhrObj){
+                                                xhrObj.setRequestHeader("Accept","application/json");
+                                                
+                                        },
+                                        data: {
+                                                query: query,
+                                                'rwb-version': getCurrentVersion(),
+                                                'rwb-user': getUser()
+                                        },
+                                        success: function(data){
+                                                console.log(data);
+                                        },
+                                        error: function(){
+                                                
+                                        }
+                                });
+                        }
+                </script>
+                <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=load"></script>
+        </head>
+        <body>
+                <div id="network">
+
+                </div>
+                <div id="resource-name">
+
+                </div>
+                <div id="properties">
+
+                </div>
+        </body>
+</html>

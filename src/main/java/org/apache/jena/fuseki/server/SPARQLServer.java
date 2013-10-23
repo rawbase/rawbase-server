@@ -203,8 +203,8 @@ public class SPARQLServer
         
         if ( installManager || installServices )
         {
-            //String [] files = { "fuseki.html", "index.html" } ;
-            String [] files = { "rawbase/index.html" } ;
+            String [] files = { "rawbase/index.html","fuseki.html", "index.html" } ;
+            //String [] files = { "rawbase/index.html" } ;
             context.setWelcomeFiles(files) ;
             addContent(context, "/", serverConfig.pages) ;
         }

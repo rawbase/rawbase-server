@@ -18,7 +18,10 @@
 
 package org.apache.jena.fuseki.server;
 
+import be.ugent.mmlab.servlets.rawbase.SPARQL_QueryRawbase;
+import be.ugent.mmlab.servlets.rawbase.SPARQL_UpdateRawbase;
 import be.ugent.mmlab.jena.rawbase.RawbaseDataSet;
+import be.ugent.mmlab.servlets.openid.LoginServlet;
 import static java.lang.String.format ;
 import static org.apache.jena.fuseki.Fuseki.serverLog ;
 
@@ -197,6 +200,11 @@ public class SPARQLServer
             addServlet(context, validateData, validationRoot+"/data", false) ;
             addServlet(context, validateIRI, validationRoot+"/iri", false) ;
             addServlet(context, dumpService, "/dump", false) ;
+            //MVS: add openid support servlet
+            HttpServlet loginOpenIdServlet = new LoginServlet();
+            
+            addServlet(context, loginOpenIdServlet , "/login", false) ;
+            
             // general query processor.
             addServlet(context, generalQueryService, sparqlProcessor, enableCompression) ;
         }

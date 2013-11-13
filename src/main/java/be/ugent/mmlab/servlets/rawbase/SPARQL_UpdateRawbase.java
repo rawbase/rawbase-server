@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.jena.fuseki.servlets;
+package be.ugent.mmlab.servlets.rawbase;
 
 import be.ugent.mmlab.jena.rawbase.RawbaseCommitManager;
 import be.ugent.mmlab.jena.rawbase.exceptions.RawbaseException;
@@ -59,6 +59,7 @@ import com.hp.hpl.jena.update.UpdateRequest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.HttpRequest;
+import org.apache.jena.fuseki.servlets.SPARQL_Protocol;
 
 public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
 

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.jena.fuseki.servlets;
+package be.ugent.mmlab.servlets.rawbase;
 
 import be.ugent.mmlab.jena.rawbase.RawbaseCommitIndex;
 import be.ugent.mmlab.jena.rawbase.RawbaseCommitManager;
@@ -27,6 +27,7 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.jena.fuseki.servlets.SPARQL_QueryDataset;
 
 public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
     //MVS: added index for versions
@@ -52,7 +53,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         String queryString = query.toString(Syntax.syntaxSPARQL);
         String hash = "";
         Integer[] vPath;
-        
+
         for (String graph : query.getGraphURIs()) {
             int i;
             
@@ -66,7 +67,8 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
 
             hash = graph;
             //Replace graph in FROM clause with real graph
-            queryString = queryString.replaceAll(graph, graph.substring(0, i));
+            queryString = queryString.replaceAll("FROM\\s*?<" + graph + ">", "");
+            //queryString = queryString.replaceAll(graph, graph.substring(0, i));
         }
         query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
         

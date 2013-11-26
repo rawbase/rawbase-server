@@ -1,78 +1,78 @@
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
+
 <!DOCTYPE html>
 <html>
-        <head>
-                <title></title>
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <link href="rawbase/jQueryOpenIdPlugin/openid.css" rel="stylesheet" type="text/css" />
-                <script type="text/javascript" src="rawbase/js/jquery-ui-1.10.3/jquery-1.9.1.js"></script>
-                <script type="text/javascript" src="rawbase/js/jquery-ui-1.10.3/ui/minified/jquery-ui.min.js"></script>
-                <script type="text/javascript" src="rawbase/js/n3.js"></script>
-                <script type="text/javascript" src="rawbase/js/d3/d3.min.js"></script>
-                <script type="text/javascript" src="rawbase/jQueryOpenIdPlugin/jquery.openid.js"></script>
-                <script type="text/javascript" src="rawbase/js/script.js"></script>
+    <head>
+        <title>Bootstrap 101 Template</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap -->
+        <link href="rawbase/css/bootstrap.min.css" rel="stylesheet">
+        <link href="rawbase/css/openid.css" rel="stylesheet" type="text/css" />
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+    </head>
 
-        </head>
-        <body>
-                <div id="login">
-                        <form class="openid" method="post" action="login"> 
-                                <div>
-                                        <ul class="providers"> 
-                                                <li class="openid" title="OpenID">
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/openidW.png" alt="icon" /> 
-                                                        <span><strong>http://{your-openid-url}</strong></span></li> 
-                                                <li class="direct" title="Google"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/googleW.png" alt="icon" /><span>https://www.google.com/accounts/o8/id</span></li> 
-                                                <li class="direct" title="Yahoo"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/yahooW.png" alt="icon" /><span>http://yahoo.com/</span></li> 
-                                                <li class="username" title="AOL screen name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/aolW.png" alt="icon" /><span>http://openid.aol.com/<strong>username</strong></span></li> 
-                                                <li class="username" title="MyOpenID user name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/myopenid.png" alt="icon" /><span>http://<strong>username</strong>.myopenid.com/</span></li> 
-                                                <li class="username" title="Flickr user name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/flickr.png" alt="icon" /><span>http://flickr.com/<strong>username</strong>/</span></li> 
-                                                <li class="username" title="Technorati user name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/technorati.png" alt="icon" /><span>http://technorati.com/people/technorati/<strong>username</strong>/</span></li> 
-                                                <li class="username" title="Wordpress blog name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/wordpress.png" alt="icon" /><span>http://<strong>username</strong>.wordpress.com</span></li> 
-                                                <li class="username" title="Blogger blog name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/blogger.png" alt="icon" /><span>http://<strong>username</strong>.blogspot.com/</span></li> 
-                                                <li class="username" title="LiveJournal blog name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/livejournal.png" alt="icon" /><span>http://<strong>username</strong>.livejournal.com</span></li> 
-                                                <li class="username" title="ClaimID user name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/claimid.png" alt="icon" /><span>http://claimid.com/<strong>username</strong></span></li> 
-                                                <li class="username" title="Vidoop user name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/vidoop.png" alt="icon" /><span>http://<strong>username</strong>.myvidoop.com/</span></li> 
-                                                <li class="username" title="Verisign user name"> 
-                                                        <img src="rawbase/jQueryOpenIdPlugin/images/verisign.png" alt="icon" /><span>http://<strong>username</strong>.pip.verisignlabs.com/</span></li> 
-                                        </ul></div> 
-                                <fieldset> 
-                                        <label for="openid_username">Enter your <span>Provider user name</span></label> 
-                                        <div><span></span><input type="text" name="openid_username" /><span></span> 
-                                                <input type="submit" value="Login" /></div> 
-                                </fieldset> 
-                                <fieldset> 
-                                        <label for="openid_identifier">Enter your <a class="openid_logo" href="http://openid.net">OpenID</a></label> 
-                                        <div><input type="text" name="openid_identifier" /> 
-                                                <input type="submit" value="Login" /></div> 
-                                </fieldset> 
-                        </form>
+    <body>
+        <div id="login">
+            <form class="openid" method="get" action="openid"> 
+                <div>
+                    <ul class="providers"> 
+                        <li class="openid" title="OpenID">
+                            <img src="rawbase/images/images/openidW.png" alt="icon" /> 
+                            <span><strong>http://{your-openid-url}</strong></span></li> 
+                        <li class="direct" title="Google"> 
+                            <img src="rawbase/images/googleW.png" alt="icon" /><span>https://www.google.com/accounts/o8/id</span></li> 
+                        <li class="direct" title="Yahoo"> 
+                            <img src="rawbase/images/yahooW.png" alt="icon" /><span>http://yahoo.com/</span></li> 
+                        <li class="username" title="AOL screen name"> 
+                            <img src="rawbase/images/aolW.png" alt="icon" /><span>http://openid.aol.com/<strong>username</strong></span></li> 
+                        <li class="username" title="MyOpenID user name"> 
+                            <img src="rawbase/images/myopenid.png" alt="icon" /><span>http://<strong>username</strong>.myopenid.com/</span></li> 
+                        <li class="username" title="Flickr user name"> 
+                            <img src="rawbase/images/flickr.png" alt="icon" /><span>http://flickr.com/<strong>username</strong>/</span></li> 
+                        <li class="username" title="Technorati user name"> 
+                            <img src="rawbase/images/technorati.png" alt="icon" /><span>http://technorati.com/people/technorati/<strong>username</strong>/</span></li> 
+                        <li class="username" title="Wordpress blog name"> 
+                            <img src="rawbase/images/wordpress.png" alt="icon" /><span>http://<strong>username</strong>.wordpress.com</span></li> 
+                        <li class="username" title="Blogger blog name"> 
+                            <img src="rawbase/images/blogger.png" alt="icon" /><span>http://<strong>username</strong>.blogspot.com/</span></li> 
+                        <li class="username" title="LiveJournal blog name"> 
+                            <img src="rawbase/images/livejournal.png" alt="icon" /><span>http://<strong>username</strong>.livejournal.com</span></li> 
+                        <li class="username" title="ClaimID user name"> 
+                            <img src="rawbase/images/claimid.png" alt="icon" /><span>http://claimid.com/<strong>username</strong></span></li> 
+                        <li class="username" title="Vidoop user name"> 
+                            <img src="rawbase/images/vidoop.png" alt="icon" /><span>http://<strong>username</strong>.myvidoop.com/</span></li> 
+                        <li class="username" title="Verisign user name"> 
+                            <img src="rawbase/images/verisign.png" alt="icon" /><span>http://<strong>username</strong>.pip.verisignlabs.com/</span></li> 
+                    </ul></div> 
+                <fieldset> 
+                    <label for="openid_username">Enter your <span>Provider user name</span></label> 
+                    <div><span></span><input type="text" name="openid_username" /><span></span> 
+                        <input type="submit" value="Login" /></div> 
+                </fieldset> 
+                <fieldset> 
+                    <label for="openid_identifier">Enter your <a class="openid_logo" href="http://openid.net">OpenID</a></label> 
+                    <div><input type="text" name="openid_identifier" /> 
+                        <input type="submit" value="Login" /></div> 
+                </fieldset> 
+            </form>
+        </div>
+        <div id="network">
 
+        </div>
+        <div id="types">
+            
+        </div>
+        
+        <div id="resource">
 
-                </div>
-                <div id="network">
-
-                </div>
-                <div id="resource">
-                        <h1 id ="resource-name"></h1>
-                </div>
-                <div id="properties">
-                        <table id="properties-table">
-
-                        </table>
-                </div>
-        </body>
+        </div>
+        <div id="properties">
+            
+        </div>
+        
+        <script data-main="rawbase/js/main" src="rawbase/js/require.js"></script>
 </html>

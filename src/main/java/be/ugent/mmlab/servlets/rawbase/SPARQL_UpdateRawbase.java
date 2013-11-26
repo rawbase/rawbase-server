@@ -56,9 +56,6 @@ import com.hp.hpl.jena.update.UpdateAction;
 import com.hp.hpl.jena.update.UpdateException;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.http.HttpRequest;
 import org.apache.jena.fuseki.servlets.SPARQL_Protocol;
 
 public class SPARQL_UpdateRawbase extends SPARQL_Protocol {

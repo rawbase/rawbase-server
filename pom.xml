@@ -242,45 +242,9 @@
                         <version>1.0</version>
                 </dependency>
                 <dependency>
-                        <groupId>org.openid4java</groupId>
-                        <artifactId>openid4java</artifactId>
-                        <version>0.9.8</version>
-                        <exclusions>
-                                <exclusion>
-                                        <groupId>xerces</groupId>
-                                        <artifactId>xercesImpl</artifactId>
-                                </exclusion>
-                                <exclusion>
-                                        <groupId>org.apache.httpcomponents</groupId>
-                                        <artifactId>httpclient</artifactId>
-                                </exclusion>
-                                <exclusion>
-                                        <groupId>log4j</groupId>
-                                        <artifactId>log4j</artifactId>
-                                </exclusion>
-                                <exclusion>
-                                        <groupId>commons-logging</groupId>
-                                        <artifactId>commons-logging</artifactId>
-                                </exclusion>
-                                <exclusion>
-                                        <groupId>commons-collections</groupId>
-                                        <artifactId>commons-collections</artifactId>
-                                </exclusion>
-                                <exclusion>
-                                        <groupId>xml-apis</groupId>
-                                        <artifactId>xml-apis</artifactId>
-                                </exclusion>
-                            
-                                <exclusion> 
-                                        <groupId>org.slf4j</groupId>
-                                        <artifactId>slf4j-log4j12</artifactId>
-                                </exclusion>
-                                <exclusion> 
-                                        <groupId>log4j</groupId>
-                                        <artifactId>log4j</artifactId>
-                                </exclusion>
-      
-                        </exclusions>
+                        <groupId>org.expressme</groupId>
+                        <artifactId>JOpenId</artifactId>
+                        <version>1.08</version>
                 </dependency>
         </dependencies>
 

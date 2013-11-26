@@ -38,6 +38,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
 
     @Override
     protected void validateRequest(HttpServletRequest request) {
+        
     }
 
     @Override
@@ -86,4 +87,6 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         //2. perform query
         return RawbaseQueryExecutionFactory.create(query, dataset, vPath);
     }
+    
+    
 }

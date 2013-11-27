@@ -30,8 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.jena.fuseki.servlets.SPARQL_QueryDataset;
 
 public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
-    //MVS: added index for versions
-
+    
     public SPARQL_QueryRawbase(boolean verbose) {
         super(verbose);
     }
@@ -43,14 +42,20 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
 
     @Override
     protected void validateQuery(HttpActionQuery action, Query query) {
+        String version = action.request.getParameter("rwb-version");
+        if (version != null){
+            query.addNamedGraphURI(version);
+        }
     }
 
+    
+    
     @Override
     protected QueryExecution createQueryExecution(Query query, Dataset dataset) {
 
         RawbaseCommitIndex index = RawbaseCommitManager.getInstance().getIndex();
        
-        //1. Extract the version from the graphs
+        //1. Extract the version from the graph
         String queryString = query.toString(Syntax.syntaxSPARQL);
         String hash = "";
         Integer[] vPath;

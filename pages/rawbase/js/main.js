@@ -2,23 +2,46 @@
     "use strict";
 
     requirejs.config({
+        baseUrl: 'rawbase/js/lib',
+        paths: {
+            jquery: 'jquery-1.10.2.min',
+            app: '../app',
+            slickgrid: './SlickGrid-2.1',
+            jqueryui: './jquery-ui-1.10.3/ui/minified'
+        },
         shim: {
-            'lib/jquery-1.10.2.min': {
-                exports: 'jQuery'
+            'jquery-ui.min': {
+                deps: ['jquery']
             },
-            'lib/jquery.openid': {
-                deps: ['lib/jquery-1.10.2.min']
+            'SlickGrid-2.1/lib/jquery.event.drag-2.2': {
+                deps: ['jquery']
             },
-            'lib/bootstrap.min': {
-                deps: ['lib/jquery-1.10.2.min']
+            'jquery.openid': {
+                deps: ['jquery']
             },
-            'lib/n3': {
+            'bootstrap.min': {
+                deps: ['jquery']
+            },
+            'bootstrap-select.min': {
+                deps: ['bootstrap.min']
+            },
+            'slick.core': {
+                deps: ['jquery','SlickGrid-2.1/lib/jquery.event.drag-2.2']
+            },
+            'slick.formatters': {
+                deps: ['slick.core']
+            },
+            'slick.grid': {
+                deps: ['slick.core']
+            },
+            
+            'n3': {
                 exports: 'n3'
             },
         },
     });
 
-    require(['application'], function (Application) {
+    require(['app/application', 'bootstrap.min'], function (Application) {
         var app = new Application();
         app.init();
     });

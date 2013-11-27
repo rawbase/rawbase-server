@@ -1,0 +1,28 @@
+/* 
+    Document   : style
+    Created on : Nov 26, 2013, 11:19:50 AM
+    Author     : mielvandersande
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+#sigma-parent {
+  width: 500px;
+  height: 500px;
+  position: relative
+}
+#sigma-example{
+  position: absolute;
+  width: 100%;
+  height: 100%
+  }
+#login {
+    display: none
+}
+
+
+#types {
+    width: 100%;
+    position: absolute
+}
+

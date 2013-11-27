@@ -7,6 +7,10 @@
         <!-- Bootstrap -->
         <link href="rawbase/css/bootstrap.min.css" rel="stylesheet">
         <link href="rawbase/css/openid.css" rel="stylesheet" type="text/css" />
+        <link href="rawbase/css/style.css" rel="stylesheet" type="text/css" />
+        <link href="rawbase/js/lib/SlickGrid-2.1/slick.grid.css" rel="stylesheet" type="text/css"/>
+        <link href="rawbase/js/lib/jquery-ui-1.10.3/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+        <link href="rawbase/css/grid.css" rel="stylesheet" type="text/css" />
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -16,6 +20,9 @@
     </head>
 
     <body>
+        <div class="page-header">
+            <img id="logo" src="rawbase/images/logo_blue_text.png" />
+        </div>
         <div id="login">
             <form class="openid" method="get" action="openid"> 
                 <div>
@@ -60,19 +67,40 @@
                 </fieldset> 
             </form>
         </div>
-        <div id="network">
+        <div id="graph-parent">
+            <div id="graph"></div>
+        </div>
+        <div id="network" class="panel panel-default">
+            <div class="panel-heading">Choose a version</div>
+            <div class="panel-body">
+                <select class="selectpicker">
+
+                </select>
+            </div>
 
         </div>
-        <div id="types">
-            
+        <div id="query" class="panel panel-default">
+            <div class="panel-heading"></div>
+            <div class="panel-body">
+                <div class="input-group">
+                    <span class="input-group-addon">SPARQL</span>
+                    <input id="query-text" type="text" class="form-control" placeholder="SELECT * WHERE { ?s ?p ?o }">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Go!</button>
+                    </span>
+                </div>
+            </div>
         </div>
-        
-        <div id="resource">
+        <div id="results" class="panel panel-default">
+            <div class="panel-heading">Results</div>
+            <div class="panel-body">
 
+                <div id="myGrid" style="width:100%;height:500px;">
+
+                </div>
+            </div>
         </div>
-        <div id="properties">
-            
-        </div>
-        
         <script data-main="rawbase/js/main" src="rawbase/js/require.js"></script>
+    </body>
+
 </html>

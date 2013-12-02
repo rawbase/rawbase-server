@@ -131,7 +131,7 @@ define( ['jquery',
                     }
                 });
             },
-            buildGrid: function(data){
+            buildGrid: function(resultset){
                 function requiredFieldValidator(value) {
                     if (value == null || value == undefined || !value.length) {
                         return {
@@ -146,6 +146,10 @@ define( ['jquery',
                     }
                 }
                 
+                function URIFormatter(row, cell, value, columnDef, dataContext) {
+                    return '<a href="' + value + '">' + value + '</a>';
+                }
+                
                 function buildColumns(head){
                     var columns = [];
                     head.vars.forEach(function(c){
@@ -153,7 +157,8 @@ define( ['jquery',
                             id: c, 
                             name: c, 
                             field: c, 
-                            editor: Slick.Editors.Text
+                            minWidth: 120,
+                            editor: Slick.Editors.LongText
                         });
                     });
                     
@@ -229,30 +234,29 @@ define( ['jquery',
                 var grid;
                 var data = [];
                 
-                var columns = buildColumns(data.head);
+                var columns = buildColumns(resultset.head);
                 
                 var options = {
                     editable: true,
                     enableAddRow: true,
                     enableCellNavigation: true,
-                    asyncEditorLoading: false,
+                    asyncEditorLoading: true,
                     autoEdit: false
                 };
 
                 $(function () {
-                    for (var i = 0; i < 500; i++) {
-                        var d = (data[i] = {});
-
-                        d["title"] = "Task " + i;
-                        d["description"] = "This is a sample task description.\n  It can be multiline";
-                        d["duration"] = "5 days";
-                        d["percentComplete"] = Math.round(Math.random() * 100);
-                        d["start"] = "01/01/2009";
-                        d["finish"] = "01/05/2009";
-                        d["effortDriven"] = (i % 5 == 0);
+                    var results = resultset.results.bindings
+                             
+                    for (var i = 0; i < results.length; i++) {
+                        var item = {};
+                        for (var key in results[i]){
+                            item[key] = results[i][key].value
+                        }
+     
+                        results[i] = item;
                     }
 
-                    grid = new Slick.Grid("#myGrid", data, columns, options);
+                    grid = new Slick.Grid("#myGrid", results, columns, options);
 
                     grid.setSelectionModel(new Slick.CellSelectionModel());
 

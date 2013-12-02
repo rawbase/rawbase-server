@@ -7,7 +7,8 @@
             jquery: 'jquery-1.10.2.min',
             app: '../app',
             slickgrid: './SlickGrid-2.1',
-            jqueryui: './jquery-ui-1.10.3/ui/minified'
+            jqueryui: './jquery-ui-1.10.3/ui/minified',
+            sigma: './sigma'
         },
         shim: {
             'jquery-ui.min': {
@@ -34,7 +35,9 @@
             'slick.grid': {
                 deps: ['slick.core']
             },
-            
+            'sigma.parseGexf': {
+                deps: ['sigma.min']
+            },
             'n3': {
                 exports: 'n3'
             },

@@ -44,7 +44,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
     protected void validateQuery(HttpActionQuery action, Query query) {
         String version = action.request.getParameter("rwb-version");
         if (version != null){
-            query.addNamedGraphURI(version);
+            query.addGraphURI(version);
         }
     }
 

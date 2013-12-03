@@ -1,10 +1,13 @@
 define( ['jquery',
+    'd3/d3',
+    'd3/d3.layout',
     'jquery.openid', 
     'jqueryui/jquery-ui.min',
     'slickgrid/lib/jquery.event.drag-2.2',
     'n3',
     'sigma/sigma.min',
     'sigma/sigma.parseGexf',
+    'jquery.tipsy',
     'bootstrap-select.min',
     'slickgrid/slick.core', 
     'slickgrid/slick.formatters',
@@ -14,7 +17,7 @@ define( ['jquery',
     'slickgrid/plugins/slick.cellrangeselector',
     'slickgrid/plugins/slick.cellselectionmodel'
     ], 
-    function( $ ) {
+    function( $ , d3) {
         "use strict";
         
         function Application(){
@@ -51,9 +54,9 @@ define( ['jquery',
                         graph: 'urn:rawbase:provenance' 
                     },
                     success: function(data){
-                        self.parsePROV(data, function(){
-                            
-                            });
+                        self.parsePROV(data, function(links){
+                            self.initD3(null, links);
+                        });
                     },
                     error: function(){
 
@@ -70,19 +73,9 @@ define( ['jquery',
                     self.current = $selected.text();
                 });
                 
-                //GRAPH STUFF!!!
                 
-                var sigRoot = document.getElementById('graph');
-                var sigInst = sigma.init(sigRoot);
-                sigInst.addNode('hello',{
-                    label: 'Hello',
-                    color: '#ff0000'
-                }).addNode('world',{
-                    label: 'World !',
-                    color: '#00ff00'
-                }).addEdge('hello_world','hello','world').draw();
+                var links = [];
                 
-   
                 var parser = new N3.Parser();
                 parser.parse(prov,
                     function (err, triple) {
@@ -99,17 +92,137 @@ define( ['jquery',
                                     .appendTo($list)
                                     .text(triple.object);
       
-                                }  
+                                }
+                                
+                                if(triple.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom"){
+                                    links.push({
+                                        source: triple.subject, 
+                                        target: triple.object,
+                                        type: triple.predicate
+                                    });
+                                }
+                                
                             }else{
                                 console.log("# That's all, folks!");
-                                success();
+                                success(links);
                             }
                         }
                     });
                     
             //$list.selectpicker();
             },
-            
+            initD3: function(error, links) {
+                var self = this;
+                var nodes = {};
+
+                // Compute the distinct nodes from the links.
+                links.forEach(function(link) {
+                    link.source = nodes[link.source] || (nodes[link.source] = {
+                        name: link.source
+                    });
+                    link.target = nodes[link.target] || (nodes[link.target] = {
+                        name: link.target
+                    });
+                });
+
+
+                var width = $('#graph').width(),
+                height = $('#graph').height();
+
+                var force = d3.layout.force()
+                .nodes(d3.values(nodes))
+                .links(links)
+                .size([width, height])
+                .linkDistance(50)
+                .charge(-300)
+                .on("tick", tick)
+                .start();
+
+                var svg = d3.select("#graph").append("svg")
+                .attr("width", width)
+                .attr("height", height);
+                
+                // build the arrow.
+                svg.append("svg:defs").selectAll("marker")
+                .data(["end"])      // Different link/path types can be defined here
+                .enter().append("svg:marker")    // This section adds in the arrows
+                .attr("id", String)
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 15)
+                .attr("refY", -1.5)
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .attr("orient", "auto")
+                .append("svg:path")
+                .attr("d", "M0,-5L10,0L0,5");
+
+                var link = svg.selectAll(".link")
+                .data(force.links())
+                .enter().append("line")
+                .attr("class", "link")
+                .attr("marker-end", "url(#end)");
+
+                var node = svg.selectAll(".node")
+                .data(force.nodes())
+                .enter().append("g")
+                .attr("class", "node")
+                .on("mouseover", mouseover)
+                .on("mouseout", mouseout)
+                .on("click", click)
+                .call(force.drag);
+
+                node.append("circle")
+                .attr("r", 8);
+
+                node.append("text")
+                .attr("x", 12)
+                .attr("dy", ".35em")
+                .text(function(d) {
+                    return d.name;
+                });
+
+                function tick() {
+                    link
+                    .attr("x1", function(d) {
+                        return d.source.x;
+                    })
+                    .attr("y1", function(d) {
+                        return d.source.y;
+                    })
+                    .attr("x2", function(d) {
+                        return d.target.x;
+                    })
+                    .attr("y2", function(d) {
+                        return d.target.y;
+                    });
+
+                    node
+                    .attr("transform", function(d) {
+                        return "translate(" + d.x + "," + d.y + ")";
+                    });
+                }
+
+                function mouseover() {
+                    d3.select(this).select("circle").transition()
+                    .duration(200)
+                    .attr("r", 16);
+                }
+
+                function mouseout() {
+                    if (self.currentVersion != d3.select(this).select("text").text()){
+                        d3.select(this).select("circle").transition()
+                        .duration(200)
+                        .attr("r", 8);
+                    }
+                }
+                
+                function click() {
+                    d3.select("circle").attr("r", 8);
+                    d3.select(this).select("circle").attr("r", 16);
+                    
+                    self.currentVersion = d3.select(this).select("text").text();
+                }
+            },
             executeSparql: function (query, success, error){
                 var url = this.HOST + "sparql";
                                 

@@ -8,13 +8,14 @@
             app: '../app',
             slickgrid: './SlickGrid-2.1',
             jqueryui: './jquery-ui-1.10.3/ui/minified',
-            sigma: './sigma'
+            sigma: './sigma',
+            d3: './d3'
         },
         shim: {
             'jquery-ui.min': {
                 deps: ['jquery']
             },
-            'SlickGrid-2.1/lib/jquery.event.drag-2.2': {
+            'slickgrid/lib/jquery.event.drag-2.2': {
                 deps: ['jquery']
             },
             'jquery.openid': {
@@ -26,20 +27,34 @@
             'bootstrap-select.min': {
                 deps: ['bootstrap.min']
             },
-            'slick.core': {
-                deps: ['jquery','SlickGrid-2.1/lib/jquery.event.drag-2.2']
+            'slickgrid/slick.core': {
+                deps: ['jquery','slickgrid/lib/jquery.event.drag-2.2']
             },
-            'slick.formatters': {
-                deps: ['slick.core']
+            'slickgrid/slick.formatters': {
+                deps: ['slickgrid/slick.core']
             },
-            'slick.grid': {
-                deps: ['slick.core']
+            'slickgrid/slick.grid': {
+                deps: ['slickgrid/slick.core']
             },
-            'sigma.parseGexf': {
-                deps: ['sigma.min']
+            'sigma/sigma.parseGexf': {
+                deps: ['sigma/sigma.min']
+            },
+            'jquery.tipsy' : {
+                deps: ['jquery']
             },
             'n3': {
                 exports: 'n3'
+            },
+            'd3/d3': {
+                exports: 'd3'
+            },
+            'd3/d3.geom': {
+                deps: ['d3/d3'],
+                exports: 'd3.geom'
+            },
+            'd3/d3.layout': {
+                deps: ['d3/d3.geom'],
+                exports: 'd3.layout'
             },
         },
     });

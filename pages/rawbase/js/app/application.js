@@ -92,7 +92,7 @@ define( ['jquery',
             },
             parsePROV: function(prov, success, error){
                 
-                var links = [], nodes = [];
+                var links = [], nodes = {};
                 
                 var parser = new N3.Parser();
                 parser.parse(prov,
@@ -104,7 +104,7 @@ define( ['jquery',
                                 console.log(triple.subject, triple.predicate, triple.object, '.');
                                         
                                 if (triple.object == 'http://www.w3.org/ns/prov#Entity'){
-                                    nodes.push(triple.subject);
+                                    nodes[triple.subject] = {name: triple.subject};
                                 }
                                 
                                 if(triple.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom"){
@@ -128,15 +128,15 @@ define( ['jquery',
                 var self = this;
 //                var nodes = {};
 //
-//                // Compute the distinct nodes from the links.
-//                links.forEach(function(link) {
-//                    link.source = nodes[link.source] || (nodes[link.source] = {
-//                        name: link.source
-//                    });
-//                    link.target = nodes[link.target] || (nodes[link.target] = {
-//                        name: link.target
-//                    });
-//                });
+                // Compute the distinct nodes from the links.
+                links.forEach(function(link) {
+                    link.source = nodes[link.source] || (nodes[link.source] = {
+                        name: link.source
+                    });
+                    link.target = nodes[link.target] || (nodes[link.target] = {
+                        name: link.target
+                    });
+                });
 
                 this.currentVersion = nodes[0];
                 

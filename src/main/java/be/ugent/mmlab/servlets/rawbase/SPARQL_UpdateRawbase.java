@@ -243,7 +243,7 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
             user = "anonymous";
         }
         
-        if (currentCommit.isEmpty()){
+        if (currentCommit != null && currentCommit.isEmpty()){
             currentCommit = null;
         }
 

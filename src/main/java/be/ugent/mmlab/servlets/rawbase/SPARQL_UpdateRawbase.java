@@ -239,8 +239,12 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
         String currentCommit = request.getParameter("rwb-version");
         String user = request.getParameter("rwb-user");
 
-        if (user == null) {
-            user = "Anonymous";
+        if (user == null || user.isEmpty()) {
+            user = "anonymous";
+        }
+        
+        if (currentCommit.isEmpty()){
+            currentCommit = null;
         }
 
         /*
@@ -278,12 +282,13 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
                 } else {
                     UpdateAction.execute(req, action.getActiveDSG());
                 }
-
                 action.commit();
+                
                 //SAM
                 //action.abort();
-                action.endWrite();
                 RawbaseCommitManager.getInstance().storeCommit();
+                
+                action.endWrite();
             } catch (UpdateException ex) {
                 action.abort();
                 errorBadRequest(ex.getMessage());

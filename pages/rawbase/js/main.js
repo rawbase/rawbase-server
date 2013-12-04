@@ -21,6 +21,9 @@
             'jquery.openid': {
                 deps: ['jquery']
             },
+            'jquery.simplemodal.1.4.4.min': {
+                deps: ['jquery']  
+            },
             'bootstrap.min': {
                 deps: ['jquery']
             },

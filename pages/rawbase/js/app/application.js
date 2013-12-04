@@ -1,4 +1,5 @@
 define( ['jquery',
+    'app/authenticator',
     'd3/d3',
     'd3/d3.layout',
     'jquery.openid', 
@@ -17,13 +18,14 @@ define( ['jquery',
     'slickgrid/plugins/slick.cellrangeselector',
     'slickgrid/plugins/slick.cellselectionmodel'
     ], 
-    function( $ , d3) {
+    function( $, Authenticator ) {
         "use strict";
         
         function Application(){
             this.HOST = "http://localhost:3030/rawbase/";
             this.currentVersion = null;
-            this.user = null;
+            
+            this.authenticator = new Authenticator();
         };
         
         Application.prototype = {
@@ -33,16 +35,41 @@ define( ['jquery',
                 $('form.openid').openid();
                 this.getPROV();
                 
-                $('#query').find('.btn').on('click',function(){
-                    self.executeSparql($('#query-text').val(), 
-                        self.buildGrid, 
-                        function(err){
-                        
-                        });
+                $('#loginText').on('click', function() {
+                    self.authenticator.login();
                 });
+                    
+                $('#logoutText').on('click', function() {
+                    self.authenticator.login();
+                });
+                    
+                function update(){
+                    self.executeSparqlUpdate($('#query-text').val(), 
+                        function(){
+                            self.getPROV()
+                        }, 
+                        function(err){});
+                };
                 
+                $('#query').find('.btn').on('click',function(){
+                    
+                    switch ($('#query').find('select').val()){
+                        case 'sparql':
+                            self.executeSparql($('#query-text').val(), 
+                                self.buildGrid, 
+                                function(err){});
+                            break;
+                        case 'update':
+                            if (!self.authenticator.isAuthenticated()){
+                                self.authenticator.login(update);
+                            } else {
+                                update();
+                            }
+
+                            break;
+                    }
+                });
             },
-            
             getPROV: function(){
                 var self = this;
                 $.ajax({
@@ -54,8 +81,8 @@ define( ['jquery',
                         graph: 'urn:rawbase:provenance' 
                     },
                     success: function(data){
-                        self.parsePROV(data, function(links){
-                            self.initD3(null, links);
+                        self.parsePROV(data, function(links, nodes){
+                            self.initD3(null, links, nodes);
                         });
                     },
                     error: function(){
@@ -65,16 +92,7 @@ define( ['jquery',
             },
             parsePROV: function(prov, success, error){
                 
-                var self = this;
-                var $list = $("#network").find('.selectpicker');
-                
-                $list.on('change', function(){
-                    var $selected = $(this).find(":selected");
-                    self.current = $selected.text();
-                });
-                
-                
-                var links = [];
+                var links = [], nodes = [];
                 
                 var parser = new N3.Parser();
                 parser.parse(prov,
@@ -85,13 +103,8 @@ define( ['jquery',
                             if (triple){
                                 console.log(triple.subject, triple.predicate, triple.object, '.');
                                         
-                                if (triple.predicate == 'http://www.w3.org/ns/prov#generated'){
-                                    self.currentVersion = triple.object;
-                                
-                                    $("<option />")
-                                    .appendTo($list)
-                                    .text(triple.object);
-      
+                                if (triple.object == 'http://www.w3.org/ns/prov#Entity'){
+                                    nodes.push(triple.subject);
                                 }
                                 
                                 if(triple.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom"){
@@ -104,37 +117,41 @@ define( ['jquery',
                                 
                             }else{
                                 console.log("# That's all, folks!");
-                                success(links);
+                                success(links, nodes);
                             }
                         }
                     });
                     
             //$list.selectpicker();
             },
-            initD3: function(error, links) {
+            initD3: function(error, links, nodes) {
                 var self = this;
-                var nodes = {};
+//                var nodes = {};
+//
+//                // Compute the distinct nodes from the links.
+//                links.forEach(function(link) {
+//                    link.source = nodes[link.source] || (nodes[link.source] = {
+//                        name: link.source
+//                    });
+//                    link.target = nodes[link.target] || (nodes[link.target] = {
+//                        name: link.target
+//                    });
+//                });
 
-                // Compute the distinct nodes from the links.
-                links.forEach(function(link) {
-                    link.source = nodes[link.source] || (nodes[link.source] = {
-                        name: link.source
-                    });
-                    link.target = nodes[link.target] || (nodes[link.target] = {
-                        name: link.target
-                    });
-                });
-
-
+                this.currentVersion = nodes[0];
+                
                 var width = $('#graph').width(),
                 height = $('#graph').height();
+                
+                //Clear the div
+                $('#graph').empty();
 
                 var force = d3.layout.force()
                 .nodes(d3.values(nodes))
                 .links(links)
                 .size([width, height])
-                .linkDistance(50)
-                .charge(-300)
+                .linkDistance(10)
+                .charge(-800)
                 .on("tick", tick)
                 .start();
 
@@ -172,7 +189,11 @@ define( ['jquery',
                 .call(force.drag);
 
                 node.append("circle")
-                .attr("r", 8);
+                .attr("r", function(d) {
+                    if (self.currentVersion == d.name)
+                        return 8
+                    return 4;
+                });
 
                 node.append("text")
                 .attr("x", 12)
@@ -205,22 +226,31 @@ define( ['jquery',
                 function mouseover() {
                     d3.select(this).select("circle").transition()
                     .duration(200)
-                    .attr("r", 16);
+                    .attr("r", 8);
                 }
 
                 function mouseout() {
                     if (self.currentVersion != d3.select(this).select("text").text()){
                         d3.select(this).select("circle").transition()
                         .duration(200)
-                        .attr("r", 8);
+                        .attr("r", 4);
                     }
                 }
                 
                 function click() {
-                    d3.select("circle").attr("r", 8);
-                    d3.select(this).select("circle").attr("r", 16);
+                    node.selectAll("circle").attr("r", 4);
+                    node.attr("class","node");
+                    
+                    d3.select(this).select("circle").attr("r", 8);
+                    d3.select(this).attr("class","node-selected");
                     
                     self.currentVersion = d3.select(this).select("text").text();
+                    
+                    self.executeSparql($('#query-text').val(), 
+                        self.buildGrid, 
+                        function(err){
+                        
+                        });
                 }
             },
             executeSparql: function (query, success, error){
@@ -236,6 +266,29 @@ define( ['jquery',
                         'rwb-version': this.currentVersion,
                         'rwb-user': this.user
                     },
+                    success: function(data){
+                        success(data);
+                    },
+                    error: function(err){
+                        error(err);              
+                    }
+                });
+            },
+            executeSparqlUpdate: function (query, success, error){
+                var url = this.HOST + "update";
+                
+                var data = {
+                    'rwb-user': this.authenticator.getURI(),
+                    update: query
+                }
+                
+                if (this.currentVersion)
+                    data['rwb-version'] = this.currentVersion;
+                                
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: data,
                     success: function(data){
                         success(data);
                     },

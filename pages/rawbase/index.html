@@ -22,68 +22,30 @@
     <body>
         <div class="page-header">
             <img id="logo" src="rawbase/images/logo_blue_text.png" />
-        </div>
-        <div id="login">
-            <form class="openid" method="get" action="openid"> 
-                <div>
-                    <ul class="providers"> 
-                        <li class="openid" title="OpenID">
-                            <img src="rawbase/images/openidW.png" alt="icon" /> 
-                            <span><strong>http://{your-openid-url}</strong></span></li> 
-                        <li class="direct" title="Google"> 
-                            <img src="rawbase/images/googleW.png" alt="icon" /><span>https://www.google.com/accounts/o8/id</span></li> 
-                        <li class="direct" title="Yahoo"> 
-                            <img src="rawbase/images/yahooW.png" alt="icon" /><span>http://yahoo.com/</span></li> 
-                        <li class="username" title="AOL screen name"> 
-                            <img src="rawbase/images/aolW.png" alt="icon" /><span>http://openid.aol.com/<strong>username</strong></span></li> 
-                        <li class="username" title="MyOpenID user name"> 
-                            <img src="rawbase/images/myopenid.png" alt="icon" /><span>http://<strong>username</strong>.myopenid.com/</span></li> 
-                        <li class="username" title="Flickr user name"> 
-                            <img src="rawbase/images/flickr.png" alt="icon" /><span>http://flickr.com/<strong>username</strong>/</span></li> 
-                        <li class="username" title="Technorati user name"> 
-                            <img src="rawbase/images/technorati.png" alt="icon" /><span>http://technorati.com/people/technorati/<strong>username</strong>/</span></li> 
-                        <li class="username" title="Wordpress blog name"> 
-                            <img src="rawbase/images/wordpress.png" alt="icon" /><span>http://<strong>username</strong>.wordpress.com</span></li> 
-                        <li class="username" title="Blogger blog name"> 
-                            <img src="rawbase/images/blogger.png" alt="icon" /><span>http://<strong>username</strong>.blogspot.com/</span></li> 
-                        <li class="username" title="LiveJournal blog name"> 
-                            <img src="rawbase/images/livejournal.png" alt="icon" /><span>http://<strong>username</strong>.livejournal.com</span></li> 
-                        <li class="username" title="ClaimID user name"> 
-                            <img src="rawbase/images/claimid.png" alt="icon" /><span>http://claimid.com/<strong>username</strong></span></li> 
-                        <li class="username" title="Vidoop user name"> 
-                            <img src="rawbase/images/vidoop.png" alt="icon" /><span>http://<strong>username</strong>.myvidoop.com/</span></li> 
-                        <li class="username" title="Verisign user name"> 
-                            <img src="rawbase/images/verisign.png" alt="icon" /><span>http://<strong>username</strong>.pip.verisignlabs.com/</span></li> 
-                    </ul></div> 
-                <fieldset> 
-                    <label for="openid_username">Enter your <span>Provider user name</span></label> 
-                    <div><span></span><input type="text" name="openid_username" /><span></span> 
-                        <input type="submit" value="Login" /></div> 
-                </fieldset> 
-                <fieldset> 
-                    <label for="openid_identifier">Enter your <a class="openid_logo" href="http://openid.net">OpenID</a></label> 
-                    <div><input type="text" name="openid_identifier" /> 
-                        <input type="submit" value="Login" /></div> 
-                </fieldset> 
-            </form>
-        </div>
-        <div id="graph-parent">
-            <div id="graph"></div>
+            <div id="login">
+                <a href="#" id="loginText"> Click here to login </a>
+                <a href="#" id="logoutText" target='myIFrame' onclick="myIFrame.location='https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a>
+                <iframe name='myIFrame' id="myIFrame" ></iframe>
+                <div id='uName'></div>
+                <img src='' id='imgHolder'/>
+            </div>
         </div>
         <div id="network" class="panel panel-default">
             <div class="panel-heading">Choose a version</div>
             <div class="panel-body">
-                <select class="selectpicker">
-
-                </select>
+                <div id="graph"></div>
             </div>
-
         </div>
         <div id="query" class="panel panel-default">
             <div class="panel-heading"></div>
             <div class="panel-body">
                 <div class="input-group">
-                    <span class="input-group-addon">SPARQL</span>
+                    <div class="input-group-btn">
+                        <select class="selectpicker">
+                            <option value="sparql" selected>SPARQL</option>
+                            <option value="update">SPARQL Update</option>
+                        </select>
+                    </div><!-- /btn-group -->
                     <input id="query-text" type="text" class="form-control" placeholder="SELECT * WHERE { ?s ?p ?o }">
                     <span class="input-group-btn">
                         <button class="btn btn-default" type="button">Go!</button>

@@ -18,6 +18,9 @@
 
 package org.apache.jena.fuseki.server;
 
+import be.ugent.mmlab.servlets.rawbase.SPARQL_QueryRawbase;
+import be.ugent.mmlab.servlets.rawbase.SPARQL_UpdateRawbase;
+import be.ugent.mmlab.jena.rawbase.RawbaseDataSet;
 import static java.lang.String.format ;
 import static org.apache.jena.fuseki.Fuseki.serverLog ;
 
@@ -51,6 +54,7 @@ import org.eclipse.jetty.servlets.GzipFilter;
 
 
 import com.hp.hpl.jena.sparql.util.Utils ;
+import jopenid.sample.OpenIdServlet;
 
 public class SPARQLServer
 {
@@ -196,13 +200,19 @@ public class SPARQLServer
             addServlet(context, validateData, validationRoot+"/data", false) ;
             addServlet(context, validateIRI, validationRoot+"/iri", false) ;
             addServlet(context, dumpService, "/dump", false) ;
+            //MVS: add openid support servlet
+            HttpServlet loginOpenIdServlet = new OpenIdServlet();
+            
+            addServlet(context, loginOpenIdServlet , "/openid", false) ;
+            
             // general query processor.
             addServlet(context, generalQueryService, sparqlProcessor, enableCompression) ;
         }
         
         if ( installManager || installServices )
         {
-            String [] files = { "fuseki.html", "index.html" } ;
+            String [] files = { "rawbase/index.html","fuseki.html", "index.html" } ;
+            //String [] files = { "rawbase/index.html" } ;
             context.setWelcomeFiles(files) ;
             addContent(context, "/", serverConfig.pages) ;
         }
@@ -231,9 +241,18 @@ public class SPARQLServer
         DatasetRegistry.get().put(datasetPath, sDesc) ;
         serverLog.info(format("Dataset path = %s", datasetPath)) ;
         
-        //HttpServlet sparqlQuery     = new SPARQL_QueryDataset(verboseLogging) ;
-        HttpServlet sparqlQuery     = new SPARQL_QueryRawbase(verboseLogging) ;
-        HttpServlet sparqlUpdate    = new SPARQL_Update(verboseLogging) ;
+        //MVS:
+        HttpServlet sparqlQuery = null;
+        HttpServlet sparqlUpdate = null;
+        
+        if (sDesc.dataset instanceof RawbaseDataSet.RawbaseDataSetGraph){
+            sparqlQuery     = new SPARQL_QueryRawbase(verboseLogging) ;
+            sparqlUpdate    = new SPARQL_UpdateRawbase(verboseLogging) ;
+        } else {
+            sparqlQuery     = new SPARQL_QueryDataset(verboseLogging) ;
+            sparqlUpdate    = new SPARQL_Update(verboseLogging) ;
+        }
+
         HttpServlet sparqlUpload    = new SPARQL_Upload(verboseLogging) ;
         HttpServlet sparqlHttpR     = new SPARQL_REST_R(verboseLogging) ;  
         HttpServlet sparqlHttpRW    = new SPARQL_REST_RW(verboseLogging) ;

@@ -235,22 +235,24 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
         HttpServletRequest request = action.request;
         String currentCommit = request.getParameter("rwb-version");
         String user = request.getParameter("rwb-user");
+        String message = request.getParameter("rwb-message");
 
         if (user == null || user.isEmpty()) {
             user = "anonymous";
+        }
+        
+        if (message == null || message.isEmpty()) {
+            message = "This is a commit!";
         }
         
         if (currentCommit != null && currentCommit.isEmpty()){
             currentCommit = null;
         }
 
-        /*
-         * Miel: Hack into this!
-         */
         try {
 
             //Start Commit + start transaction
-            RawbaseCommitManager.getInstance().startCommit(user, user, "This is a commit!", currentCommit);
+            RawbaseCommitManager.getInstance().startCommit(user, user, message, currentCommit);
 
 
             UsingList usingList = processProtocol(action.request);

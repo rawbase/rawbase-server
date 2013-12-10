@@ -62,20 +62,11 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         Integer[] vPath;
 
         for (String graph : query.getGraphURIs()) {
-            int i;
-            
-            //A version hash is identified by being the last part of the graph URI
-            //seperated by a # or /
-            if (graph.lastIndexOf("#") >= 0) {
-                i = graph.lastIndexOf('#') + 1;
-            } else {
-                i = graph.lastIndexOf("/") + 1;
+            if (index.hashExists(graph)) {
+                hash = graph;
+                //Delete FROM that specifies version
+                queryString = queryString.replaceAll("FROM\\s*?<" + graph + ">", "");
             }
-
-            hash = graph;
-            //Replace graph in FROM clause with real graph
-            queryString = queryString.replaceAll("FROM\\s*?<" + graph + ">", "");
-            //queryString = queryString.replaceAll(graph, graph.substring(0, i));
         }
         query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
         

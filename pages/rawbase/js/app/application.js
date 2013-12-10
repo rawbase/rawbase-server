@@ -43,13 +43,29 @@ define( ['jquery',
                 $('#logoutText').on('click', function() {
                     self.authenticator.login();
                 });
+                
+                $('#query').find('select').on('change',function(){
+                    switch ($('#query').find('select').val()){
+                        case 'sparql':
+                            $('#commit-message').hide();
+                            break;
+                        case 'update':
+                            $('#commit-message').show();
+                            break;
+                    }
+                    
+                });
                     
                 function update(){
-                    self.executeSparqlUpdate($('#query-text').val(), 
+                  
+                    self.executeSparqlUpdate($('#query-text').val(),
+                        $('#commit-message').val(), 
                         function(){
                             self.getPROV()
                         }, 
-                        function(err){});
+                        function(err){
+                                        
+                        });
                 };
                 
                 $('#query').find('.btn').on('click',function(){
@@ -58,7 +74,9 @@ define( ['jquery',
                         case 'sparql':
                             self.executeSparql($('#query-text').val(), 
                                 self.buildGrid, 
-                                function(err){});
+                                function(err){
+                                    
+                                });
                             break;
                         case 'update':
                             if (!self.authenticator.isAuthenticated()){
@@ -249,8 +267,8 @@ define( ['jquery',
                     if (self.currentVersion == d.name)
                         return 8
                     return 4;
-                })
-                .call(function(selection) { 
+                });
+                /*.call(function(selection) { 
                     var node = selection.node();
                     $(node).tipsy({ 
                         gravity: 's', 
@@ -266,13 +284,13 @@ define( ['jquery',
                             return html; 
                         }
                     }); 
-                });
+                });*/
                 
                 
                 
 
                 node.append("text")
-                .attr("x", 12)
+                .attr("x", 6)
                 .attr("dy", ".35em")
                 .text(function(d) {
                     return d.name;
@@ -291,7 +309,8 @@ define( ['jquery',
                     })
                     .attr("y2", function(d) {
                         return d.target.y;
-                    });
+                    })
+                    ;
 
                     node
                     .attr("transform", function(d) {
@@ -303,7 +322,16 @@ define( ['jquery',
                     d3.select(this).select("circle").transition()
                     .duration(200)
                     .attr("r", 8)
-                ;
+                    ;
+                
+                    var commit = commits[this.__data__.commit];
+         
+                    var html = '<b>Message: </b>'+commit.message.split('"')[1] + '<br />';
+                    html +=    '<b> Author: </b><a href="' + commit.author + '">' + commit.author + "</a>";
+                    html += '<b> Time: </b>' + commit.timestamp.split('"')[1] + '<br />';
+                
+                    $(d3.select(this).select("circle").node()).tooltip({html: html, trigger: 'manual'});
+                
                 }
 
                 function mouseout() {
@@ -354,12 +382,13 @@ define( ['jquery',
                     }
                 });
             },
-            executeSparqlUpdate: function (query, success, error){
+            executeSparqlUpdate: function (query, message,success, error){
                 var self = this;
                 var url = this.HOST + "update";
                 
                 var data = {
                     'rwb-user': this.authenticator.getURI(),
+                    'rwb-message': message,
                     update: query
                 }
                 

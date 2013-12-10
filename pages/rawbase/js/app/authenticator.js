@@ -98,6 +98,21 @@ define( ['jquery'], function ($){
         },
         getURI: function() {
             return this.user.link;
+        },
+        getUser: function (uri) {
+            
+            function extractID(uri){
+                return uri.substr(uri.lastIndexOf('/') + 1);
+            }
+            
+            var url = 'https://www.googleapis.com/plus/v1/people/' + extractID(uri);
+            
+            $.getJSON(url,{}, function(user){
+                
+                
+                
+            });
+            
         }
         
     }

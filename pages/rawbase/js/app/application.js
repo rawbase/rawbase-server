@@ -16,7 +16,8 @@ define( ['jquery',
     'slickgrid/slick.editors', 
     'slickgrid/plugins/slick.cellrangedecorator',
     'slickgrid/plugins/slick.cellrangeselector',
-    'slickgrid/plugins/slick.cellselectionmodel'
+    'slickgrid/plugins/slick.cellselectionmodel',
+    'jquery.simplemodal.1.4.4.min'
     ], 
     function( $, Authenticator ) {
         "use strict";
@@ -81,53 +82,107 @@ define( ['jquery',
                         graph: 'urn:rawbase:provenance' 
                     },
                     success: function(data){
-                        self.parsePROV(data, function(links, nodes){
-                            self.initD3(null, links, nodes);
-                        });
+                        self.parsePROV(data, 
+                            function(links, nodes, commits){
+                                self.initD3(null, links, nodes, commits);
+                            });
                     },
                     error: function(){
 
                     }
                 });
             },
-            parsePROV: function(prov, success, error){
-                
-                var links = [], nodes = {};
-                
+            parseN3: function (triples, hit, end, error){
                 var parser = new N3.Parser();
-                parser.parse(prov,
+                parser.parse(triples,
                     function (err, triple) {
                         if (err){
                             error(err);
                         } else {
                             if (triple){
-                                console.log(triple.subject, triple.predicate, triple.object, '.');
-                                        
-                                if (triple.object == 'http://www.w3.org/ns/prov#Entity'){
-                                    nodes[triple.subject] = {name: triple.subject};
-                                }
-                                
-                                if(triple.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom"){
-                                    links.push({
-                                        source: triple.subject, 
-                                        target: triple.object,
-                                        type: triple.predicate
-                                    });
-                                }
-                                
-                            }else{
-                                console.log("# That's all, folks!");
-                                success(links, nodes);
+                                hit(triple);
+                            } else {
+                                end();
                             }
                         }
                     });
-                    
-            //$list.selectpicker();
             },
-            initD3: function(error, links, nodes) {
+            parsePROV: function(prov, success, error){
                 var self = this;
-//                var nodes = {};
-//
+                var links = [], nodes = {}, commits = {};
+                
+                this.parseN3(prov, function(triple){
+                    console.log(triple.subject, triple.predicate, triple.object, '.');
+        
+                    var commit = self.parseCommit(triple, commits[triple.subject]);
+                    
+                    if (commit){
+                        commits[commit.iri] = commit;
+                        if (commit.version) {
+                            nodes[commit.version] = {
+                                name: commit.version,
+                                commit: commit.iri
+                            };
+                        }
+                    }
+        
+                    if(triple.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom"){
+                        links.push({
+                            source: triple.subject, 
+                            target: triple.object,
+                            type: triple.predicate
+                        });
+                    }
+                },
+                function(){
+                    success(links, nodes, commits);
+                }, 
+                function (err){
+            
+                    });
+            },
+            parseCommit: function(triple, commit){
+                
+                if (!commit)
+                    commit = {
+                        iri : triple.subject
+                    };
+                
+                switch (triple.predicate){
+                    case 'http://purl.org/dc/terms/title':
+                        commit.message = triple.object;
+                        break;
+                    case 'http://www.w3.org/ns/prov#atTime':
+                        commit.timestamp = triple.object;
+                        break;
+                    case 'http://www.w3.org/ns/prov#generated':
+                        commit.version = triple.object;
+                        break;
+                    case 'http://www.w3.org/ns/prov#wasAssociatedWith':
+                        commit.author = triple.object;
+                        break;
+
+                    default:
+                        if (triple.object != 'http://www.w3.org/ns/prov#Activity'){
+                            return null;
+                        }
+                }
+                
+                return commit;
+            },
+            toggleLoader: function(){
+                if ($('#loader').css('display') == 'none')
+                    $('#loader').modal({
+                        overlayCss: 'loader-overlay',
+                        close:false
+                    });
+                else
+                    $.modal.close();
+            },
+            initD3: function(error, links, nodes, commits) {
+                var self = this;
+                //                var nodes = {};
+                //
                 // Compute the distinct nodes from the links.
                 links.forEach(function(link) {
                     link.source = nodes[link.source] || (nodes[link.source] = {
@@ -181,7 +236,8 @@ define( ['jquery',
 
                 var node = svg.selectAll(".node")
                 .data(force.nodes())
-                .enter().append("g")
+                .enter()
+                .append("g")
                 .attr("class", "node")
                 .on("mouseover", mouseover)
                 .on("mouseout", mouseout)
@@ -193,7 +249,27 @@ define( ['jquery',
                     if (self.currentVersion == d.name)
                         return 8
                     return 4;
+                })
+                .call(function(selection) { 
+                    var node = selection.node();
+                    $(node).tipsy({ 
+                        gravity: 's', 
+                        
+                        html: true, 
+                        title: function() {
+                            var commit = commits[this.__data__.commit];
+         
+                            var html = '<b>Message: </b>'+commit.message.split('"')[1] + '<br />';
+                            html +=    '<b> Author: </b><a href="' + commit.author + '">' + commit.author + "</a>";
+                            html += '<b> Time: </b>' + commit.timestamp.split('"')[1] + '<br />';
+                            
+                            return html; 
+                        }
+                    }); 
                 });
+                
+                
+                
 
                 node.append("text")
                 .attr("x", 12)
@@ -226,7 +302,8 @@ define( ['jquery',
                 function mouseover() {
                     d3.select(this).select("circle").transition()
                     .duration(200)
-                    .attr("r", 8);
+                    .attr("r", 8)
+                ;
                 }
 
                 function mouseout() {
@@ -254,8 +331,9 @@ define( ['jquery',
                 }
             },
             executeSparql: function (query, success, error){
+                var self = this;
                 var url = this.HOST + "sparql";
-                                
+                this.toggleLoader();                
                 $.ajax({
                     url: url,
                     beforeSend: function(xhrObj){
@@ -267,14 +345,17 @@ define( ['jquery',
                         'rwb-user': this.user
                     },
                     success: function(data){
+                        self.toggleLoader();
                         success(data);
                     },
                     error: function(err){
+                        self.toggleLoader();
                         error(err);              
                     }
                 });
             },
             executeSparqlUpdate: function (query, success, error){
+                var self = this;
                 var url = this.HOST + "update";
                 
                 var data = {
@@ -284,15 +365,19 @@ define( ['jquery',
                 
                 if (this.currentVersion)
                     data['rwb-version'] = this.currentVersion;
-                                
+                
+                this.toggleLoader();
+
                 $.ajax({
                     url: url,
                     type: 'POST',
                     data: data,
                     success: function(data){
+                        self.toggleLoader();
                         success(data);
                     },
                     error: function(err){
+                        self.toggleLoader();
                         error(err);              
                     }
                 });

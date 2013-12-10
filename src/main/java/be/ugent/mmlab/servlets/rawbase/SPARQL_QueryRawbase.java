@@ -58,6 +58,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         //1. Extract the version from the graph
         String queryString = query.toString(Syntax.syntaxSPARQL);
         String hash = "";
+	
         Integer[] vPath;
 
         for (String graph : query.getGraphURIs()) {
@@ -68,7 +69,7 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
             if (graph.lastIndexOf("#") >= 0) {
                 i = graph.lastIndexOf('#') + 1;
             } else {
-                i = graph.lastIndexOf('/') + 1;
+                i = graph.lastIndexOf("/") + 1;
             }
 
             hash = graph;

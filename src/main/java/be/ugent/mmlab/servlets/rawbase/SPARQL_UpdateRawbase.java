@@ -19,35 +19,6 @@ package be.ugent.mmlab.servlets.rawbase;
 
 import be.ugent.mmlab.jena.rawbase.RawbaseCommitManager;
 import be.ugent.mmlab.jena.rawbase.exceptions.RawbaseException;
-import static java.lang.String.format;
-import static org.apache.jena.fuseki.Fuseki.requestLog;
-import static org.apache.jena.fuseki.HttpNames.paramRequest;
-import static org.apache.jena.fuseki.HttpNames.paramUpdate;
-import static org.apache.jena.fuseki.HttpNames.paramUsingGraphURI;
-import static org.apache.jena.fuseki.HttpNames.paramUsingNamedGraphURI;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.jena.atlas.io.IO;
-import org.apache.jena.atlas.web.MediaType;
-import org.apache.jena.fuseki.FusekiLib;
-import org.apache.jena.fuseki.HttpNames;
-import org.apache.jena.fuseki.server.DatasetRef;
-import org.apache.jena.iri.IRI;
-import org.apache.jena.riot.WebContent;
-import org.apache.jena.riot.system.IRIResolver;
-import org.apache.jena.web.HttpSC;
-
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.Syntax;
@@ -55,8 +26,34 @@ import com.hp.hpl.jena.sparql.modify.UsingList;
 import com.hp.hpl.jena.update.UpdateAction;
 import com.hp.hpl.jena.update.UpdateException;
 import com.hp.hpl.jena.update.UpdateFactory;
+
 import com.hp.hpl.jena.update.UpdateRequest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import static java.lang.String.format;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.jena.atlas.io.IO;
+import org.apache.jena.atlas.web.MediaType;
+import static org.apache.jena.fuseki.Fuseki.requestLog;
+import org.apache.jena.fuseki.FusekiLib;
+import org.apache.jena.fuseki.HttpNames;
+import static org.apache.jena.fuseki.HttpNames.paramRequest;
+import static org.apache.jena.fuseki.HttpNames.paramUpdate;
+import static org.apache.jena.fuseki.HttpNames.paramUsingGraphURI;
+import static org.apache.jena.fuseki.HttpNames.paramUsingNamedGraphURI;
+import org.apache.jena.fuseki.server.DatasetRef;
 import org.apache.jena.fuseki.servlets.SPARQL_Protocol;
+import org.apache.jena.iri.IRI;
+import org.apache.jena.riot.WebContent;
+import org.apache.jena.riot.system.IRIResolver;
+import org.apache.jena.web.HttpSC;
 
 public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
 

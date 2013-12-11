@@ -4,10 +4,9 @@ define( ['jquery',
     'd3/d3.layout',
     'jquery.openid', 
     'jqueryui/jquery-ui.min',
+    'jqueryui-editable.min',
     'slickgrid/lib/jquery.event.drag-2.2',
     'n3',
-    'sigma/sigma.min',
-    'sigma/sigma.parseGexf',
     'jquery.tipsy',
     'bootstrap-select.min',
     'slickgrid/slick.core', 
@@ -44,8 +43,8 @@ define( ['jquery',
                     self.authenticator.login();
                 });
                 
-                $('#query').find('select').on('change',function(){
-                    switch ($('#query').find('select').val()){
+                $('#query-language-select').on('change',function(){
+                    switch ($(this).val()){
                         case 'sparql':
                             $('#commit-message').hide();
                             break;
@@ -68,9 +67,9 @@ define( ['jquery',
                         });
                 };
                 
-                $('#query').find('.btn').on('click',function(){
+                $('#query-submit').on('click',function(){
                     
-                    switch ($('#query').find('select').val()){
+                    switch ($('#query-language-select').val()){
                         case 'sparql':
                             self.executeSparql($('#query-text').val(), 
                                 self.buildGrid, 
@@ -267,27 +266,22 @@ define( ['jquery',
                     if (self.currentVersion == d.name)
                         return 8
                     return 4;
-                });
-                /*.call(function(selection) { 
-                    var node = selection.node();
-                    $(node).tipsy({ 
-                        gravity: 's', 
-                        
-                        html: true, 
-                        title: function() {
-                            var commit = commits[this.__data__.commit];
+                })
+                
+                $('svg circle').tipsy({ 
+                    gravity: 's',
+                    html: true, 
+                    title: function() { 
+                        var commit = commits[this.__data__.commit];
          
-                            var html = '<b>Message: </b>'+commit.message.split('"')[1] + '<br />';
-                            html +=    '<b> Author: </b><a href="' + commit.author + '">' + commit.author + "</a>";
-                            html += '<b> Time: </b>' + commit.timestamp.split('"')[1] + '<br />';
+                        var html = '<table><tr><td>Message: </td><td>'+commit.message.split('"')[1] + '</td></tr>';
+                        html +=    '<tr><td>Author: </td><td><a href="' + commit.author + '">' + commit.author + "</a></td></tr>";
+                        html += '<tr><td>Time: </td><td>' + commit.timestamp.split('"')[1] + '</td></tr>';
                             
-                            return html; 
-                        }
-                    }); 
-                });*/
-                
-                
-                
+                        return html; 
+                    }
+                }); 
+
 
                 node.append("text")
                 .attr("x", 6)
@@ -322,16 +316,7 @@ define( ['jquery',
                     d3.select(this).select("circle").transition()
                     .duration(200)
                     .attr("r", 8)
-                    ;
-                
-                    var commit = commits[this.__data__.commit];
-         
-                    var html = '<b>Message: </b>'+commit.message.split('"')[1] + '<br />';
-                    html +=    '<b> Author: </b><a href="' + commit.author + '">' + commit.author + "</a>";
-                    html += '<b> Time: </b>' + commit.timestamp.split('"')[1] + '<br />';
-                
-                    $(d3.select(this).select("circle").node()).tooltip({html: html, trigger: 'manual'});
-                
+                ;
                 }
 
                 function mouseout() {
@@ -521,6 +506,7 @@ define( ['jquery',
                     enableAddRow: true,
                     enableCellNavigation: true,
                     asyncEditorLoading: true,
+                    forceFitColumns: true,
                     autoEdit: false
                 };
 

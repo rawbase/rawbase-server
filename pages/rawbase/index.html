@@ -10,6 +10,7 @@
         <link href="rawbase/js/lib/SlickGrid-2.1/slick.grid.css" rel="stylesheet" type="text/css"/>
         <link href="rawbase/js/lib/jquery-ui-1.10.3/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
         <link href="rawbase/css/grid.css" rel="stylesheet" type="text/css" />
+        <link href="rawbase/css/jqueryui-editable.css" rel="stylesheet" type="text/css" />
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -35,119 +36,6 @@
                 <div id="graph"></div>
             </div>
         </div>
-        <div id="query" class="panel panel-default">
-            <div class="panel-heading">Query the selected version</div>
-            <div class="panel-body">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-mid-4">
-                            <form action="#" method="post" class="form">
-                                <div class="get-in-touch">
-                                    <div class="form-group">
-                                        <select>
-                                            <option value="sparql" selected>SPARQL</option>
-                                            <option value="update">SPARQL Update</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <textarea id="query-text" class="form-control" rows="3" placeholder="Query" required></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <textarea id="commit-message" class="form-control" rows="3" placeholder="Commit message" required></textarea>
-                                    </div>
-                                    <a href="#" class="btn btn-danger btn-sm btn-block" role="button">Submit</a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="editor" class="panel panel-default">
-            <div class="panel-heading">Edit resources</div>
-            <div class="panel-body">
-                <table id="user" class="table table-bordered table-striped" style="clear: both">
-                    <tbody> 
-                        <tr>         
-                            <td width="35%">Simple text field</td>
-                            <td width="65%"><a href="#" id="username" data-type="text" data-pk="1" data-title="Enter username" class="editable editable-click" data-original-title="" title="">superuser</a></td>
-                        </tr>
-                        <tr>         
-                            <td>Empty text field, required</td>
-                            <td><a href="#" id="firstname" data-type="text" data-pk="1" data-placement="right" data-placeholder="Required" data-title="Enter your firstname" class="editable editable-click editable-empty">Empty</a></td>
-                        </tr>  
-                        <tr>         
-                            <td>Select, local array, custom display</td>
-                            <td><a href="#" id="sex" data-type="select" data-pk="1" data-value="" data-title="Select sex" class="editable editable-click" style="color: gray;" data-original-title="" title="">not selected</a></td>
-                        </tr>
-                        <tr>         
-                            <td>Select, remote array, no buttons</td>
-                            <td><a href="#" id="group" data-type="select" data-pk="1" data-value="5" data-source="/groups" data-title="Select group" class="editable editable-click" data-original-title="" title="">Admin</a></td>
-                        </tr> 
-                        <tr>         
-                            <td>Select, error while loading</td>
-                            <td><a href="#" id="status" data-type="select" data-pk="1" data-value="0" data-source="/status" data-title="Select status" class="editable editable-click" data-original-title="" title="">Active</a></td>
-                        </tr>  
-
-                        <tr>         
-                            <td>Datepicker</td>
-                            <td>
-
-                                <span class="notready">not implemented for Bootstrap 3 yet</span>
-
-                            </td>
-                        </tr>
-                        <tr>         
-                            <td>Combodate (date)</td>
-                            <td><a href="#" id="dob" data-type="combodate" data-value="1984-05-15" data-format="YYYY-MM-DD" data-viewformat="DD/MM/YYYY" data-template="D / MMM / YYYY" data-pk="1" data-title="Select Date of birth" class="editable editable-click">15/05/1984</a></td>
-                        </tr> 
-                        <tr>         
-                            <td>Combodate (datetime)</td>
-                            <td><a href="#" id="event" data-type="combodate" data-template="D MMM YYYY  HH:mm" data-format="YYYY-MM-DD HH:mm" data-viewformat="MMM D, YYYY, HH:mm" data-pk="1" data-title="Setup event date and time" class="editable editable-click editable-empty" data-original-title="" title="">Empty</a></td>
-                        </tr> 
-
-
-
-                        <tr>         
-                            <td>Textarea, buttons below. Submit by <i>ctrl+enter</i></td>
-                            <td><a href="#" id="comments" data-type="textarea" data-pk="1" data-placeholder="Your comments here..." data-title="Enter comments" class="editable editable-pre-wrapped editable-click" data-original-title="" title="">awesome
-                                    user!</a></td>
-                        </tr> 
-
-
-
-
-                        <tr>         
-                            <td>Twitter typeahead.js</td>
-                            <td><a href="#" id="state2" data-type="typeaheadjs" data-pk="1" data-placement="right" data-title="Start typing State.." class="editable editable-click" data-original-title="" title="">California</a></td>
-                        </tr>                       
-
-
-                        <tr>         
-                            <td>Checklist</td>
-                            <td><a href="#" id="fruits" data-type="checklist" data-value="2,3" data-title="Select fruits" class="editable editable-click">peach<br>apple</a></td>
-                        </tr>
-
-                        <tr>         
-                            <td>Select2 (tags mode)</td>
-                            <td><a href="#" id="tags" data-type="select2" data-pk="1" data-title="Enter tags" class="editable editable-click" data-original-title="" title="">html, javascript</a></td>
-                        </tr>                    
-
-                        <tr>         
-                            <td>Select2 (dropdown mode)</td>
-                            <td><a href="#" id="country" data-type="select2" data-pk="1" data-value="BS" data-title="Select country" class="editable editable-click" data-original-title="" title="">Bahamas</a></td>
-                        </tr>  
-
-                        <tr>         
-                            <td>Custom input, several fields</td>
-                            <td><a href="#" id="address" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click"><b>Moscow</b>, Lenina st., bld. 12</a></td>
-                        </tr>                      
-
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
         <div id="results" class="panel panel-primary">
             <div class="panel-heading">
                 <h3 class="panel-title">Results</h3>
@@ -162,10 +50,62 @@
             <div class="panel-body">
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab1">
-                        <div id="myGrid" style="width:100%;height:500px;">
+                        <div class="query-form">
+                            <div class="row">
+                                <div class="col-mid-4">
+                                    <form action="#" method="post" class="form">
+                                        <div class="get-in-touch">
+                                            <div class="form-group">
+                                                <select id="query-language-select" class="form-control">
+                                                    <option value="sparql" selected>SPARQL</option>
+                                                    <option value="update">SPARQL Update</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <textarea id="query-text" class="form-control" rows="3" placeholder="Query" required></textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <textarea id="commit-message" class="form-control" rows="3" placeholder="Commit message" required></textarea>
+                                            </div>
+                                            <a href="#" id="query-submit" class="btn btn-danger btn-sm btn-block" role="button">Submit</a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="result-grid">
                         </div>
                     </div>
                     <div class="tab-pane" id="tab2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Resource: </span>
+                            <input type="text" class="form-control" placeholder="http://dbpedia.org/resource/Barack_Obama">
+                        </div>
+                        <table id="user" class="table table-bordered table-striped" style="clear: both">
+                            <tbody> 
+                                <tr>         
+                                    <td width="35%">Simple text field</td>
+                                    <td width="65%"><a href="#" id="username" data-type="text" data-pk="1" data-title="Enter username" class="editable editable-click">superuser</a></td>
+                                </tr>
+                                <tr>         
+                                    <td>Datepicker</td>
+                                    <td>
+                                        <a href="#" id="vacation" data-type="date" data-viewformat="dd.mm.yyyy" data-pk="1" data-placement="right" data-title="When you want vacation to start?" class="editable editable-click">25.02.2013</a>                        
+                                    </td>
+                                </tr>
+                                <tr>         
+                                    <td>Textarea, buttons below. Submit by <i>ctrl+enter</i></td>
+                                    <td>
+                                        <a href="#" id="comments" data-type="textarea" data-pk="1" data-placeholder="Your comments here..." data-title="Enter comments" class="editable editable-pre-wrapped editable-click">awesome
+                                            user!</a>
+                                    </td>
+                                </tr> 
+                                <tr>         
+                                    <td>Custom input, several fields</td>
+                                    <td><a href="#" id="address" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click"><b>Moscow</b>, Lenina st., bld. 12</a></td>
+                                </tr>   
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

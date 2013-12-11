@@ -6,10 +6,11 @@
     text-align: center;
 }
 
-#myGrid {
+#result-grid {
   background: white;
   outline: 0;
   border: 1px solid gray;
+  height: 300px;
 }
 
 .grid-header {

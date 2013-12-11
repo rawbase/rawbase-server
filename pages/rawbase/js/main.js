@@ -12,7 +12,7 @@
             d3: './d3'
         },
         shim: {
-            'jquery-ui.min': {
+            'jqueryui/jquery-ui.min': {
                 deps: ['jquery']
             },
             'slickgrid/lib/jquery.event.drag-2.2': {
@@ -44,6 +44,9 @@
             },
             'jquery.tipsy' : {
                 deps: ['jquery']
+            },
+            'jqueryui-editable.min' : {
+              deps: ['jquery','jqueryui/jquery-ui.min']  
             },
             'n3': {
                 exports: 'n3'

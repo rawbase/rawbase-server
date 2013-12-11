@@ -31,16 +31,17 @@ CREATE DISTINCT NO PRIMARY KEY REF INDEX RDF_QUAD_OP
   ON RDF_QUAD (O, P) 
   PARTITION (O VARCHAR (-1, 0hexffff));
 
--- Extra optional indexes
-/*
-CREATE BITMAP INDEX RDF_QUAD_OPGSDA
-  ON DB.DBA.RDF_QUAD (O, P, G, S, DA) 
-  PARTITION (O VARCHAR (-1, 0hexffff));
+RDF_GLOBAL_RESET();
 
-CREATE BITMAP INDEX RDF_QUAD_SPOGDA 
-  ON RDF_QUAD (S, P, O, G, DA) 
-  PARTITION (P VARCHAR (-1, 0hexffff));
-*/
+-- Extra optional indexes
+
+-- CREATE BITMAP INDEX RDF_QUAD_OPGSDA
+--  ON DB.DBA.RDF_QUAD (O, P, G, S, DA) 
+--  PARTITION (O VARCHAR (-1, 0hexffff));
+
+-- CREATE BITMAP INDEX RDF_QUAD_SPOGDA 
+--  ON RDF_QUAD (S, P, O, G, DA) 
+--  PARTITION (P VARCHAR (-1, 0hexffff));
 
 -- 2. Add versioned query procedure with subselect and integer
 

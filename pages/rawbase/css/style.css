@@ -71,7 +71,9 @@ General controls
     display: none;
 }
 
-
+#form {
+    margin: 15px;
+}
 
 #types {
     width: 100%;

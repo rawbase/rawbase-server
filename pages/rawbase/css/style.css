@@ -96,8 +96,11 @@ General controls
     display: none;
 }
 
-#editor {
-    display:none;
+.clear-triple {
+    display: inline-block;
+    background-image: url('../images/clear.png');
+    width: 13px;
+    height: 13px;
 }
 
 /*Panel tabs*/

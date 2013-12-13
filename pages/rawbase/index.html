@@ -42,8 +42,8 @@
                 <span class="pull-right">
                     <!-- Tabs -->
                     <ul class="nav panel-tabs">
-                        <li class="active"><a href="#tab1" data-toggle="tab">Tab 1</a></li>
-                        <li><a href="#tab2" data-toggle="tab">Tab 2</a></li>
+                        <li class="active"><a href="#tab1" data-toggle="tab">SPARQL</a></li>
+                        <li><a href="#tab2" data-toggle="tab">Resource Editor</a></li>
                     </ul>
                 </span>
             </div>
@@ -54,7 +54,8 @@
                             <div class="row">
                                 <div class="col-mid-4">
                                     <form id="form" action="#" method="post" class="form">
-                                        <div class="get-in-touch">
+                                        <div class="form-body">
+                                            
                                             <div class="form-group">
                                                 <select id="query-language-select" class="form-control">
                                                     <option value="sparql" selected>SPARQL</option>
@@ -79,31 +80,34 @@
                     <div class="tab-pane" id="tab2">
                         <div class="input-group">
                             <span class="input-group-addon">Resource: </span>
-                            <input type="text" class="form-control" placeholder="http://dbpedia.org/resource/Barack_Obama">
+                            <input id="resource" type="text" class="form-control" placeholder="http://dbpedia.org/resource/Barack_Obama" />
+                            <span class="input-group-btn">
+                                <button id="editor-load" class="btn btn-default" type="button">Load</button>
+                            </span>
                         </div>
-                        <table id="user" class="table table-bordered table-striped" style="clear: both">
+                        <table id="resource-editor" class="table table-bordered table-striped" style="clear: both">
                             <tbody> 
-                                <tr>         
-                                    <td width="35%">Simple text field</td>
-                                    <td width="65%"><a href="#" id="username" data-type="text" data-pk="1" data-title="Enter username" class="editable editable-click">superuser</a></td>
-                                </tr>
-                                <tr>         
-                                    <td>Datepicker</td>
-                                    <td>
-                                        <a href="#" id="vacation" data-type="date" data-viewformat="dd.mm.yyyy" data-pk="1" data-placement="right" data-title="When you want vacation to start?" class="editable editable-click">25.02.2013</a>                        
-                                    </td>
-                                </tr>
-                                <tr>         
-                                    <td>Textarea, buttons below. Submit by <i>ctrl+enter</i></td>
-                                    <td>
-                                        <a href="#" id="comments" data-type="textarea" data-pk="1" data-placeholder="Your comments here..." data-title="Enter comments" class="editable editable-pre-wrapped editable-click">awesome
-                                            user!</a>
-                                    </td>
-                                </tr> 
-                                <tr>         
-                                    <td>Custom input, several fields</td>
-                                    <td><a href="#" id="address" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click"><b>Moscow</b>, Lenina st., bld. 12</a></td>
-                                </tr>   
+                                <!-- <tr>         
+                                     <td width="35%">Simple text field</td>
+                                     <td width="65%"><a href="#" id="username" data-type="text" data-pk="1" data-title="Enter username" class="editable editable-click">superuser</a></td>
+                                 </tr>
+                                 <tr>         
+                                     <td>Datepicker</td>
+                                     <td>
+                                         <a href="#" id="vacation" data-type="date" data-viewformat="dd.mm.yyyy" data-pk="1" data-placement="right" data-title="When you want vacation to start?" class="editable editable-click">25.02.2013</a>                        
+                                     </td>
+                                 </tr>
+                                 <tr>         
+                                     <td>Textarea, buttons below. Submit by <i>ctrl+enter</i></td>
+                                     <td>
+                                         <a href="#" id="comments" data-type="textarea" data-pk="1" data-placeholder="Your comments here..." data-title="Enter comments" class="editable editable-pre-wrapped editable-click">awesome
+                                             user!</a>
+                                     </td>
+                                 </tr> 
+                                 <tr>         
+                                     <td>Custom input, several fields</td>
+                                     <td><a href="#" id="address" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click"><b>Moscow</b>, Lenina st., bld. 12</a></td>
+                                 </tr>   -->
                             </tbody>
                         </table>
                     </div>

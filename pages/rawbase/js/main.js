@@ -39,6 +39,12 @@
             'slickgrid/slick.grid': {
                 deps: ['slickgrid/slick.core']
             },
+            'slick.editors': {
+                deps: ['slickgrid/slick.core']
+            },
+            'slickgrid/plugins/slick.cellrangeselector': {
+                deps: ['slickgrid/slick.core']
+            },
             'sigma/sigma.parseGexf': {
                 deps: ['sigma/sigma.min']
             },

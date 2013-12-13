@@ -43,6 +43,18 @@ define( ['jquery',
                     self.authenticator.login();
                 });
                 
+                $('#editor-load').on('click', function() {
+                    self.loadResource($('#resource').val());
+                });
+                
+                $('#username').editable({
+                    url: '/post',
+                    type: 'text',
+                    pk: 1,
+                    name: 'username',
+                    title: 'Enter username'
+                });
+                
                 $('#query-language-select').on('change',function(){
                     switch ($(this).val()){
                         case 'sparql':
@@ -210,7 +222,11 @@ define( ['jquery',
                     });
                 });
 
-                this.currentVersion = nodes[0];
+                for (var key in nodes){
+                    this.currentVersion = nodes[key].name;
+                    break;
+                }
+                
                 
                 var width = $('#graph').width(),
                 height = $('#graph').height();
@@ -255,7 +271,12 @@ define( ['jquery',
                 .data(force.nodes())
                 .enter()
                 .append("g")
-                .attr("class", "node")
+                .attr("class",function(d) {
+                    if (self.currentVersion == d.name){
+                        return "node-selected";
+                    }
+                    return "node";
+                })
                 .on("mouseover", mouseover)
                 .on("mouseout", mouseout)
                 .on("click", click)
@@ -263,10 +284,12 @@ define( ['jquery',
 
                 node.append("circle")
                 .attr("r", function(d) {
-                    if (self.currentVersion == d.name)
-                        return 8
+                    if (self.currentVersion == d.name){
+                        return 8;
+                    }
                     return 4;
-                })
+                });
+                
                 
                 $('svg circle').tipsy({ 
                     gravity: 's',
@@ -343,6 +366,68 @@ define( ['jquery',
                         });
                 }
             },
+            loadResource: function (uri){
+                var self = this;
+                var query = 'SELECT  ?p ?o  WHERE { <'+uri+'> ?p ?o }';
+                
+                function processLiteral(l){
+                    if(l['xml:lang']){
+                        return $('<a href="#" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click" style="display: inline;" />').text(l.value+'@'+l['xml:lang']).editable();  
+                    } else
+                    if (l.datatype){
+                        switch (l.datatype){
+                            case 'http://www.w3.org/2001/XMLSchema#dateTime':
+                                return $('<a href="#" data-type="date" data-viewformat="yyyy-mm-dd" data-pk="1" data-placement="right" data-title="When you want vacation to start?" class="editable editable-click"/>').text(l.value).editable();
+                                break;
+                        }
+                    }
+                    return $('<a href="#" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click">'+l.value+'</a>').editable();
+                }
+                
+                function processBinding(b){
+                    var $td = $('<td />');
+                    switch (b.type){
+                        case 'uri':
+                            return $td.append($('<a />').attr('href', b.value).text(b.value).editable());
+                            break;
+                        case 'literal':
+                            return $td.append(processLiteral(b));
+                            break;
+                        case 'bnode':
+                            return $td.append($('<a />').attr('href', b.value).text(b.value).editable());
+                            break;
+                    }
+                };
+                
+                this.executeSparql(query, 
+                    function(resultset){
+                        var results = resultset.results.bindings;
+                        
+                        var $tbody = $('#resource-editor > tbody');
+                       
+                             
+                        for (var i = 0; i < results.length; i++) {
+                            var $row = $('<tr />');
+
+                            var p = results[i].p;
+                            $row.append(processBinding(p));
+                            
+                            var o = results[i].o;
+                            $row.append(processBinding(o));
+                            
+                            var $clear = $('<a />').addClass('clear-triple').attr('href','#').on('click',function(){
+                                
+                            });
+                            $row.append($('<td />').append($clear));
+                        
+                            $tbody.append($row);
+                        }
+                    },function(){
+                    
+                    
+                    });
+                
+            },
             executeSparql: function (query, success, error){
                 var self = this;
                 var url = this.HOST + "sparql";
@@ -350,7 +435,7 @@ define( ['jquery',
                 $.ajax({
                     url: url,
                     beforeSend: function(xhrObj){
-                        xhrObj.setRequestHeader("Accept","application/sparql-results+json");              
+                        xhrObj.setRequestHeader("Accept", "application/sparql-results+json");              
                     },
                     data: {
                         query: query,
@@ -363,6 +448,12 @@ define( ['jquery',
                     },
                     error: function(err){
                         self.toggleLoader();
+                        
+                        $('<div class="alert alert-danger alert-dismissable" />')
+                        .append('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>')
+                        .append(err.statusText)
+                        .prependTo($('#results > .panel-body'));
+
                         error(err);              
                     }
                 });
@@ -522,7 +613,7 @@ define( ['jquery',
                         results[i] = item;
                     }
 
-                    grid = new Slick.Grid("#myGrid", results, columns, options);
+                    grid = new Slick.Grid("#result-grid", results, columns, options);
 
                     grid.setSelectionModel(new Slick.CellSelectionModel());
 

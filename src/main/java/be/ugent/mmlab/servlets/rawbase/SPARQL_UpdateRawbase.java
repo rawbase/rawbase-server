@@ -264,7 +264,7 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
             if (!action.isTransactional()) {
                 try {
                     // TODO implement a spill-to-disk version of this
-                    req = UpdateFactory.read(usingList, input, Syntax.syntaxARQ);
+                    req = UpdateFactory.read(usingList, input, "", Syntax.syntaxARQ);
                 } catch (UpdateException ex) {
                     errorBadRequest(ex.getMessage());
                     return;

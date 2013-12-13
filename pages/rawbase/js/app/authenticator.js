@@ -5,8 +5,8 @@ define( ['jquery'], function ($){
         this.OAUTHURL    =   'https://accounts.google.com/o/oauth2/auth?';
         this.VALIDURL    =   'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=';
         this.SCOPE       =   'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
-        this.CLIENTID    =   '989147634264.apps.googleusercontent.com';
-        this.REDIRECT    =   'http://localhost:3030'
+        this.CLIENTID    =   config.google.clientid;
+        this.REDIRECT    =   config.google.redirect;
         this.LOGOUT      =   'http://accounts.google.com/Logout';
         this.TYPE        =   'token';
         this._url        =   this.OAUTHURL + 'scope=' + this.SCOPE + '&client_id=' + this.CLIENTID + '&redirect_uri=' + this.REDIRECT + '&response_type=' + this.TYPE;

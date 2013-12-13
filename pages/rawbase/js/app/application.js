@@ -22,7 +22,7 @@ define( ['jquery',
         "use strict";
         
         function Application(){
-            this.HOST = "http://localhost:3030/rawbase/";
+            this.HOST = config.host;
             this.currentVersion = null;
             
             this.authenticator = new Authenticator();

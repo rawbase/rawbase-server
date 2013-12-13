@@ -71,7 +71,7 @@
         },
     });
 
-    require(['app/application', 'bootstrap.min'], function (Application) {
+    require(['app/application', 'bootstrap.min', 'app/config'], function (Application) {
         var app = new Application();
         app.init();
     });

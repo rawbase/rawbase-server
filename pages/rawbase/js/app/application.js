@@ -15,8 +15,7 @@ define( ['jquery',
     'slickgrid/slick.editors', 
     'slickgrid/plugins/slick.cellrangedecorator',
     'slickgrid/plugins/slick.cellrangeselector',
-    'slickgrid/plugins/slick.cellselectionmodel',
-    'jquery.simplemodal.1.4.4.min'
+    'slickgrid/plugins/slick.cellselectionmodel'
     ], 
     function( $, Authenticator ) {
         "use strict";
@@ -204,13 +203,13 @@ define( ['jquery',
                 return commit;
             },
             toggleLoader: function(){
-                if ($('#loader').css('display') == 'none')
-                    $('#loader').modal({
-                        overlayCss: 'loader-overlay',
-                        close:false
+                if (!$('#loader').dialog( "isOpen" ))
+                    $('#loader').dialog({
+                    	dialogClass: "no-close",
+                    	modal: true
                     });
                 else
-                    $.modal.close();
+                    $('#loader').dialog( "close" );
             },
             initD3: function(error, links, nodes, commits) {
                 var self = this;

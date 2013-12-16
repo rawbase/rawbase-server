@@ -25,6 +25,11 @@ define( ['jquery',
             this.currentVersion = null;
             
             this.authenticator = new Authenticator();
+            
+            this.commit = {
+            	del:[], 
+            	add:[]
+            	};
         };
         
         Application.prototype = {
@@ -75,7 +80,7 @@ define( ['jquery',
                     self.executeSparqlUpdate($('#query-text').val(),
                         $('#commit-message').val(), 
                         function(){
-                            self.getPROV()
+                            self.getPROV();
                         }, 
                         function(err){
                                         
@@ -388,7 +393,8 @@ define( ['jquery',
                 }
                 
                 function saveValue(e, params){
-                	alert('Saved value: ' + params.newValue);
+                	alert('Saved value: ' + $(this).editable('getValue'));
+                	//alert('Saved value: ' + params.newValue);
                 };
                 
                 function processBinding(b){
@@ -429,6 +435,9 @@ define( ['jquery',
                                 
                             });
                             $row.append($('<td />').append($clear));
+                        
+                        	results[i].s = uri;
+                        	$row.data('triple',results[i]);
                         
                             $tbody.append($row);
                         }

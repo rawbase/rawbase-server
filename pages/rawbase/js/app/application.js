@@ -55,6 +55,12 @@ define( ['jquery',
                     self.loadResource($('#resource').val());
                 });
                 
+                $('#loader').dialog({
+                    	dialogClass: "no-close",
+                    	modal: true,
+                    	autoOpen: false
+                    });
+                
                 $('#username').editable({
                     url: '/post',
                     type: 'text',
@@ -209,10 +215,7 @@ define( ['jquery',
             },
             toggleLoader: function(){
                 if (!$('#loader').dialog( "isOpen" ))
-                    $('#loader').dialog({
-                    	dialogClass: "no-close",
-                    	modal: true
-                    });
+                    $('#loader').dialog( "open" );
                 else
                     $('#loader').dialog( "close" );
             },

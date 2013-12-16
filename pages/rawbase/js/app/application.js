@@ -26,10 +26,7 @@ define( ['jquery',
             
             this.authenticator = new Authenticator();
             
-            this.commit = {
-            	del:[], 
-            	add:[]
-            	};
+
         };
         
         Application.prototype = {
@@ -52,7 +49,13 @@ define( ['jquery',
                 });
                 
                 $('#editor-save').on('click', function() {
-                    self.loadResource($('#resource').val());
+                    $('#resource-editor > tbody').children('tr').data('new-triple');
+                    self.saveResource();
+                });
+                
+                $('#editor-add').on('click',function() {
+                	$('<a href="#" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click" />')
+                	.appendTo($('#resource-editor > tbody'));
                 });
                 
                 $('#loader').dialog({
@@ -377,6 +380,9 @@ define( ['jquery',
                         });
                 }
             },
+            saveResource: function () {
+            	
+            },
             loadResource: function (uri){
                 var self = this;
                 var query = 'SELECT  ?p ?o  WHERE { <'+uri+'> ?p ?o }';
@@ -392,12 +398,17 @@ define( ['jquery',
                                 break;
                         }
                     }
-                    return $('<a href="#" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click">'+l.value+'</a>');
+                    return $('<a href="#" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click" />').text(l.value);
                 }
                 
                 function saveValue(e, params){
-                	alert('Saved value: ' + $(this).editable('getValue'));
-                	//alert('Saved value: ' + params.newValue);
+                	var $tr = $(this).parents('tr');
+
+                	if ($tr.data ('new-triple')){
+                		var triple = $(this).data('old-triple');
+                		triple[$(this).attr('name')] = params.newValue;
+                		$tr.data('new-triple', triple);
+                	}
                 };
                 
                 function processBinding(b){
@@ -414,7 +425,7 @@ define( ['jquery',
                             break;
                     }
                     $a.editable().on('save', saveValue);
-                    return $('<td />').append($a);
+                    return $a;
                 };
 
                 this.executeSparql(query, 
@@ -422,6 +433,8 @@ define( ['jquery',
                         var results = resultset.results.bindings;
                         
                         var $tbody = $('#resource-editor > tbody');
+                        
+                        $tbody.data('deleted-triples', []);
                        
                        $tbody.empty();
                              
@@ -429,18 +442,22 @@ define( ['jquery',
                             var $row = $('<tr />');
 
                             var p = results[i].p;
-                            $row.append(processBinding(p));
+                            $row.append(processBinding(p).attr('name','p'));
                             
                             var o = results[i].o;
-                            $row.append(processBinding(o));
+                            $row.append(processBinding(o).attr('name','o'));
                             
-                            var $clear = $('<a />').addClass('clear-triple').attr('href','#').on('click',function(){
-                                
+                            var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href','#').on('click',
+                            function(){
+                            	$tr = $(this).parents('tr');
+                                self.commit.del.push($tr.data('old-triple'));
+                                $tr.remove();
                             });
                             $row.append($('<td />').append($clear));
                         
+                        	
                         	results[i].s = uri;
-                        	$row.data('triple',results[i]);
+                        	$row.data('old-triple',results[i]);
                         
                             $tbody.append($row);
                         }

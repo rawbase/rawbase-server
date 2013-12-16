@@ -34,16 +34,19 @@
                 deps: ['jquery','slickgrid/lib/jquery.event.drag-2.2']
             },
             'slickgrid/slick.formatters': {
-                deps: ['slickgrid/slick.core']
+                deps: ['jquery','slickgrid/slick.core']
             },
             'slickgrid/slick.grid': {
-                deps: ['slickgrid/slick.core']
+                deps: ['jquery','slickgrid/slick.core']
             },
             'slick.editors': {
-                deps: ['slickgrid/slick.core']
+                deps: ['jquery','slickgrid/slick.core']
+            },
+            'slick.cellrangedecorator' : {
+                deps:  ['jquery','slickgrid/slick.core'] 
             },
             'slickgrid/plugins/slick.cellrangeselector': {
-                deps: ['slickgrid/slick.core']
+                deps: ['jquery','slickgrid/slick.core']
             },
             'sigma/sigma.parseGexf': {
                 deps: ['sigma/sigma.min']
@@ -52,7 +55,7 @@
                 deps: ['jquery']
             },
             'jqueryui-editable.min' : {
-              deps: ['jquery','jqueryui/jquery-ui.min']  
+                deps: ['jquery','jqueryui/jquery-ui.min']  
             },
             'n3': {
                 exports: 'n3'

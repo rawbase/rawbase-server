@@ -47,6 +47,10 @@ define( ['jquery',
                     self.loadResource($('#resource').val());
                 });
                 
+                $('#editor-save').on('click', function() {
+                    self.loadResource($('#resource').val());
+                });
+                
                 $('#username').editable({
                     url: '/post',
                     type: 'text',
@@ -372,39 +376,46 @@ define( ['jquery',
                 
                 function processLiteral(l){
                     if(l['xml:lang']){
-                        return $('<a href="#" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click" style="display: inline;" />').text(l.value+'@'+l['xml:lang']).editable();  
+                        return $('<a href="#" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click" style="display: inline;" />').text(l.value+'@'+l['xml:lang']);  
                     } else
                     if (l.datatype){
                         switch (l.datatype){
                             case 'http://www.w3.org/2001/XMLSchema#dateTime':
-                                return $('<a href="#" data-type="date" data-viewformat="yyyy-mm-dd" data-pk="1" data-placement="right" data-title="When you want vacation to start?" class="editable editable-click"/>').text(l.value).editable();
+                                return $('<a href="#" data-type="date" data-viewformat="yyyy-mm-dd" data-pk="1" data-placement="right" data-title="When you want vacation to start?" class="editable editable-click"/>').text(l.value);
                                 break;
                         }
                     }
-                    return $('<a href="#" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click">'+l.value+'</a>').editable();
+                    return $('<a href="#" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click">'+l.value+'</a>');
                 }
                 
-                function processBinding(b){
-                    var $td = $('<td />');
-                    switch (b.type){
-                        case 'uri':
-                            return $td.append($('<a />').attr('href', b.value).text(b.value).editable());
-                            break;
-                        case 'literal':
-                            return $td.append(processLiteral(b));
-                            break;
-                        case 'bnode':
-                            return $td.append($('<a />').attr('href', b.value).text(b.value).editable());
-                            break;
-                    }
+                function saveValue(e, params){
+                	alert('Saved value: ' + params.newValue);
                 };
                 
+                function processBinding(b){
+                    var $a;
+                    switch (b.type){
+                        case 'uri':
+                            $a = $('<a />').attr('href', b.value).text(b.value);
+                            break;
+                        case 'literal':
+							$a = processLiteral(b).on('save', saveValue);
+                            break;
+                        case 'bnode':
+                            $a = $('<a />').attr('href', b.value).text(b.value);
+                            break;
+                    }
+                    $a.editable().on('save', saveValue);
+                    return $('<td />').append($a);
+                };
+
                 this.executeSparql(query, 
                     function(resultset){
                         var results = resultset.results.bindings;
                         
                         var $tbody = $('#resource-editor > tbody');
                        
+                       $tbody.empty();
                              
                         for (var i = 0; i < results.length; i++) {
                             var $row = $('<tr />');
@@ -466,7 +477,7 @@ define( ['jquery',
                     'rwb-user': this.authenticator.getURI(),
                     'rwb-message': message,
                     update: query
-                }
+                };
                 
                 if (this.currentVersion)
                     data['rwb-version'] = this.currentVersion;
@@ -602,12 +613,12 @@ define( ['jquery',
                 };
 
                 $(function () {
-                    var results = resultset.results.bindings
+                    var results = resultset.results.bindings;
                              
                     for (var i = 0; i < results.length; i++) {
                         var item = {};
                         for (var key in results[i]){
-                            item[key] = results[i][key].value
+                            item[key] = results[i][key].value;
                         }
      
                         results[i] = item;
@@ -624,7 +635,7 @@ define( ['jquery',
                         grid.updateRowCount();
                         grid.render();
                     });
-                })
+                });
             }
 
         };

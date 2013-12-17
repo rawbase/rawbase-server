@@ -335,18 +335,21 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			var $tbody = $('#resource-editor > tbody');
 
 			function toNTriple(triple) {
-				return '<' + triple.s.value + '> <' + triple.p.value + '> <' + triple.o.value + '> . ';
+				if (triple.o.type == 'uri')
+					return '<' + triple.s.value + '> <' + triple.p.value + '> <' + triple.o.value + '> . ';
+
+				return '<' + triple.s.value + '> <' + triple.p.value + '> "' + triple.o.value + '" . ';
 			}
 
 			var query = 'INSERT DATA { ';
 
 			$tbody.children('tr').each(function(i, obj) {
 				var triple = $(obj).data('newTriple');
-				if (!triple.s || !triple.p || !triple.o){
+				if (!triple.s.value || !triple.p.value || !triple.o.value) {
 					addErrorMessage('Update is incomplete');
 					return;
 				}
-				
+
 				query += toNTriple(triple);
 			});
 
@@ -358,11 +361,11 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			});
 
 			query += '}';
-			
-			this.executeSparqlUpdate(query, message, function(result){
+
+			this.executeSparqlUpdate(query, message, function(result) {
 				self.getPROV();
-			},function(err){
-				
+			}, function(err) {
+
 			});
 
 		},
@@ -385,7 +388,24 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 
 			function saveValue(e, params) {
 				var $tr = $(this).parents('tr');
-				var triple = $tr.data('oldTriple') || {};
+				var triple = $tr.data('oldTriple');
+				if (!triple) {
+					triple = {
+						s : {
+							type : 'uri',
+							value : uri
+						},
+						p : {
+							type : 'uri',
+							value : null
+						},
+						o : {
+							type : 'Literal',
+							value : null
+						}
+
+					};
+				}
 				triple[$(this).attr('name')].value = params.newValue;
 				$tr.data('newTriple', triple);
 
@@ -445,9 +465,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 		executeSparql : function(query, success, error) {
 			var self = this;
 			var url = this.HOST + "sparql";
-			
+
 			this.toggleLoader();
-			
+
 			$.ajax({
 				url : url,
 				beforeSend : function(xhrObj) {
@@ -471,11 +491,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 				}
 			});
 		},
-		addErrorMessage: function(message) {
-			$('<div class="alert alert-danger alert-dismissable" />')
-			.append('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>')
-			.append(message)
-			.prependTo($('#results > .panel-body'));
+		addErrorMessage : function(message) {
+			$('<div class="alert alert-danger alert-dismissable" />').append('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>').append(message).prependTo($('#results > .panel-body'));
 		},
 		executeSparqlUpdate : function(query, message, success, error) {
 			var self = this;

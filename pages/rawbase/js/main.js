@@ -71,6 +71,9 @@
                 deps: ['d3/d3.geom'],
                 exports: 'd3.layout'
             },
+            'dagre-d3.min': {
+            	deps: ['d3/d3']
+            }
         },
     });
 

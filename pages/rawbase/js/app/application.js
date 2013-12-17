@@ -1,4 +1,4 @@
-define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid', 'jqueryui/jquery-ui.min', 'jqueryui-editable.min', 'slickgrid/lib/jquery.event.drag-2.2', 'n3', 'jquery.tipsy', 'bootstrap-select.min', 'slickgrid/slick.core', 'slickgrid/slick.formatters', 'slickgrid/slick.grid', 'slickgrid/slick.editors', 'slickgrid/plugins/slick.cellrangedecorator', 'slickgrid/plugins/slick.cellrangeselector', 'slickgrid/plugins/slick.cellselectionmodel'], function($, Authenticator) {"use strict";
+define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min' , 'jquery.openid', 'jqueryui/jquery-ui.min', 'jqueryui-editable.min', 'slickgrid/lib/jquery.event.drag-2.2', 'n3', 'jquery.tipsy', 'bootstrap-select.min', 'slickgrid/slick.core', 'slickgrid/slick.formatters', 'slickgrid/slick.grid', 'slickgrid/slick.editors', 'slickgrid/plugins/slick.cellrangedecorator', 'slickgrid/plugins/slick.cellrangeselector', 'slickgrid/plugins/slick.cellselectionmodel'], function($, Authenticator) {"use strict";
 
 	function Application() {
 		this.HOST = config.host;
@@ -94,15 +94,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 
 			});
 
-			function update() {
-
-				self.executeSparqlUpdate($('#query-text').val(), $('#commit-message').val(), function() {
-					self.getPROV();
-				}, function(err) {
-
-				});
-			};
-
 			$('#query-submit').on('click', function() {
 
 				switch ($('#query-language-select').val()) {
@@ -112,11 +103,11 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 						});
 						break;
 					case 'update':
-						if (!self.authenticator.isAuthenticated()) {
-							self.authenticator.login(update);
-						} else {
-							update();
-						}
+						self.executeSparqlUpdate($('#query-text').val(), $('#commit-message').val(), function() {
+							self.getPROV();
+						}, function(err) {
+
+						});
 
 						break;
 				}
@@ -389,22 +380,28 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			function saveValue(e, params) {
 				var $tr = $(this).parents('tr');
 				var triple = jQuery.extend(true, {
-						s : {
-							type : 'uri',
-							value : uri
-						},
-						p : {
-							type : 'uri',
-							value : null
-						},
-						o : {
-							type : 'Literal',
-							value : null
-						}
+					s : {
+						type : 'uri',
+						value : uri
+					},
+					p : {
+						type : 'uri',
+						value : null
+					},
+					o : {
+						type : 'Literal',
+						value : null
+					}
 
-					}, $tr.data('oldTriple') || {});
+				}, $tr.data('oldTriple') || {});
 
 				triple[$(this).attr('name')].value = params.newValue;
+				
+				/*
+				 * FUTURE: add comparison between new and old to make sure reverted triples are not deleted!!!!!
+				 */
+				$tbody.data('deletedTriples').push($tr.data('oldTriple'));
+				
 				$tr.data('newTriple', triple);
 
 			};
@@ -496,30 +493,40 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			var self = this;
 			var url = this.HOST + "update";
 
-			var data = {
-				'rwb-user' : this.authenticator.getURI(),
-				'rwb-message' : message,
-				update : query
+			function execute() {
+
+				var data = {
+					'rwb-user' : self.authenticator.getURI(),
+					'rwb-message' : message,
+					update : query
+				};
+
+				if (self.currentVersion)
+					data['rwb-version'] = self.currentVersion;
+
+				this.toggleLoader();
+
+				$.ajax({
+					url : url,
+					type : 'POST',
+					data : data,
+					success : function(data) {
+						self.toggleLoader();
+						success(data);
+					},
+					error : function(err) {
+						self.toggleLoader();
+						error(err);
+					}
+				});
 			};
 
-			if (this.currentVersion)
-				data['rwb-version'] = this.currentVersion;
+			if (!self.authenticator.isAuthenticated()) {
+				self.authenticator.login(execute);
+			} else {
+				execute();
+			}
 
-			this.toggleLoader();
-
-			$.ajax({
-				url : url,
-				type : 'POST',
-				data : data,
-				success : function(data) {
-					self.toggleLoader();
-					success(data);
-				},
-				error : function(err) {
-					self.toggleLoader();
-					error(err);
-				}
-			});
 		},
 		buildGrid : function(resultset) {
 			function requiredFieldValidator(value) {

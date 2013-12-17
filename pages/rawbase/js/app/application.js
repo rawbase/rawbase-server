@@ -377,7 +377,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				}
 			});
 
-			query += '} DELETE DATA { ';
+			query += '}; DELETE DATA { ';
 
 			$tbody.data('deletedTriples').forEach(function(triple) {
 				triple.s = {

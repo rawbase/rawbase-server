@@ -58,6 +58,22 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 				autoOpen : false
 			});
 
+			$('#commit-message-popup').dialog({
+				resizable : false,
+				height : 140,
+				modal : true,
+				autoOpen : false,
+				buttons : {
+					Submit : function() {
+						self.saveResource($(this).find('textarea').val());
+						$(this).dialog("close");
+					},
+					Cancel : function() {
+						$(this).dialog("close");
+					}
+				}
+			});
+
 			$('#username').editable({
 				url : '/post',
 				type : 'text',
@@ -315,22 +331,35 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			}
 
 		},
-		saveResource : function() {
+		saveResource : function(message) {
 			var $tbody = $('#resource-editor > tbody');
 
 			function toNTriple(triple) {
-				return '<' + triple.s.value + '> <' + triple.p.value + '> <' + triple.o.value + '> .';
+				return '<' + triple.s.value + '> <' + triple.p.value + '> <' + triple.o.value + '> . ';
 			}
 
+			var query = 'INSERT DATA { ';
 
 			$tbody.children('tr').each(function(i, obj) {
-				var triple = obj.data('new-triple');
-				console.log(obj);
+				var triple = $(this).data('new-triple');
+				query += toNTriple(triple);
 			});
 
-			$tbody.data('deleted-triples').forEach(function(obj) {
-				console.log(obj);
+			query += '} DELETE DATA { ';
+
+			$tbody.data('deleted-triples').forEach(function(triple) {
+				query += toNTriple(triple);
+
 			});
+
+			query += '}';
+			
+			this.executeSparqlUpdate(query, message, function(result){
+				self.getPROV();
+			},function(err){
+				
+			});
+
 		},
 		loadResource : function(uri) {
 			var self = this;
@@ -411,7 +440,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 		executeSparql : function(query, success, error) {
 			var self = this;
 			var url = this.HOST + "sparql";
+			
 			this.toggleLoader();
+			
 			$.ajax({
 				url : url,
 				beforeSend : function(xhrObj) {

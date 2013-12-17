@@ -334,7 +334,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 
 			function saveValue(e, params) {
 				var $tr = $(this).parents('tr');
-				var triple = $(this).data('old-triple') || {};
+				var triple = $tr.data('old-triple') || {};
 				triple[$(this).attr('name')] = params.newValue;
 				$tr.data('new-triple', triple);
 

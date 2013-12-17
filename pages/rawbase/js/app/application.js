@@ -27,7 +27,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				value : null
 			}
 
-		}, $tr.data('oldTriple') || {});
+		}, $tr.data('newTriple') || $tr.data('oldTriple') || {}); //Copy the new triple, if null copy the old one, if null use default
 
 		triple[$(this).attr('name')].value = params.newValue;
 

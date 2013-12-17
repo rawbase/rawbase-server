@@ -1,144 +1,182 @@
-/* 
-    Document   : style
-    Created on : Nov 26, 2013, 11:19:50 AM
-    Author     : mielvandersande
-    Description:
-        Purpose of the stylesheet follows.
-*/
+/*
+ Document   : style
+ Created on : Nov 26, 2013, 11:19:50 AM
+ Author     : mielvandersande
+ Description:
+ Purpose of the stylesheet follows.
+ */
 
 /*
  Provenance GRAPH
-*/
+ */
 
 #network .panel-body {
-    width: 100%;
-    height: 150px;
-    position: relative
+	width: 100%;
+	height: 150px;
+	position: relative
 }
 #graph {
-    /*position: absolute;*/
-    width: 100%;
-    height: 100%
+	/*position: absolute;*/
+	width: 100%;
+	height: 100%
 }
 
 .link {
-    fill: none;
-    stroke: #666;
-    stroke-width: 1.5px;
+	fill: none;
+	stroke: #666;
+	stroke-width: 1.5px;
 }
 
-
 .node circle {
-    fill: #ccc;
-    stroke: #fff;
-    stroke-width: 1.5px;
-    cursor: pointer
-
+	fill: #ccc;
+	stroke: #fff;
+	stroke-width: 1.5px;
+	cursor: pointer
 }
 
 .node-selected circle {
-    fill: #cfc;
-    stroke: #fff;
-    stroke-width: 1.5px;
+	fill: #cfc;
+	stroke: #fff;
+	stroke-width: 1.5px;
 }
 
 text {
-    font: 10px sans-serif;
-    pointer-events: none;
+	font: 10px sans-serif;
+	pointer-events: none;
 }
 
 /*
-General controls
-*/
+ General controls
+ */
 
 #login {
-    margin: 20px;
-    padding: 10px;
-    border: gray 1px solid;
-    width: 20%;
-    position: absolute;
-    top: 0px;
-    right: 0px;
-
+	margin: 20px;
+	padding: 10px;
+	border: gray 1px solid;
+	width: 20%;
+	position: absolute;
+	top: 0px;
+	right: 0px;
 }
 
 #imgHolder {
-    width: 40px;
-    height: 40px;
+	width: 40px;
+	height: 40px;
 }
 
 #logoutText, #myIFrame, #imgHolder {
-    display: none;
+	display: none;
 }
 
 #form {
-    margin: 15px;
+	margin: 15px;
 }
 
 #types {
-    width: 100%;
-    position: absolute
+	width: 100%;
+	position: absolute
 }
 
 #logo {
-    margin-left: 15px;
+	margin-left: 15px;
 }
 
 #loader {
-    display:none;
+	display: none;
 }
 
 .input-group {
-    margin-bottom: 10px;
+	margin-bottom: 10px;
 }
 
 #commit-message {
-    display: none;
+	display: none;
 }
 
 .clear-triple {
-    display: inline-block;
-    background-image: url('../images/clear.png');
-    width: 13px;
-    height: 13px;
+	display: inline-block;
+	background-image: url('../images/clear.png');
+	width: 13px;
+	height: 13px;
+}
+
+/* jQuery ui dialog box */
+.ui-dialog {
+	border: 1px solid #000000;
+	background-color: #eee8aa;
+	position: relative;
+	width: 300px;
+}
+.ui-dialog .ui-dialog-titlebar {
+	padding-left: 10px;
+	position: relative;
+	top: -2px;
+}
+.ui-dialog .ui-dialog-title {
+	font-weight: 900;
+}
+.ui-dialog .ui-dialog-titlebar-close {
+	background: url
+	('close_icon.png') no-repeat;
+	text-decoration: none;
+	position: relative;
+	height: 20px;
+	width: 20px;
+	top: +4px;
+	left: +179px;
+}
+.ui-dialog .ui-dialog-titlebar-close span {
+	display: block;
+	cursor: pointer;
+}
+.ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus {
+	text-decoration: none;
+	font-weight: 900;
+}
+.ui-dialog .ui-dialog-content {
+	font-size: 12px;
+	font-weight: 500;
+	border-top: 1px solid #000000;
+	padding: 10px;
+	background: none;
+	overflow: no;
+	zoom: 1;
 }
 
 /*Panel tabs*/
 .panel-tabs {
-    position: relative;
-    bottom: 30px;
-    clear:both;
-    border-bottom: 1px solid transparent;
+	position: relative;
+	bottom: 30px;
+	clear: both;
+	border-bottom: 1px solid transparent;
 }
 
 .panel-tabs > li {
-    float: left;
-    margin-bottom: -1px;
+	float: left;
+	margin-bottom: -1px;
 }
 
 .panel-tabs > li > a {
-    margin-right: 2px;
-    margin-top: 4px;
-    line-height: .85;
-    border: 1px solid transparent;
-    border-radius: 4px 4px 0 0;
-    color: #ffffff;
+	margin-right: 2px;
+	margin-top: 4px;
+	line-height: .85;
+	border: 1px solid transparent;
+	border-radius: 4px 4px 0 0;
+	color: #ffffff;
 }
 
 .panel-tabs > li > a:hover {
-    border-color: transparent;
-    color: #ffffff;
-    background-color: transparent;
+	border-color: transparent;
+	color: #ffffff;
+	background-color: transparent;
 }
 
-.panel-tabs > li.active > a,
-.panel-tabs > li.active > a:hover,
-.panel-tabs > li.active > a:focus {
-    color: #fff;
-    cursor: default;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-    background-color: rgba(255,255,255, .23);
-    border-bottom-color: transparent;
+.panel-tabs > li.active > a, .panel-tabs > li.active > a:hover, .panel-tabs > li.active > a:focus {
+	color: #fff;
+	cursor: default;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	background-color: rgba(255,255,255, .23);
+	border-bottom-color: transparent;
 }

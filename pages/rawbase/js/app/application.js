@@ -388,7 +388,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 
 			function saveValue(e, params) {
 				var $tr = $(this).parents('tr');
-				var triple = jQuery.extend({
+				var triple = jQuery.extend(true, {
 						s : {
 							type : 'uri',
 							value : uri

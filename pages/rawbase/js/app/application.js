@@ -10,8 +10,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 
 	function deleteRow() {
 		var $tr = $(this).parents('tr');
-		if ($tr.data('old-triple'))
-			$('#resource-editor > tbody').data('deleted-triples').push($tr.data('old-triple'));
+		if ($tr.data('oldTriple'))
+			$('#resource-editor > tbody').data('deletedTriples').push($tr.data('oldTriple'));
 		$tr.remove();
 	}
 
@@ -341,13 +341,13 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			var query = 'INSERT DATA { ';
 
 			$tbody.children('tr').each(function(i, obj) {
-				var triple = $(obj).data('new-triple');
+				var triple = $(obj).data('newTriple');
 				query += toNTriple(triple);
 			});
 
 			query += '} DELETE DATA { ';
 
-			$tbody.data('deleted-triples').forEach(function(triple) {
+			$tbody.data('deletedTriples').forEach(function(triple) {
 				query += toNTriple(triple);
 
 			});
@@ -380,9 +380,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 
 			function saveValue(e, params) {
 				var $tr = $(this).parents('tr');
-				var triple = $tr.data('old-triple') || {};
+				var triple = $tr.data('oldTriple') || {};
 				triple[$(this).attr('name')].value = params.newValue;
-				$tr.data('new-triple', triple);
+				$tr.data('newTriple', triple);
 
 			};
 
@@ -408,7 +408,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 
 				var $tbody = $('#resource-editor > tbody');
 
-				$tbody.data('deleted-triples', []);
+				$tbody.data('deletedTriples', []);
 
 				$tbody.empty();
 
@@ -428,7 +428,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 						type : 'uri',
 						value : uri
 					};
-					$row.data('old-triple', results[i]);
+					$row.data('oldTriple', results[i]);
 
 					$tbody.append($row);
 				}

@@ -363,6 +363,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min' ,
 		loadResource : function(uri) {
 			var self = this;
 			var query = 'SELECT ?p ?o  WHERE { <' + uri + '> ?p ?o }';
+			
+			var $tbody = $('#resource-editor > tbody');
 
 			function processLiteral(l) {
 				if (l['xml:lang']) {
@@ -425,8 +427,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min' ,
 
 			this.executeSparql(query, function(resultset) {
 				var results = resultset.results.bindings;
-
-				var $tbody = $('#resource-editor > tbody');
 
 				$tbody.data('deletedTriples', []);
 

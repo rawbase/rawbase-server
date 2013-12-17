@@ -18,10 +18,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 	function saveValue(e, params) {
 		var $tr = $(this).parents('tr');
 		var triple = jQuery.extend(true, {
-			s : {
-				type : 'uri',
-				value : uri
-			},
 			p : {
 				type : 'uri',
 				value : null
@@ -67,7 +63,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			});
 
 			$('#editor-save').on('click', function() {
-				self.saveResource();
+				$('#commit-message-popup').dialog('open');
 			});
 
 			$('#editor-add').on('click', function() {
@@ -364,19 +360,28 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			$tbody.children('tr').each(function(i, obj) {
 				var triple = $(obj).data('newTriple');
-				if (!triple){
-				if (!triple.s.value || !triple.p.value || !triple.o.value) {
-					addErrorMessage('Update is incomplete');
-					return;
-				}
+				if (!triple) {
+					if (!triple.p.value || !triple.o.value) {
+						addErrorMessage('Update is incomplete');
+						return;
+					}
+					
+					triple.s = {
+						type : 'uri',
+						value : $(obj).data('subject')
+					};
 
-				query += toNTriple(triple);
+					query += toNTriple(triple);
 				}
 			});
 
 			query += '} DELETE DATA { ';
 
 			$tbody.data('deletedTriples').forEach(function(triple) {
+				triple.s = {
+						type : 'uri',
+						value : $(obj).data('subject')
+					};
 				query += toNTriple(triple);
 
 			});
@@ -430,6 +435,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				var results = resultset.results.bindings;
 
 				$tbody.data('deletedTriples', []);
+				
+				$tbody.data('subject', uri);
 
 				$tbody.empty();
 
@@ -445,10 +452,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
 					$row.append($('<td />').append($clear));
 
-					results[i].s = {
-						type : 'uri',
-						value : uri
-					};
 					$row.data('oldTriple', results[i]);
 
 					$tbody.append($row);

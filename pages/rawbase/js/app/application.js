@@ -360,7 +360,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			$tbody.children('tr').each(function(i, obj) {
 				var triple = $(obj).data('newTriple');
-				if (!triple) {
+				if (triple) {
 					if (!triple.p.value || !triple.o.value) {
 						addErrorMessage('Update is incomplete');
 						return;
@@ -368,7 +368,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					
 					triple.s = {
 						type : 'uri',
-						value : $(obj).data('subject')
+						value : $tbody.data('subject')
 					};
 
 					query += toNTriple(triple);
@@ -380,7 +380,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			$tbody.data('deletedTriples').forEach(function(triple) {
 				triple.s = {
 						type : 'uri',
-						value : $(obj).data('subject')
+						value : $tbody.data('subject')
 					};
 				query += toNTriple(triple);
 

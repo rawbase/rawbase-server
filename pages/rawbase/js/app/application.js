@@ -381,10 +381,10 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
                     var $row = $('<tr />');
 
                     var p = results[i].p;
-                    $row.append(processBinding(p).attr('name', 'p'));
+                    $('<td />').append(processBinding(p).attr('name', 'p')).appendTo($row);
 
                     var o = results[i].o;
-                    $row.append(processBinding(o).attr('name', 'o'));
+                    $('<td />').append(processBinding(o).attr('name', 'o')).appendTo($row);
 
                     var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
                     $row.append($('<td />').append($clear));

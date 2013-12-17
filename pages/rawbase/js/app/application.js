@@ -342,6 +342,11 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 
 			$tbody.children('tr').each(function(i, obj) {
 				var triple = $(obj).data('newTriple');
+				if (!triple.s || !triple.p || !triple.o){
+					addErrorMessage('Update is incomplete');
+					return;
+				}
+				
 				query += toNTriple(triple);
 			});
 
@@ -460,11 +465,17 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 				error : function(err) {
 					self.toggleLoader();
 
-					$('<div class="alert alert-danger alert-dismissable" />').append('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>').append(err.statusText).prependTo($('#results > .panel-body'));
+					self.addErrorMessage(err.statusText);
 
 					error(err);
 				}
 			});
+		},
+		addErrorMessage: function(message) {
+			$('<div class="alert alert-danger alert-dismissable" />')
+			.append('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>')
+			.append(message)
+			.prependTo($('#results > .panel-body'));
 		},
 		executeSparqlUpdate : function(query, message, success, error) {
 			var self = this;

@@ -42,8 +42,11 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			});
 
 			$('#editor-add').on('click', function() {
-				var $row = $('<tr><td><a href="#" name="p" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />Empty</td><td><a href="#" name="o" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click" /></td></tr>');
+				var $row = $('<tr />');
+				$row.append($('<td />').append($('<a href="#" name="p" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />').text('Empty')));
+				$row.append($('<td />').append($('<a href="#" name="o" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />').text('Empty')));
 				var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
+				
 				$row.append($('<td />').append($clear));
 				$('#resource-editor > tbody').append($row);
 			});

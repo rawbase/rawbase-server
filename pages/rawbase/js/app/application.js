@@ -341,7 +341,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			var query = 'INSERT DATA { ';
 
 			$tbody.children('tr').each(function(i, obj) {
-				var triple = $(this).data('new-triple');
+				var triple = $(obj).data('new-triple');
 				query += toNTriple(triple);
 			});
 

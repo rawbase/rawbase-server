@@ -7,10 +7,19 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 		this.authenticator = new Authenticator();
 
 	};
+	
+	function deleteRow() {
+				var $tr = $(this).parents('tr');
+				$('#resource-editor > tbody').data('deleted-triples').push($tr.data('old-triple'));
+				$tr.remove();
+			}
 
 	Application.prototype = {
 		init : function() {
 			var self = this;
+
+			//turn editable into inline mode
+			$.fn.editable.defaults.mode = 'inline';
 
 			$('form.openid').openid();
 			this.getPROV();
@@ -32,8 +41,10 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			});
 
 			$('#editor-add').on('click', function() {
-				$('#resource-editor > tbody').append($('<tr>' + '<td><a href="#" name="p" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click" /></td>' + '<td><a href="#" name="o" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click" /></td>' + '</tr>'));
-
+				var $row = $('<tr><td><a href="#" name="p" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />Empty</td><td><a href="#" name="o" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click" /></td></tr>');
+				var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
+				$row.append($('<td />').append($clear));
+				$('#resource-editor > tbody').append($row);
 			});
 
 			$('#loader').dialog({
@@ -317,7 +328,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 		},
 		loadResource : function(uri) {
 			var self = this;
-			var query = 'SELECT  ?p ?o  WHERE { <' + uri + '> ?p ?o }';
+			var query = 'SELECT <' + uri + '> ?p ?o  WHERE { <' + uri + '> ?p ?o }';
 
 			function processLiteral(l) {
 				if (l['xml:lang']) {
@@ -335,16 +346,12 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			function saveValue(e, params) {
 				var $tr = $(this).parents('tr');
 				var triple = $tr.data('old-triple') || {};
-				triple[$(this).attr('name')] = params.newValue;
+				triple[$(this).attr('name')].value = params.newValue;
 				$tr.data('new-triple', triple);
 
 			};
 
-			function deleteRow() {
-				var $tr = $(this).parents('tr');
-				$('#resource-editor > tbody').data('deleted-triples').push($tr.data('old-triple'));
-				$tr.remove();
-			}
+			
 
 			function processBinding(b) {
 				var $a;
@@ -384,7 +391,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 					var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
 					$row.append($('<td />').append($clear));
 
-					results[i].s = uri;
 					$row.data('old-triple', results[i]);
 
 					$tbody.append($row);

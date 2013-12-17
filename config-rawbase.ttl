@@ -19,7 +19,7 @@ fuvirtext:RawbaseDataset  rdfs:subClassOf  ja:RDFDataset .
 
 <#service_virt_read_write> rdf:type fuseki:Service ;
     rdfs:label                      "Rawbase" ;
-    fuseki:name                     "rawbase" ;
+    fuseki:name                     "rwb" ;
     fuseki:serviceQuery             "query" ;
     fuseki:serviceQuery             "sparql" ;
     fuseki:serviceUpdate            "update" ;
@@ -30,8 +30,8 @@ fuvirtext:RawbaseDataset  rdfs:subClassOf  ja:RDFDataset .
     .
 
 <#rawbase_dataset> rdf:type      fuvirtext:RawbaseDataset ;
-#    fuvirtext:jdbcURL             "jdbc:virtuoso://monn.elis.ugent.be:1111" ;
-    fuvirtext:jdbcURL             "jdbc:virtuoso://localhost:1111" ;
+    fuvirtext:jdbcURL             "jdbc:virtuoso://monn.elis.ugent.be:1111" ;
+#    fuvirtext:jdbcURL             "jdbc:virtuoso://localhost:1111" ;
     fuvirtext:user                "dba" ;
     fuvirtext:password            "dba" ;
 	fuvirtext:graphName           "http://dbpedia.org#" ;

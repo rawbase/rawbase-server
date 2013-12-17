@@ -7,12 +7,13 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 		this.authenticator = new Authenticator();
 
 	};
-	
+
 	function deleteRow() {
-				var $tr = $(this).parents('tr');
-				$('#resource-editor > tbody').data('deleted-triples').push($tr.data('old-triple'));
-				$tr.remove();
-			}
+		var $tr = $(this).parents('tr');
+		$('#resource-editor > tbody').data('deleted-triples').push($tr.data('old-triple'));
+		$tr.remove();
+	}
+
 
 	Application.prototype = {
 		init : function() {
@@ -328,7 +329,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 		},
 		loadResource : function(uri) {
 			var self = this;
-			var query = 'SELECT <' + uri + '> ?p ?o  WHERE { <' + uri + '> ?p ?o }';
+			var query = 'SELECT ?p ?o  WHERE { <' + uri + '> ?p ?o }';
 
 			function processLiteral(l) {
 				if (l['xml:lang']) {
@@ -350,8 +351,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 				$tr.data('new-triple', triple);
 
 			};
-
-			
 
 			function processBinding(b) {
 				var $a;
@@ -391,6 +390,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 					var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
 					$row.append($('<td />').append($clear));
 
+					results[i].s = {type: 'uri', value: uri};
 					$row.data('old-triple', results[i]);
 
 					$tbody.append($row);

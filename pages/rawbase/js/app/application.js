@@ -34,7 +34,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 		/*
 		 * FUTURE: add comparison between new and old to make sure reverted triples are not deleted!!!!!
 		 */
-		$tbody.data('deletedTriples').push($tr.data('oldTriple'));
+		$('#resource-editor > tbody').data('deletedTriples').push($tr.data('oldTriple'));
 
 		$tr.data('newTriple', triple);
 
@@ -399,7 +399,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			var self = this;
 			var query = 'SELECT ?p ?o  WHERE { <' + uri + '> ?p ?o }';
 
-			var $tbody = $('#resource-editor > tbody');
 
 			function processLiteral(l) {
 				if (l['xml:lang']) {
@@ -433,6 +432,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			this.executeSparql(query, function(resultset) {
 				var results = resultset.results.bindings;
+				
+				var $tbody = $('#resource-editor > tbody');
 
 				$tbody.data('deletedTriples', []);
 				

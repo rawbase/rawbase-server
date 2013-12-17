@@ -34,7 +34,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 		/*
 		 * FUTURE: add comparison between new and old to make sure reverted triples are not deleted!!!!!
 		 */
-		$('#resource-editor > tbody').data('deletedTriples').push($tr.data('oldTriple'));
+		if ($tr.data('oldTriple'))
+			$('#resource-editor > tbody').data('deletedTriples').push($tr.data('oldTriple'));
 
 		$tr.data('newTriple', triple);
 

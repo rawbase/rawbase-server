@@ -347,6 +347,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 		},
 		saveResource : function(message) {
+			var self = this;
 			var $tbody = $('#resource-editor > tbody');
 
 			function toNTriple(triple) {
@@ -362,7 +363,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				var triple = $(obj).data('newTriple');
 				if (triple) {
 					if (!triple.p.value || !triple.o.value) {
-						addErrorMessage('Update is incomplete');
+						self.addErrorMessage('Update is incomplete');
 						return;
 					}
 					

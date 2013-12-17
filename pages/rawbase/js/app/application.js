@@ -10,7 +10,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 
 	function deleteRow() {
 		var $tr = $(this).parents('tr');
-		$('#resource-editor > tbody').data('deleted-triples').push($tr.data('old-triple'));
+		if ($tr.data('old-triple'))
+			$('#resource-editor > tbody').data('deleted-triples').push($tr.data('old-triple'));
 		$tr.remove();
 	}
 
@@ -46,7 +47,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 				$row.append($('<td />').append($('<a href="#" name="p" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />').text('Empty').editable()));
 				$row.append($('<td />').append($('<a href="#" name="o" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />').text('Empty').editable()));
 				var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
-				
+
 				$row.append($('<td />').append($clear));
 				$('#resource-editor > tbody').append($row);
 			});
@@ -318,15 +319,16 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 			var $tbody = $('#resource-editor > tbody');
 
 			function toNTriple(triple) {
-				return '<' + triple.s + '> <' + triple.p + '> <' + triple.o + '> .';
+				return '<' + triple.s.value + '> <' + triple.p.value + '> <' + triple.o.value + '> .';
 			}
 
 
-			$tbody.children('tr').data('new-triple').each(function(i, obj) {
+			$tbody.children('tr').each(function(i, obj) {
+				var triple = obj.data('new-triple');
 				console.log(obj);
 			});
 
-			$tbody.data('deleted-triples').each(function(i, obj) {
+			$tbody.data('deleted-triples').forEach(function(obj) {
 				console.log(obj);
 			});
 		},
@@ -393,7 +395,10 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'jquery.openid',
 					var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
 					$row.append($('<td />').append($clear));
 
-					results[i].s = {type: 'uri', value: uri};
+					results[i].s = {
+						type : 'uri',
+						value : uri
+					};
 					$row.data('old-triple', results[i]);
 
 					$tbody.append($row);

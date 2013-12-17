@@ -509,7 +509,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				if (self.currentVersion)
 					data['rwb-version'] = self.currentVersion;
 
-				this.toggleLoader();
+				self.toggleLoader();
 
 				$.ajax({
 					url : url,

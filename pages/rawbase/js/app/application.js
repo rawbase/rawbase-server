@@ -1,4 +1,4 @@
-define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min' , 'jquery.openid', 'jqueryui/jquery-ui.min', 'jqueryui-editable.min', 'slickgrid/lib/jquery.event.drag-2.2', 'n3', 'jquery.tipsy', 'bootstrap-select.min', 'slickgrid/slick.core', 'slickgrid/slick.formatters', 'slickgrid/slick.grid', 'slickgrid/slick.editors', 'slickgrid/plugins/slick.cellrangedecorator', 'slickgrid/plugins/slick.cellrangeselector', 'slickgrid/plugins/slick.cellselectionmodel'], function($, Authenticator) {"use strict";
+define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 'jquery.openid', 'jqueryui/jquery-ui.min', 'jqueryui-editable.min', 'slickgrid/lib/jquery.event.drag-2.2', 'n3', 'jquery.tipsy', 'bootstrap-select.min', 'slickgrid/slick.core', 'slickgrid/slick.formatters', 'slickgrid/slick.grid', 'slickgrid/slick.editors', 'slickgrid/plugins/slick.cellrangedecorator', 'slickgrid/plugins/slick.cellrangeselector', 'slickgrid/plugins/slick.cellselectionmodel'], function($, Authenticator) {"use strict";
 
 	function Application() {
 		this.HOST = config.host;
@@ -15,6 +15,34 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min' ,
 		$tr.remove();
 	}
 
+	function saveValue(e, params) {
+		var $tr = $(this).parents('tr');
+		var triple = jQuery.extend(true, {
+			s : {
+				type : 'uri',
+				value : uri
+			},
+			p : {
+				type : 'uri',
+				value : null
+			},
+			o : {
+				type : 'Literal',
+				value : null
+			}
+
+		}, $tr.data('oldTriple') || {});
+
+		triple[$(this).attr('name')].value = params.newValue;
+
+		/*
+		 * FUTURE: add comparison between new and old to make sure reverted triples are not deleted!!!!!
+		 */
+		$tbody.data('deletedTriples').push($tr.data('oldTriple'));
+
+		$tr.data('newTriple', triple);
+
+	};
 
 	Application.prototype = {
 		init : function() {
@@ -44,8 +72,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min' ,
 
 			$('#editor-add').on('click', function() {
 				var $row = $('<tr />');
-				$row.append($('<td />').append($('<a href="#" name="p" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />').text('Empty').editable()));
-				$row.append($('<td />').append($('<a href="#" name="o" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />').text('Empty').editable()));
+				$row.append($('<td />').append($('<a href="#" name="p" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />').text('Empty').editable().on('save', saveValue)));
+				$row.append($('<td />').append($('<a href="#" name="o" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click editable-empty" />').text('Empty').editable().on('save', saveValue)));
 				var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
 
 				$row.append($('<td />').append($clear));
@@ -336,12 +364,14 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min' ,
 
 			$tbody.children('tr').each(function(i, obj) {
 				var triple = $(obj).data('newTriple');
+				if (!triple){
 				if (!triple.s.value || !triple.p.value || !triple.o.value) {
 					addErrorMessage('Update is incomplete');
 					return;
 				}
 
 				query += toNTriple(triple);
+				}
 			});
 
 			query += '} DELETE DATA { ';
@@ -363,7 +393,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min' ,
 		loadResource : function(uri) {
 			var self = this;
 			var query = 'SELECT ?p ?o  WHERE { <' + uri + '> ?p ?o }';
-			
+
 			var $tbody = $('#resource-editor > tbody');
 
 			function processLiteral(l) {
@@ -378,35 +408,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min' ,
 				}
 				return $('<a href="#" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click" />').text(l.value);
 			}
-
-			function saveValue(e, params) {
-				var $tr = $(this).parents('tr');
-				var triple = jQuery.extend(true, {
-					s : {
-						type : 'uri',
-						value : uri
-					},
-					p : {
-						type : 'uri',
-						value : null
-					},
-					o : {
-						type : 'Literal',
-						value : null
-					}
-
-				}, $tr.data('oldTriple') || {});
-
-				triple[$(this).attr('name')].value = params.newValue;
-				
-				/*
-				 * FUTURE: add comparison between new and old to make sure reverted triples are not deleted!!!!!
-				 */
-				$tbody.data('deletedTriples').push($tr.data('oldTriple'));
-				
-				$tr.data('newTriple', triple);
-
-			};
 
 			function processBinding(b) {
 				var $a;

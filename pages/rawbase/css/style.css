@@ -57,9 +57,6 @@ svg {
     cursor: pointer
 }
 
-.node rect:hover {
-	fill: #aaa;
-}
 
 .node-selected rect {
 	fill: #cfc;

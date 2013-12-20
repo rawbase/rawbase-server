@@ -194,7 +194,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 							// our nodes.
 							g.addNode(commit.version, {
 								label : commit.version,
-								commit : commit.iri
+								commit : commits[commit.iri]
 							});
 						}
 					}
@@ -261,7 +261,15 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			var svg = d3.select("#graph").append("svg").attr("width", width).attr("height", height).append("g").attr("transform", 'translate(20,20)');
 
 			var renderer = new dagreD3.Renderer();
-			var layout = dagreD3.layout().nodeSep(20).rankDir("LR");
+			var layout = dagreD3.layout().nodeSep(10).rankDir("LR");
+
+			var oldDrawNode = renderer.drawNode();
+			renderer.drawNode(function(graph, u, svg) {
+				oldDrawNode(graph, u, svg);
+				$(svg[0]).data('commit', graph.node(u).commit);
+				//svg.attr("id", graph.node(u).);
+			});
+			
 			renderer.layout(layout).run(g, svg);
 
 			$('.node').on('click', function() {
@@ -269,12 +277,14 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				$('.node-selected').attr('class', "node");
 				$(this).attr('class', "node-selected");
 			});
+			
+			
 
 			$('.node').tipsy({
 				gravity : 's',
 				html : true,
 				title : function() {
-					var commit = commits[this.__data__];
+					var commit = $(this).data('commit');
 
 					var html = '<table><tr><td>Message: </td><td>' + commit.message.split('"')[1] + '</td></tr>';
 					html += '<tr><td>Author: </td><td><a href="' + commit.author + '">' + commit.author + "</a></td></tr>";

@@ -20,7 +20,7 @@
 	width: 100%;
 	height: 100%
 }
-
+/*
 .link {
 	fill: none;
 	stroke: #666;
@@ -44,6 +44,39 @@ text {
 	font: 10px sans-serif;
 	pointer-events: none;
 }
+*/
+
+svg {
+    overflow: auto;
+}
+
+.node rect {
+    /*stroke: #333;
+    stroke-width: 1.5px;*/
+    fill: #fff;
+    cursor: pointer
+}
+
+.node rect:hover {
+	fill: #aaa;
+}
+
+.node-selected rect {
+	fill: #cfc;
+	stroke: #fff;
+	stroke-width: 1.5px;
+}
+
+.edgeLabel rect {
+    fill: #fff;
+}
+
+.edge path {
+    stroke: #333;
+    stroke-width: 1.5px;
+    fill: none;
+}
+
 
 /*
  General controls

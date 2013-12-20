@@ -72,7 +72,8 @@
                 exports: 'd3.layout'
             },
             'dagre-d3.min': {
-            	deps: ['d3/d3']
+            	deps: ['d3/d3'],
+            	exports: 'dagreD3'
             }
         },
     });

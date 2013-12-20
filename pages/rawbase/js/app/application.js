@@ -27,7 +27,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				value : null
 			}
 
-		}, $tr.data('newTriple') || $tr.data('oldTriple') || {}); //Copy the new triple, if null copy the old one, if null use default
+		}, $tr.data('newTriple') || $tr.data('oldTriple') || {});
+		//Copy the new triple, if null copy the old one, if null use default
 
 		triple[$(this).attr('name')].value = params.newValue;
 
@@ -149,8 +150,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					graph : 'urn:rawbase:provenance'
 				},
 				success : function(data) {
-					self.parsePROV(data, function(links, nodes, commits) {
-						self.initD3(null, links, nodes, commits);
+					self.parsePROV(data, function(g, commits) {
+						//self.initD3(null, links, nodes, commits);
+						self.initDagre(g, commits);
 					});
 				},
 				error : function() {
@@ -174,7 +176,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 		},
 		parsePROV : function(prov, success, error) {
 			var self = this;
-			var links = [], nodes = {}, commits = {};
+			var commits = [];
+			// Create a new directed graph
+			var g = new dagreD3.Digraph();
 
 			this.parseN3(prov, function(triple) {
 				console.log(triple.subject, triple.predicate, triple.object, '.');
@@ -184,22 +188,29 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				if (commit) {
 					commits[commit.iri] = commit;
 					if (commit.version) {
-						nodes[commit.version] = {
-							name : commit.version,
-							commit : commit.iri
-						};
+						if (!g.hasNode(commit.version)) {
+							// Add nodes to the graph. The first argument is the node id. The second is
+							// metadata about the node. In this case we're going to add labels to each of
+							// our nodes.
+							g.addNode(commit.version, {
+								label : commit.version,
+								commit : commit.iri
+							});
+						}
 					}
 				}
 
 				if (triple.predicate == "http://www.w3.org/ns/prov#wasDerivedFrom") {
-					links.push({
-						source : triple.subject,
-						target : triple.object,
-						type : triple.predicate
-					});
+
+					// Add edges to the graph. The first argument is the edge id. Here we use null
+					// to indicate that an arbitrary edge id can be assigned automatically. The
+					// second argument is the source of the edge. The third argument is the target
+					// of the edge. The last argument is the edge metadata.
+					g.addEdge(null, triple.object, triple.subject, {});
+
 				}
 			}, function() {
-				success(links, nodes, commits);
+				success(g, commits);
 			}, function(err) {
 
 			});
@@ -239,60 +250,31 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			else
 				$('#loader').dialog("close");
 		},
-		initD3 : function(error, links, nodes, commits) {
+		initDagre : function(g, commits) {
 			var self = this;
-			//                var nodes = {};
-			//
-			// Compute the distinct nodes from the links.
-			links.forEach(function(link) {
-				link.source = nodes[link.source] || (nodes[link.source] = {
-					name : link.source
-				});
-				link.target = nodes[link.target] || (nodes[link.target] = {
-					name : link.target
-				});
-			});
-
-			for (var key in nodes) {
-				this.currentVersion = nodes[key].name;
-				break;
-			}
 
 			var width = $('#graph').width(), height = $('#graph').height();
 
 			//Clear the div
 			$('#graph').empty();
 
-			var force = d3.layout.force().nodes(d3.values(nodes)).links(links).size([width, height]).linkDistance(10).charge(-800).on("tick", tick).start();
+			var svg = d3.select("#graph").append("svg").attr("width", width).attr("height", height).append("g").attr("transform", 'translate(20,20)');
 
-			var svg = d3.select("#graph").append("svg").attr("width", width).attr("height", height);
+			var renderer = new dagreD3.Renderer();
+			var layout = dagreD3.layout().nodeSep(20).rankDir("LR");
+			renderer.layout(layout).run(g, svg);
 
-			// build the arrow.
-			svg.append("svg:defs").selectAll("marker").data(["end"])// Different link/path types can be defined here
-			.enter().append("svg:marker")// This section adds in the arrows
-			.attr("id", String).attr("viewBox", "0 -5 10 10").attr("refX", 15).attr("refY", -1.5).attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto").append("svg:path").attr("d", "M0,-5L10,0L0,5");
-
-			var link = svg.selectAll(".link").data(force.links()).enter().append("line").attr("class", "link").attr("marker-end", "url(#end)");
-
-			var node = svg.selectAll(".node").data(force.nodes()).enter().append("g").attr("class", function(d) {
-				if (self.currentVersion == d.name) {
-					return "node-selected";
-				}
-				return "node";
-			}).on("mouseover", mouseover).on("mouseout", mouseout).on("click", click).call(force.drag);
-
-			node.append("circle").attr("r", function(d) {
-				if (self.currentVersion == d.name) {
-					return 8;
-				}
-				return 4;
+			$('.node').on('click', function() {
+				self.currentVersion = $(this).text();
+				$('.node-selected').attr('class', "node");
+				$(this).attr('class', "node-selected");
 			});
 
-			$('svg circle').tipsy({
+			$('.node').tipsy({
 				gravity : 's',
 				html : true,
 				title : function() {
-					var commit = commits[this.__data__.commit];
+					var commit = commits[this.__data__];
 
 					var html = '<table><tr><td>Message: </td><td>' + commit.message.split('"')[1] + '</td></tr>';
 					html += '<tr><td>Author: </td><td><a href="' + commit.author + '">' + commit.author + "</a></td></tr>";
@@ -301,50 +283,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					return html;
 				}
 			});
-
-			node.append("text").attr("x", 6).attr("dy", ".35em").text(function(d) {
-				return d.name;
-			});
-
-			function tick() {
-				link.attr("x1", function(d) {
-					return d.source.x;
-				}).attr("y1", function(d) {
-					return d.source.y;
-				}).attr("x2", function(d) {
-					return d.target.x;
-				}).attr("y2", function(d) {
-					return d.target.y;
-				});
-
-				node.attr("transform", function(d) {
-					return "translate(" + d.x + "," + d.y + ")";
-				});
-			}
-
-			function mouseover() {
-				d3.select(this).select("circle").transition().duration(200).attr("r", 8);
-			}
-
-			function mouseout() {
-				if (self.currentVersion != d3.select(this).select("text").text()) {
-					d3.select(this).select("circle").transition().duration(200).attr("r", 4);
-				}
-			}
-
-			function click() {
-				node.selectAll("circle").attr("r", 4);
-				node.attr("class", "node");
-
-				d3.select(this).select("circle").attr("r", 8);
-				d3.select(this).attr("class", "node-selected");
-
-				self.currentVersion = d3.select(this).select("text").text();
-
-				self.executeSparql($('#query-text').val(), self.buildGrid, function(err) {
-
-				});
-			}
 
 		},
 		saveResource : function(message) {
@@ -367,7 +305,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						self.addErrorMessage('Update is incomplete');
 						return;
 					}
-					
+
 					triple.s = {
 						type : 'uri',
 						value : $tbody.data('subject')
@@ -381,9 +319,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			$tbody.data('deletedTriples').forEach(function(triple) {
 				triple.s = {
-						type : 'uri',
-						value : $tbody.data('subject')
-					};
+					type : 'uri',
+					value : $tbody.data('subject')
+				};
 				query += toNTriple(triple);
 
 			});
@@ -400,7 +338,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 		loadResource : function(uri) {
 			var self = this;
 			var query = 'SELECT ?p ?o  WHERE { <' + uri + '> ?p ?o }';
-
 
 			function processLiteral(l) {
 				if (l['xml:lang']) {
@@ -434,11 +371,11 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			this.executeSparql(query, function(resultset) {
 				var results = resultset.results.bindings;
-				
+
 				var $tbody = $('#resource-editor > tbody');
 
 				$tbody.data('deletedTriples', []);
-				
+
 				$tbody.data('subject', uri);
 
 				$tbody.empty();

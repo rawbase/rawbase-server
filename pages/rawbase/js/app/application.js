@@ -365,7 +365,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			function processLiteral(l) {
 				if (l['xml:lang']) {
-					return $('<a href="#" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click" style="display: inline;" />').text(l.value + '@' + l['xml:lang']);
+					
+					
+					return $('<a href="#" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click" />').text(l.value + '@' + l['xml:lang']);
 				} else if (l.datatype) {
 					switch (l.datatype) {
 						case 'http://www.w3.org/2001/XMLSchema#dateTime':

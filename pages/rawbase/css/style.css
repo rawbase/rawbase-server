@@ -51,8 +51,8 @@ svg {
 }
 
 .node rect {
-    /*stroke: #333;
-    stroke-width: 1.5px;*/
+    stroke: #333;
+    stroke-width: 1px;
     fill: #fff;
     cursor: pointer
 }

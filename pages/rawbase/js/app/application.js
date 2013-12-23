@@ -184,6 +184,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				console.log(triple.subject, triple.predicate, triple.object, '.');
 
 				var commit = self.parseCommit(triple, commits[triple.subject]);
+				var links = [];
 
 				if (commit) {
 					commits[commit.iri] = commit;
@@ -192,10 +193,18 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 							// Add nodes to the graph. The first argument is the node id. The second is
 							// metadata about the node. In this case we're going to add labels to each of
 							// our nodes.
-							g.addNode(commit.version, {
-								label : commit.version,
-								commit : commits[commit.iri]
-							});
+
+							if (g.hasNode(commit.version)) {
+								g.node(commit.version, {
+									label : commit.version,
+									commit : commits[commit.iri]
+								});
+							} else {
+								g.addNode(commit.version, {
+									label : commit.version,
+									commit : commits[commit.iri]
+								});
+							}
 						}
 					}
 				}
@@ -206,6 +215,14 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					// to indicate that an arbitrary edge id can be assigned automatically. The
 					// second argument is the source of the edge. The third argument is the target
 					// of the edge. The last argument is the edge metadata.
+					if (!g.hasNode(triple.object)) {
+						g.addNode(triple.object);
+					}
+
+					if (!g.hasNode(triple.subject)) {
+						g.addNode(triple.subject);
+					}
+
 					g.addEdge(null, triple.object, triple.subject, {});
 
 				}
@@ -269,7 +286,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				$(svg[0]).data('commit', graph.node(u).commit);
 				//svg.attr("id", graph.node(u).);
 			});
-			
+
 			renderer.layout(layout).run(g, svg);
 
 			$('.node').on('click', function() {
@@ -277,8 +294,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				$('.node-selected').attr('class', "node");
 				$(this).attr('class', "node-selected");
 			});
-			
-			
 
 			$('.node').tipsy({
 				gravity : 's',

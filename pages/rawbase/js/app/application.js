@@ -184,28 +184,27 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				console.log(triple.subject, triple.predicate, triple.object, '.');
 
 				var commit = self.parseCommit(triple, commits[triple.subject]);
-				var links = [];
 
 				if (commit) {
 					commits[commit.iri] = commit;
 					if (commit.version) {
-						if (!g.hasNode(commit.version)) {
-							// Add nodes to the graph. The first argument is the node id. The second is
-							// metadata about the node. In this case we're going to add labels to each of
-							// our nodes.
 
-							if (g.hasNode(commit.version)) {
-								g.node(commit.version, {
-									label : commit.version,
-									commit : commits[commit.iri]
-								});
-							} else {
-								g.addNode(commit.version, {
-									label : commit.version,
-									commit : commits[commit.iri]
-								});
-							}
+						// Add nodes to the graph. The first argument is the node id. The second is
+						// metadata about the node. In this case we're going to add labels to each of
+						// our nodes.
+
+						if (g.hasNode(commit.version)) {
+							g.node(commit.version, {
+								label : commit.version,
+								commit : commits[commit.iri]
+							});
+						} else {
+							g.addNode(commit.version, {
+								label : commit.version,
+								commit : commits[commit.iri]
+							});
 						}
+
 					}
 				}
 

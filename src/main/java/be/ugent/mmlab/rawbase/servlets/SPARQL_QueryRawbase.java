@@ -15,11 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ugent.mmlab.servlets.rawbase;
+package be.ugent.mmlab.rawbase.servlets;
 
-import be.ugent.mmlab.jena.rawbase.RawbaseCommitIndex;
-import be.ugent.mmlab.jena.rawbase.RawbaseCommitManager;
-import be.ugent.mmlab.jena.rawbase.RawbaseQueryExecutionFactory;
+import be.ugent.mmlab.rawbase.jena.RawbaseCommitIndex;
+import be.ugent.mmlab.rawbase.jena.RawbaseCommitManager;
+import be.ugent.mmlab.rawbase.jena.RawbaseQueryExecutionFactory;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryException;

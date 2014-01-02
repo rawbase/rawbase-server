@@ -237,14 +237,14 @@
             </exclusions> 
         </dependency>
         <dependency>
-            <groupId>be.ugent.mmlab</groupId>
-            <artifactId>delta-jena</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.expressme</groupId>
             <artifactId>JOpenId</artifactId>
             <version>1.08</version>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.3</version>
         </dependency>
     </dependencies>
 
@@ -276,8 +276,8 @@
                     <optimize>true</optimize>
                     <debug>true</debug>
                     <debuglevel>source,lines,vars</debuglevel>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
 

@@ -1,4 +1,4 @@
-package jopenid.sample;
+package be.ugent.mmlab.rawbase.servlets.openid;
 
 import java.io.IOException;
 import java.io.PrintWriter;

@@ -1,8 +1,8 @@
 package be.ugent.mmlab.triplestore;
 
-import be.ugent.mmlab.deltajena.VirtDataSet;
-import be.ugent.mmlab.deltajena.VirtGraph;
-import be.ugent.mmlab.deltajena.VirtModel;
+import be.ugent.mmlab.virtuoso.jena.VirtDataSet;
+import be.ugent.mmlab.virtuoso.jena.VirtGraph;
+import be.ugent.mmlab.virtuoso.jena.VirtModel;
 
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 

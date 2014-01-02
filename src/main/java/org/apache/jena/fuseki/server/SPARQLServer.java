@@ -18,9 +18,9 @@
 
 package org.apache.jena.fuseki.server;
 
-import be.ugent.mmlab.servlets.rawbase.SPARQL_QueryRawbase;
-import be.ugent.mmlab.servlets.rawbase.SPARQL_UpdateRawbase;
-import be.ugent.mmlab.jena.rawbase.RawbaseDataSet;
+import be.ugent.mmlab.rawbase.servlets.SPARQL_QueryRawbase;
+import be.ugent.mmlab.rawbase.servlets.SPARQL_UpdateRawbase;
+import be.ugent.mmlab.rawbase.jena.RawbaseDataSet;
 import static java.lang.String.format ;
 import static org.apache.jena.fuseki.Fuseki.serverLog ;
 
@@ -54,7 +54,7 @@ import org.eclipse.jetty.servlets.GzipFilter;
 
 
 import com.hp.hpl.jena.sparql.util.Utils ;
-import jopenid.sample.OpenIdServlet;
+import be.ugent.mmlab.rawbase.servlets.openid.OpenIdServlet;
 
 public class SPARQLServer
 {

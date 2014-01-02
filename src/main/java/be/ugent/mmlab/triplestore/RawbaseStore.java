@@ -1,7 +1,7 @@
 package be.ugent.mmlab.triplestore;
 
-import be.ugent.mmlab.jena.rawbase.RawbaseCommitManager;
-import be.ugent.mmlab.jena.rawbase.RawbaseDataSet;
+import be.ugent.mmlab.rawbase.jena.RawbaseCommitManager;
+import be.ugent.mmlab.rawbase.jena.RawbaseDataSet;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import java.util.logging.Level;
 import java.util.logging.Logger;

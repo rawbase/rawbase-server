@@ -35,9 +35,11 @@ import com.hp.hpl.jena.util.iterator.*;
 import com.hp.hpl.jena.datatypes.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.*;
+import org.apache.jena.fuseki.Fuseki;
 
 import virtuoso.jdbc3.VirtuosoConnectionPoolDataSource;
 import virtuoso.jdbc3.VirtuosoDataSource;
+import virtuoso.jdbc3.VirtuosoException;
 
 
 public class VirtGraph extends GraphBase
@@ -170,6 +172,9 @@ public class VirtGraph extends GraphBase
 
 	    ModelCom m = new ModelCom(this); //don't drop is it needed for initialize internal Jena classes
 	    TypeMapper tm = TypeMapper.getInstance();
+        } catch (VirtuosoException ex) {
+            Fuseki.serverLog.warn("R&Wbase cannot connect to Virtuoso, is it running? Aborting startup", ex);
+            System.exit(0);    
 	} catch(Exception e) {
 	    throw new JenaException(e);
 	}

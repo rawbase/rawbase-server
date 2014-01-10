@@ -18,12 +18,12 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>jena-virtuoso-fuseki</artifactId>
+    <artifactId>rawbase</artifactId>
     <packaging>jar</packaging>
-    <name>Apache Jena - Virtuoso - Fuseki (SPARQL 1.1 Server)</name>
-    <version>0.2.7</version>
-    <description>Fuseki is a SPARQL 1.1 Server which provides query, update and graph store protocol endpoints that can be used to expose  triple store(s) over HTTP. This version of Fuseki is extended to include sparql endpoints over Openlink Virtuoso Triple Stores.</description>
-    <url>http://jena.apache.org/</url>
+    <name>R&amp;Wbase</name>
+    <version>0.1</version>
+    <description>R&amp;Wbase is a distributed triple versioning control sytem based on Fuseki. Fuseki is a SPARQL 1.1 Server which provides query, update and graph store protocol endpoints that can be used to expose  triple store(s) over HTTP. This version of Fuseki is extended to include sparql endpoints over Openlink Virtuoso Triple Stores.</description>
+    <url>http://rawbase.github.io</url>
 
     <parent>
         <groupId>org.apache.jena</groupId>
@@ -405,12 +405,6 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-      
-      
-      
-
         </plugins>
-
     </build>
-  
 </project>

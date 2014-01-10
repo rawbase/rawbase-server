@@ -9,18 +9,19 @@ define( ['jquery'], function ($){
         this.REDIRECT    =   config.google.redirect;
         this.LOGOUT      =   'http://accounts.google.com/Logout';
         this.TYPE        =   'token';
+        this.KEY		 =   'AIzaSyD3XA9W9Sw5ComQ7be7lEBIS2IcAlkHgpM';
         this._url        =   this.OAUTHURL + 'scope=' + this.SCOPE + '&client_id=' + this.CLIENTID + '&redirect_uri=' + this.REDIRECT + '&response_type=' + this.TYPE;
         this.acToken;
         this.tokenType;
         this.expiresIn;
         this.user;
         this.loggedIn    =   false;
-    }
+    };
     
     Authenticator.prototype = {
         login: function(callback) {
             var self = this;
-            var win         =   window.open(this._url, "windowname1", 'width=800, height=600'); 
+            var win  = window.open(this._url, "windowname1", 'width=800, height=600'); 
 
             //credits: http://www.netlobo.com/url_query_string_javascript.html
             function gup(url, name) {
@@ -99,20 +100,15 @@ define( ['jquery'], function ($){
         getURI: function() {
             return this.user.link;
         },
-        getUser: function (uri) {
+        getUser: function (uri, callback) {
             
             function extractID(uri){
                 return uri.substr(uri.lastIndexOf('/') + 1);
             }
             
-            var url = 'https://www.googleapis.com/plus/v1/people/' + extractID(uri);
+            var url = 'https://www.googleapis.com/plus/v1/people/' + extractID(uri) + '?key=' + this.KEY;
             
-            $.getJSON(url,{}, function(user){
-                
-                
-                
-            });
-            
+            $.getJSON(url,{}, callback);
         }
         
     }

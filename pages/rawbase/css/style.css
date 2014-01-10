@@ -54,14 +54,14 @@ svg {
     stroke: #333;
     stroke-width: 1px;
     fill: #fff;
-    cursor: pointer
+    cursor: pointer;
 }
 
 
 .node-selected rect {
 	fill: #cfc;
 	stroke: #fff;
-	stroke-width: 1.5px;
+	stroke-width: 1px;
 }
 
 .edgeLabel rect {
@@ -78,6 +78,15 @@ svg {
 /*
  General controls
  */
+
+#commit-detail table {
+	width: 100%
+
+}
+
+#commit-detail span {
+width: 100%
+}
 
 #login {
 	margin: 20px;

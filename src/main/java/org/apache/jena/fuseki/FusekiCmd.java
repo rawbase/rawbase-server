@@ -51,6 +51,7 @@ import com.hp.hpl.jena.sparql.core.DatasetGraphFactory ;
 import com.hp.hpl.jena.tdb.TDB ;
 import com.hp.hpl.jena.tdb.TDBFactory ;
 import com.hp.hpl.jena.tdb.transaction.TransactionManager ;
+import virtuoso.jdbc3.VirtuosoException;
 
 public class FusekiCmd extends CmdARQ
 {

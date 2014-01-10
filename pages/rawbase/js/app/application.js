@@ -195,12 +195,14 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 						if (g.hasNode(commit.version)) {
 							g.node(commit.version, {
-								label : commit.version,
+								//label : commit.version,
+								label : '',
 								commit : commits[commit.iri]
 							});
 						} else {
 							g.addNode(commit.version, {
-								label : commit.version,
+								//label : commit.version,
+								label : '',
 								commit : commits[commit.iri]
 							});
 						}
@@ -293,19 +295,20 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				$('.node-selected').attr('class', "node");
 				$(this).attr('class', "node-selected");
 			});
-
-			$('.node').tipsy({
-				gravity : 's',
-				html : true,
-				title : function() {
-					var commit = $(this).data('commit');
-
-					var html = '<table><tr><td>Message: </td><td>' + commit.message.split('"')[1] + '</td></tr>';
-					html += '<tr><td>Author: </td><td><a href="' + commit.author + '">' + commit.author + "</a></td></tr>";
-					html += '<tr><td>Time: </td><td>' + commit.timestamp.split('"')[1] + '</td></tr>';
-
-					return html;
-				}
+			
+			
+			$('.node').on('mouseover', function() {
+				
+				var commit = $(this).data('commit');
+				
+				$('#commit-graph-message').text(commit.message.split('"')[1]);
+				self.authenticator.getUser(commit.author,
+					function(user){
+						$('#commit-graph-photo').html($('<img />').attr('src',user.image.url));
+						$('#commit-graph-name').text(user.displayName);
+						$('#commit-graph-url').text(commit.author);
+					});
+				$('#commit-graph-time').text(commit.timestamp.split('"')[1]);
 			});
 
 		},

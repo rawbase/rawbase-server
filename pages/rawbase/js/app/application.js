@@ -366,6 +366,11 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						$commitDetail.find('.graph-photo').html($('<img />').attr('src', user.image.url));
 						$commitDetail.find('.graph-name').html($('<a />').attr('href', commit.author).text(user.displayName));
 					});
+				else {
+					$commitDetail.find('.graph-photo').html($('<img />').attr('src', config.defaultAvatar));
+					$commitDetail.find('.graph-name').html($('<a />').attr('href', commit.author).text('Anonymous'));
+				}
+					
 				
 				if (commit.timestamp)
 					$commitDetail.find('.graph-time').text(commit.timestamp.split('"')[1]);

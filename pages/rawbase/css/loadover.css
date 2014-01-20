@@ -1,0 +1,28 @@
+.loadOver {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 40px;
+	height: 40px;
+	margin-top: -20px;
+	margin-left: -20px;
+	overflow: hidden;
+	z-index: 9999;
+}
+
+.loadOverDiv {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 40px;
+	height: 480px;
+	background-image: url('../images/ajax-loader_blue.gif') no-repeat;
+}
+
+.loadOverOverlay {
+	z-index: 9999;
+	display: none;
+	background-color: #777;
+	opacity: 0.7;
+	cursor: wait;
+}

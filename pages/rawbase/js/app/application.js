@@ -1,4 +1,4 @@
-define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 'jquery.openid', 'jqueryui/jquery-ui.min', 'jqueryui-editable.min', 'slickgrid/lib/jquery.event.drag-2.2', 'n3', 'jquery.tipsy', 'bootstrap-select.min', 'slickgrid/slick.core', 'slickgrid/slick.formatters', 'slickgrid/slick.grid', 'slickgrid/slick.editors', 'slickgrid/plugins/slick.cellrangedecorator', 'slickgrid/plugins/slick.cellrangeselector', 'slickgrid/plugins/slick.cellselectionmodel'], function($, Authenticator) {"use strict";
+define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 'jquery.openid', 'jqueryui/jquery-ui.min', 'jqueryui-editable.min', 'slickgrid/lib/jquery.event.drag-2.2', 'n3', 'jquery.tipsy', 'bootstrap-select.min', 'slickgrid/slick.core', 'slickgrid/slick.formatters', 'slickgrid/slick.grid', 'slickgrid/slick.editors', 'slickgrid/plugins/slick.cellrangedecorator', 'slickgrid/plugins/slick.cellrangeselector', 'slickgrid/plugins/slick.cellselectionmodel', 'loadover'], function($, Authenticator) {"use strict";
 
 	function Application() {
 		this.HOST = config.host;
@@ -141,6 +141,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 		},
 		getPROV : function() {
 			var self = this;
+			
+			$('#network > .panel-body').loadOverStart();
+			
 			$.ajax({
 				url : this.HOST + 'get',
 				beforeSend : function(xhrObj) {
@@ -151,7 +154,10 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				},
 				success : function(data) {
 					self.parsePROV(data, function(g, commits) {
-						//self.initD3(null, links, nodes, commits);
+
+						if (!self.currentVersion)
+							self.currentVersion = g.nodes(g.nodes().length -1);
+										
 						self.initDagre(g, commits);
 					});
 				},
@@ -223,7 +229,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					if (!g.hasNode(triple.subject)) {
 						g.addNode(triple.subject);
 					}
-
+					
 					g.addEdge(null, triple.object, triple.subject, {});
 
 				}
@@ -232,6 +238,48 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			}, function(err) {
 
 			});
+		},
+		getTypes : function() {
+			var query = 'SELECT DISTINCT ?type WHERE { ?s a ?type } GROUP BY ?type';
+
+			
+			$('#tab1').loadOverStart();
+			
+			this.executeSparql(query, function(data){
+				var results = resultset.results.bindings;
+				
+				results.forEach(function(result){
+					var $li = $('<li class="active" />').appendTo($('#types-list'));
+
+					var $a = $('<a href="#" />')
+					.append(result.type.value)
+					.appendTo($li);
+					
+					var countQuery = 'SELECT COUNT(*) AS ?cnt WHERE { ?s a <' + result.type.value + '> }';
+					
+					this.executeSparql(countQuery, function(data){
+						var count = resultset.results.bindings;
+						
+						$a.append($('<span class="badge pull-right" />').text(count[0].cnt.value));
+					});
+					
+					//Prefetch columns
+					var columnQuery = 'SELECT DISTINCT ?p WHERE { ?s a <' + result.type.value + '>; ?p ?o }';
+					
+					this.executeSparql(countQuery, function(data){
+						var predicates = resultset.results.bindings;
+						
+						$a.data('columns', predicates);
+					});
+					
+					$('#tab1').loadOverStop();
+					
+				});
+				
+			},function(error){
+				
+			});
+			
 		},
 		parseCommit : function(triple, commit) {
 
@@ -262,12 +310,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			return commit;
 		},
-		toggleLoader : function() {
-			if (!$('#loader').dialog("isOpen"))
-				$('#loader').dialog("open");
-			else
-				$('#loader').dialog("close");
-		},
 		initDagre : function(g, commits) {
 			var self = this;
 
@@ -285,34 +327,46 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			renderer.drawNode(function(graph, u, svg) {
 				oldDrawNode(graph, u, svg);
 				$(svg[0]).data('commit', graph.node(u).commit);
+				$(svg[0]).data('uri', u);
 				//svg.attr("id", graph.node(u).);
 			});
 
 			renderer.layout(layout).run(g, svg);
-			
+
 			$('.node rect').attr('x', -5).attr('y', -5).attr('width', 10).attr('height', 10);
-			
-			$('.node').on('click', function() {
-				self.currentVersion = $(this).text();
+
+			$('.node')
+			.each(function(){
+				if ($(this).data('uri') === self.currentVersion)
+				$(this).attr('class','node-selected');
+			})
+			.on('click', function() {
+				self.currentVersion = $(this).data('uri');
 				$('.node-selected').attr('class', "node");
 				$(this).attr('class', "node-selected");
-			});
-
-			$('.node').hover(function() {
+			})
+			.hover(function() {
 
 				var offset = $(this).offset();
 				var width = $(this).outerWidth();
 
 				var commit = $(this).data('commit');
 				var $commitDetail = $('#commit-detail');
+				
+				if (commit.message)
+					$commitDetail.find('.graph-message').text(commit.message.split('"')[1]);
 
-				$commitDetail.find('.graph-message').text(commit.message.split('"')[1]);
-				$commitDetail.find('.graph-hash').text(commit.iri);
-				self.authenticator.getUser(commit.author, function(user) {
-					$commitDetail.find('.graph-photo').html($('<img />').attr('src', user.image.url));
-					$commitDetail.find('.graph-name').html($('<a />').attr('href', commit.author).text(user.displayName));
-				});
-				$commitDetail.find('.graph-time').text(commit.timestamp.split('"')[1]);
+				if (commit.iri)
+					$commitDetail.find('.graph-hash').text(commit.iri);
+				
+				if (commit.author)
+					self.authenticator.getUser(commit.author, function(user) {
+						$commitDetail.find('.graph-photo').html($('<img />').attr('src', user.image.url));
+						$commitDetail.find('.graph-name').html($('<a />').attr('href', commit.author).text(user.displayName));
+					});
+				
+				if (commit.timestamp)
+					$commitDetail.find('.graph-time').text(commit.timestamp.split('"')[1]);
 
 				$('#commit-detail').css({
 					top : offset.top,
@@ -322,11 +376,15 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			}, function() {
 				$('#commit-detail').hide();
 			});
-			
-			$('#graph > svg').draggable({ axis: "x" });
-			
+
+			$('#graph > svg').draggable({
+				axis : "x"
+			});
+
 			$('#graph').height($('#graph > svg').height());
 			//$('#graph').width();
+			
+			$('#network > .panel-body').loadOverStop();
 
 		},
 		saveResource : function(message) {
@@ -450,8 +508,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			var self = this;
 			var url = this.HOST + "sparql";
 
-			this.toggleLoader();
-
 			$.ajax({
 				url : url,
 				beforeSend : function(xhrObj) {
@@ -463,11 +519,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					'rwb-user' : this.user
 				},
 				success : function(data) {
-					self.toggleLoader();
 					success(data);
 				},
 				error : function(err) {
-					self.toggleLoader();
 
 					self.addErrorMessage(err.statusText);
 
@@ -493,18 +547,18 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				if (self.currentVersion)
 					data['rwb-version'] = self.currentVersion;
 
-				self.toggleLoader();
+				$('#tab2').loadOverStart();
 
 				$.ajax({
 					url : url,
 					type : 'POST',
 					data : data,
 					success : function(data) {
-						self.toggleLoader();
+						$('#tab2').loadOverStop();
 						success(data);
 					},
 					error : function(err) {
-						self.toggleLoader();
+						$('#tab2').loadOverStop();
 						error(err);
 					}
 				});

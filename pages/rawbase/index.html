@@ -11,6 +11,7 @@
 		<link href="rawbase/js/lib/jquery-ui-1.10.3/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 		<link href="rawbase/css/grid.css" rel="stylesheet" type="text/css" />
 		<link href="rawbase/css/jqueryui-editable.css" rel="stylesheet" type="text/css" />
+		<link href="rawbase/css/loadover.css" rel="stylesheet" type="text/css" />
 		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 		<!--[if lt IE 9]>
@@ -47,16 +48,24 @@
 				<span class="pull-right"> <!-- Tabs -->
 					<ul class="nav panel-tabs">
 						<li class="active">
-							<a href="#tab1" data-toggle="tab">SPARQL</a>
+							<a href="#tab1" data-toggle="tab">Types View</a>
 						</li>
 						<li>
-							<a href="#tab2" data-toggle="tab">Resource Editor</a>
+							<a href="#tab2" data-toggle="tab">SPARQL</a>
+						</li>
+						<li>
+							<a href="#tab3" data-toggle="tab">Resource Editor</a>
 						</li>
 					</ul> </span>
 			</div>
 			<div class="panel-body">
 				<div class="tab-content">
 					<div class="tab-pane active" id="tab1">
+						<ul id="types" class="nav nav-pills nav-stacked">
+
+						</ul>
+					</div>
+					<div class="tab-pane" id="tab2">
 						<div class="query-form">
 							<div class="row">
 								<div class="col-mid-4">
@@ -83,7 +92,7 @@
 						</div>
 						<div id="result-grid"></div>
 					</div>
-					<div class="tab-pane" id="tab2">
+					<div class="tab-pane" id="tab3">
 						<div class="input-group">
 							<span class="input-group-addon">Resource: </span>
 							<input id="resource" type="text" class="form-control" placeholder="http://dbpedia.org/resource/Barack_Obama" />
@@ -128,10 +137,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
-
-		<div id="loader" >
-			<img src="rawbase/images/loader.GIF" />
 		</div>
 
 		<div id="commit-message-popup" >

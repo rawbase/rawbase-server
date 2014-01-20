@@ -20,72 +20,85 @@
 	width: 100%;
 	height: 100%
 }
+
+#
 /*
-.link {
-	fill: none;
-	stroke: #666;
-	stroke-width: 1.5px;
-}
+ .link {
+ fill: none;
+ stroke: #666;
+ stroke-width: 1.5px;
+ }
 
-.node circle {
-	fill: #ccc;
-	stroke: #fff;
-	stroke-width: 1.5px;
-	cursor: pointer
-}
+ .node circle {
+ fill: #ccc;
+ stroke: #fff;
+ stroke-width: 1.5px;
+ cursor: pointer
+ }
 
-.node-selected circle {
-	fill: #cfc;
-	stroke: #fff;
-	stroke-width: 1.5px;
-}
+ .node-selected circle {
+ fill: #cfc;
+ stroke: #fff;
+ stroke-width: 1.5px;
+ }
 
-text {
-	font: 10px sans-serif;
-	pointer-events: none;
-}
-*/
+ text {
+ font: 10px sans-serif;
+ pointer-events: none;
+ }
+ */
 
 svg {
-    overflow: auto;
+	overflow: auto;
 }
 
 .node rect {
-    stroke: #333;
-    stroke-width: 1px;
-    fill: #fff;
-    cursor: pointer;
+	stroke: #fff;
+	stroke-width: 0px;
+	fill: #000;
+	cursor: pointer;
 }
-
 
 .node-selected rect {
 	fill: #cfc;
 	stroke: #fff;
-	stroke-width: 1px;
+	stroke-width: 0px;
 }
 
 .edgeLabel rect {
-    fill: #fff;
+	fill: #fff;
 }
 
 .edge path {
-    stroke: #333;
-    stroke-width: 1.5px;
-    fill: none;
+	stroke: #333;
+	stroke-width: 1.5px;
+	fill: none;
 }
-
 
 /*
  General controls
  */
-
-#commit-detail table {
-	width: 100%
-
+#commit-detail {
+	position: absolute;
+	padding: 10px;
+	display: none;
+	border: #CCCCCC 1px solid;
+	background-color: #FFFFFF;
 }
 
-#commit-detail span {
-width: 100%
+#commit-detail .graph-hash {
+	color: #808080;
+	font-size: 6pt;
+}
+
+#commit-detail .graph-photo img {
+	width: 25px;
+	height: 25px;
+}
+
+#commit-detail .graph-time {
+	font-style: italic;
+	font-size: 8pt;
 }
 
 #login {

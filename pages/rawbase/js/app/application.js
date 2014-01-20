@@ -279,7 +279,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			var svg = d3.select("#graph").append("svg").attr("width", width).attr("height", height).append("g").attr("transform", 'translate(20,20)');
 
 			var renderer = new dagreD3.Renderer();
-			var layout = dagreD3.layout().nodeSep(10).rankDir("LR");
+			var layout = dagreD3.layout().nodeSep(5).rankDir("LR");
 
 			var oldDrawNode = renderer.drawNode();
 			renderer.drawNode(function(graph, u, svg) {
@@ -289,27 +289,44 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			});
 
 			renderer.layout(layout).run(g, svg);
-
+			
+			$('.node rect').attr('x', -5).attr('y', -5).attr('width', 10).attr('height', 10);
+			
 			$('.node').on('click', function() {
 				self.currentVersion = $(this).text();
 				$('.node-selected').attr('class', "node");
 				$(this).attr('class', "node-selected");
 			});
-			
-			
-			$('.node').on('mouseover', function() {
-				
+
+			$('.node').hover(function() {
+
+				var offset = $(this).offset();
+				var width = $(this).outerWidth();
+
 				var commit = $(this).data('commit');
-				
-				$('#commit-graph-message').text(commit.message.split('"')[1]);
-				self.authenticator.getUser(commit.author,
-					function(user){
-						$('#commit-graph-photo').html($('<img />').attr('src',user.image.url));
-						$('#commit-graph-name').text(user.displayName);
-						$('#commit-graph-url').text(commit.author);
-					});
-				$('#commit-graph-time').text(commit.timestamp.split('"')[1]);
+				var $commitDetail = $('#commit-detail');
+
+				$commitDetail.find('.graph-message').text(commit.message.split('"')[1]);
+				$commitDetail.find('.graph-hash').text(commit.iri);
+				self.authenticator.getUser(commit.author, function(user) {
+					$commitDetail.find('.graph-photo').html($('<img />').attr('src', user.image.url));
+					$commitDetail.find('.graph-name').html($('<a />').attr('href', commit.author).text(user.displayName));
+				});
+				$commitDetail.find('.graph-time').text(commit.timestamp.split('"')[1]);
+
+				$('#commit-detail').css({
+					top : offset.top,
+					left : offset.left + width + 15
+				}).show();
+
+			}, function() {
+				$('#commit-detail').hide();
 			});
+			
+			$('#graph > svg').draggable({ axis: "x" });
+			
+			$('#graph').height($('#graph > svg').height());
+			//$('#graph').width();
 
 		},
 		saveResource : function(message) {
@@ -368,8 +385,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			function processLiteral(l) {
 				if (l['xml:lang']) {
-					
-					
+
 					return $('<a href="#" data-type="textarea" data-pk="1" data-placeholder="Value" data-title="Enter comments" class="editable editable-pre-wrapped editable-click" />').text(l.value + '@' + l['xml:lang']);
 				} else if (l.datatype) {
 					switch (l.datatype) {
@@ -610,7 +626,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				enableCellNavigation : true,
 				asyncEditorLoading : true,
 				forceFitColumns : true,
-				autoEdit : false
+				autoEdit : false,
+				headerRowHeight : 30
 			};
 
 			$(function() {

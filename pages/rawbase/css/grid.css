@@ -13,6 +13,11 @@
   height: 300px;
 }
 
+!important
+.slick-header-column {
+	height: 30px;
+}
+
 .grid-header {
   border: 1px solid gray;
   border-bottom: 0;

@@ -1,165 +1,165 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>r&AMP;wbase - the distributed version controlled triple store</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- Bootstrap -->
-        <link href="rawbase/css/bootstrap.min.css" rel="stylesheet">
-        <link href="rawbase/css/style.css" rel="stylesheet" type="text/css" />
-        <link href="rawbase/css/tipsy.css" rel="stylesheet" type="text/css" />
-        <link href="rawbase/js/lib/SlickGrid-2.1/slick.grid.css" rel="stylesheet" type="text/css"/>
-        <link href="rawbase/js/lib/jquery-ui-1.10.3/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
-        <link href="rawbase/css/grid.css" rel="stylesheet" type="text/css" />
-        <link href="rawbase/css/jqueryui-editable.css" rel="stylesheet" type="text/css" />
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-    </head>
+	<head>
+		<title>r&AMP;wbase - the distributed version controlled triple store</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap -->
+		<link href="rawbase/css/bootstrap.min.css" rel="stylesheet">
+		<link href="rawbase/css/style.css" rel="stylesheet" type="text/css" />
+		<link href="rawbase/css/tipsy.css" rel="stylesheet" type="text/css" />
+		<link href="rawbase/js/lib/SlickGrid-2.1/slick.grid.css" rel="stylesheet" type="text/css"/>
+		<link href="rawbase/js/lib/jquery-ui-1.10.3/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+		<link href="rawbase/css/grid.css" rel="stylesheet" type="text/css" />
+		<link href="rawbase/css/jqueryui-editable.css" rel="stylesheet" type="text/css" />
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+		<![endif]-->
+	</head>
 
-    <body>
-        <div class="page-header">
-            <img id="logo" src="rawbase/images/logo_blue_text.png" />
-            <div id="login">
-                <a href="#" id="loginText"> Click here to login </a>
-                <a href="#" id="logoutText" target='myIFrame' onclick="myIFrame.location='https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a>
-                <iframe name='myIFrame' id="myIFrame" ></iframe>
-                <div id='uName'></div>
-                <img src='' id='imgHolder'/>
-            </div>
-        </div>
-        <div id="network" class="panel panel-default">
-            <div class="panel-heading">Choose a version</div>
-            <div class="panel-body">
-            	<div id="commit-detail">
-            			<table>
-            				<tr>
-            					<td>Message:</td><td id="commit-graph-message"></td>
-								<td>Author:</td><td>
-									<table>
-										<tr>
-											<td rowspan="2" id="commit-graph-photo">
-											</td>
-											<td  id="commit-graph-name">
-											</td>
-										</tr>
-										<tr>
-											<td  id="commit-graph-url">
-											</td>
-										</tr>
-									</table>
+	<body>
+		<div class="page-header">
+			<img id="logo" src="rawbase/images/logo_blue_text.png" />
+			<div id="login">
+				<a href="#" id="loginText"> Click here to login </a>
+				<a href="#" id="logoutText" target='myIFrame' onclick="myIFrame.location='https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a>
+				<iframe name='myIFrame' id="myIFrame" ></iframe>
+				<div id='uName'></div>
+				<img src='' id='imgHolder'/>
+			</div>
+		</div>
+		<div id="network" class="panel panel-default">
+			<div class="panel-heading">
+				Choose a version
+			</div>
+			<div class="panel-body">
+
+				<div id="graph">
+
+				</div>
+			</div>
+		</div>
+		<div id="results" class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">Results</h3>
+				<span class="pull-right"> <!-- Tabs -->
+					<ul class="nav panel-tabs">
+						<li class="active">
+							<a href="#tab1" data-toggle="tab">SPARQL</a>
+						</li>
+						<li>
+							<a href="#tab2" data-toggle="tab">Resource Editor</a>
+						</li>
+					</ul> </span>
+			</div>
+			<div class="panel-body">
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab1">
+						<div class="query-form">
+							<div class="row">
+								<div class="col-mid-4">
+									<form id="form" action="#" method="post" class="form">
+										<div class="form-body">
+
+											<div class="form-group">
+												<select id="query-language-select" class="form-control">
+													<option value="sparql" selected>SPARQL</option>
+													<option value="update">SPARQL Update</option>
+												</select>
+											</div>
+											<div class="form-group">
+												<textarea id="query-text" class="form-control" rows="3" placeholder="Query" required></textarea>
+											</div>
+											<div class="form-group">
+												<textarea id="commit-message" class="form-control" rows="3" placeholder="Commit message" required></textarea>
+											</div>
+											<a href="#" id="query-submit" class="btn btn-danger btn-sm btn-block" role="button">Submit</a>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+						<div id="result-grid"></div>
+					</div>
+					<div class="tab-pane" id="tab2">
+						<div class="input-group">
+							<span class="input-group-addon">Resource: </span>
+							<input id="resource" type="text" class="form-control" placeholder="http://dbpedia.org/resource/Barack_Obama" />
+							<span class="input-group-btn">
+								<button id="editor-load" class="btn btn-default" type="button">
+									Load
+								</button> </span>
+							<span class="input-group-btn">
+								<button id="editor-save" class="btn btn-default" type="button">
+									Save
+								</button> </span>
+						</div>
+						<table id="resource-editor" class="table table-bordered table-striped" style="clear: both">
+							<tbody>
+								<!-- <tr>
+								<td width="35%">Simple text field</td>
+								<td width="65%"><a href="#" id="username" data-type="text" data-pk="1" data-title="Enter username" class="editable editable-click">superuser</a></td>
+								</tr>
+								<tr>
+								<td>Datepicker</td>
+								<td>
+								<a href="#" id="vacation" data-type="date" data-viewformat="dd.mm.yyyy" data-pk="1" data-placement="right" data-title="When you want vacation to start?" class="editable editable-click">25.02.2013</a>
 								</td>
-								<td>Time:</td><td id="commit-graph-time"></td>
-							</tr>
-            		</table>
-            	</div>
-                <div id="graph">
-                	
-                </div>
-            </div>
-        </div>
-        <div id="results" class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title">Results</h3>
-                <span class="pull-right">
-                    <!-- Tabs -->
-                    <ul class="nav panel-tabs">
-                        <li class="active"><a href="#tab1" data-toggle="tab">SPARQL</a></li>
-                        <li><a href="#tab2" data-toggle="tab">Resource Editor</a></li>
-                    </ul>
-                </span>
-            </div>
-            <div class="panel-body">
-                <div class="tab-content">
-                    <div class="tab-pane active" id="tab1">
-                        <div class="query-form">
-                            <div class="row">
-                                <div class="col-mid-4">
-                                    <form id="form" action="#" method="post" class="form">
-                                        <div class="form-body">
-                                            
-                                            <div class="form-group">
-                                                <select id="query-language-select" class="form-control">
-                                                    <option value="sparql" selected>SPARQL</option>
-                                                    <option value="update">SPARQL Update</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <textarea id="query-text" class="form-control" rows="3" placeholder="Query" required></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <textarea id="commit-message" class="form-control" rows="3" placeholder="Commit message" required></textarea>
-                                            </div>
-                                            <a href="#" id="query-submit" class="btn btn-danger btn-sm btn-block" role="button">Submit</a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="result-grid">
-                        </div>
-                    </div>
-                    <div class="tab-pane" id="tab2">
-                        <div class="input-group">
-                            <span class="input-group-addon">Resource: </span>
-                            <input id="resource" type="text" class="form-control" placeholder="http://dbpedia.org/resource/Barack_Obama" />
-                            <span class="input-group-btn">
-                                <button id="editor-load" class="btn btn-default" type="button">Load</button>
-                            </span>
-                            <span class="input-group-btn">
-                                <button id="editor-save" class="btn btn-default" type="button">Save</button>
-                            </span>
-                        </div>
-                        <table id="resource-editor" class="table table-bordered table-striped" style="clear: both">
-                            <tbody> 
-                                <!-- <tr>         
-                                     <td width="35%">Simple text field</td>
-                                     <td width="65%"><a href="#" id="username" data-type="text" data-pk="1" data-title="Enter username" class="editable editable-click">superuser</a></td>
-                                 </tr>
-                                 <tr>         
-                                     <td>Datepicker</td>
-                                     <td>
-                                         <a href="#" id="vacation" data-type="date" data-viewformat="dd.mm.yyyy" data-pk="1" data-placement="right" data-title="When you want vacation to start?" class="editable editable-click">25.02.2013</a>                        
-                                     </td>
-                                 </tr>
-                                 <tr>         
-                                     <td>Textarea, buttons below. Submit by <i>ctrl+enter</i></td>
-                                     <td>
-                                         <a href="#" id="comments" data-type="textarea" data-pk="1" data-placeholder="Your comments here..." data-title="Enter comments" class="editable editable-pre-wrapped editable-click">awesome
-                                             user!</a>
-                                     </td>
-                                 </tr> 
-                                 <tr>         
-                                     <td>Custom input, several fields</td>
-                                     <td><a href="#" id="address" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click"><b>Moscow</b>, Lenina st., bld. 12</a></td>
-                                 </tr>   -->
-                                 
-                            </tbody>
-                        </table>
-                        <button id="editor-add" type="button" class="btn btn-default">
-  							<span class="glyphicon glyphicon-plus-sign"></span> Add data
+								</tr>
+								<tr>
+								<td>Textarea, buttons below. Submit by <i>ctrl+enter</i></td>
+								<td>
+								<a href="#" id="comments" data-type="textarea" data-pk="1" data-placeholder="Your comments here..." data-title="Enter comments" class="editable editable-pre-wrapped editable-click">awesome
+								user!</a>
+								</td>
+								</tr>
+								<tr>
+								<td>Custom input, several fields</td>
+								<td><a href="#" id="address" data-type="address" data-pk="1" data-title="Please, fill address" class="editable editable-click"><b>Moscow</b>, Lenina st., bld. 12</a></td>
+								</tr>   -->
+
+							</tbody>
+						</table>
+						<button id="editor-add" type="button" class="btn btn-default">
+							<span class="glyphicon glyphicon-plus-sign"></span> Add data
 						</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+					</div>
+				</div>
+			</div>
+		</div>
 
+		<div id="loader" >
+			<img src="rawbase/images/loader.GIF" />
+		</div>
 
+		<div id="commit-message-popup" >
+			Please enter a commit message
+			<div class="form-group">
+				<textarea id="message" class="form-control" rows="3" placeholder="Commit message" required></textarea>
+			</div>
+		</div>
 
-        <div id="loader" >
-            <img src="rawbase/images/loader.GIF" />
-        </div>
-        
-        <div id="commit-message-popup" >
-        	Please enter a commit message
-            <div class="form-group">
-            	<textarea id="message" class="form-control" rows="3" placeholder="Commit message" required></textarea>
-            </div>
-        </div>
+		<div id="commit-detail">
+			<table>
+				<tr>
+					<td class="graph-photo"></td>
+					<td class="graph-name"></td>
+				</tr>
+				<tr>
+					<td colspan="2" class="graph-hash"></td>
+				</tr>
+				<tr>
+					<td colspan="2" class="graph-message"></td>
+				</tr>
+				<tr>
+					<td colspan="2" class="graph-time text-right"></td>
+				</tr>
+			</table>
+		</div>
 
-        <script data-main="rawbase/js/main" src="rawbase/js/require.js"></script>
-    </body>
+		<script data-main="rawbase/js/main" src="rawbase/js/require.js"></script>
+	</body>
 
 </html>

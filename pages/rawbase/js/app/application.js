@@ -50,7 +50,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			$.fn.editable.defaults.mode = 'inline';
 
 			$('form.openid').openid();
-			this.getPROV();
+			this.getPROV(function(){
+				self.getTypes();
+			});
 
 			$('#loginText').on('click', function() {
 				self.authenticator.login();
@@ -139,7 +141,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				}
 			});
 		},
-		getPROV : function() {
+		getPROV : function(callback) {
 			var self = this;
 			
 			$('#network > .panel-body').loadOverStart();
@@ -156,7 +158,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					self.parsePROV(data, function(g, commits) {
 
 						if (!self.currentVersion)
-							self.currentVersion = g.nodes(g.nodes().length -1);
+							self.currentVersion = g.nodes()[g.nodes().length -1];
+							
+						callback();
 										
 						self.initDagre(g, commits);
 					});
@@ -245,7 +249,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			
 			$('#tab1').loadOverStart();
 			
-			this.executeSparql(query, function(data){
+			this.executeSparql(query, function(resultset){
 				var results = resultset.results.bindings;
 				
 				results.forEach(function(result){
@@ -271,11 +275,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						
 						$a.data('columns', predicates);
 					});
-					
-					$('#tab1').loadOverStop();
-					
+
 				});
-				
+				$('#tab1').loadOverStop();
 			},function(error){
 				
 			});

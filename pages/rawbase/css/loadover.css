@@ -16,7 +16,7 @@
 	left: 0;
 	width: 40px;
 	height: 480px;
-	background-image: url('../images/ajax-loader_blue.gif') no-repeat;
+	background-image: url('../images/ajax-loader_blue.gif');
 }
 
 .loadOverOverlay {

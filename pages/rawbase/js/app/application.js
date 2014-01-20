@@ -244,7 +244,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			});
 		},
 		getTypes : function() {
-			var query = 'SELECT DISTINCT ?type WHERE { ?s a ?type } GROUP BY ?type';
+			var query = 'SELECT DISTINCT ?type WHERE { ?s a ?type } GROUP BY ?type LIMIT 10';
 
 			
 			$('#tab1').loadOverStart();
@@ -261,7 +261,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					
 					var countQuery = 'SELECT COUNT(*) AS ?cnt WHERE { ?s a <' + result.type.value + '> }';
 					
-					this.executeSparql(countQuery, function(data){
+					self.executeSparql(countQuery, function(data){
 						var count = resultset.results.bindings;
 						
 						$a.append($('<span class="badge pull-right" />').text(count[0].cnt.value));
@@ -270,7 +270,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					//Prefetch columns
 					var columnQuery = 'SELECT DISTINCT ?p WHERE { ?s a <' + result.type.value + '>; ?p ?o }';
 					
-					this.executeSparql(countQuery, function(data){
+					self.executeSparql(countQuery, function(data){
 						var predicates = resultset.results.bindings;
 						
 						$a.data('columns', predicates);

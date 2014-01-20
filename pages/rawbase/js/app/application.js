@@ -244,8 +244,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			});
 		},
 		getTypes : function() {
-			var query = 'SELECT DISTINCT ?type WHERE { ?s a ?type } GROUP BY ?type LIMIT 10';
-
+			var self = this;
+			var query = 'SELECT DISTINCT ?type WHERE { ?s a ?type } LIMIT 20';
 			
 			$('#tab1').loadOverStart();
 			

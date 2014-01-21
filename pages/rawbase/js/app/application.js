@@ -160,7 +160,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						if (!self.currentVersion)
 							self.currentVersion = g.nodes()[g.nodes().length -1];
 							
-						callback();
+						if (callback)
+							callback();
 										
 						self.initDagre(g, commits);
 					});
@@ -337,10 +338,15 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			$('.node rect').attr('x', -5).attr('y', -5).attr('width', 10).attr('height', 10);
 
+			var maxWidth = 0;
+
 			$('.node')
 			.each(function(){
 				if ($(this).data('uri') === self.currentVersion)
 				$(this).attr('class','node-selected');
+				
+				var w = $(this).attr('transform').match(/translate\((.*)\,/)[1];
+				maxWidth = maxWidth > w ? maxWidth : w;
 			})
 			.on('click', function() {
 				self.currentVersion = $(this).data('uri');
@@ -384,12 +390,10 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				$('#commit-detail').hide();
 			});
 
-			$('#graph > svg').draggable({
+			$('#graph > svg').attr('width', maxWidth);
+			/*.draggable({
 				axis : "x"
-			});
-
-			$('#graph').height($('#graph > svg').height());
-			//$('#graph').width();
+			});*/
 			
 			$('#network > .panel-body').loadOverStop();
 

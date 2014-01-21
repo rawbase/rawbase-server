@@ -345,7 +345,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				if ($(this).data('uri') === self.currentVersion)
 				$(this).attr('class','node-selected');
 				
-				var w = $(this).attr('transform').match(/translate\((.*)\,/)[1];
+				var w = parseInt($(this).attr('transform').match(/translate\((.*)\,/)[1]);
 				maxWidth = maxWidth > w ? maxWidth : w;
 			})
 			.on('click', function() {

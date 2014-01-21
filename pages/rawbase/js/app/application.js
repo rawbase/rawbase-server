@@ -50,7 +50,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			$.fn.editable.defaults.mode = 'inline';
 
 			$('form.openid').openid();
-			this.getPROV(function(){
+			this.getPROV(function() {
 				self.getTypes();
 			});
 
@@ -143,9 +143,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 		},
 		getPROV : function(callback) {
 			var self = this;
-			
+
 			$('#network > .panel-body').loadOverStart();
-			
+
 			$.ajax({
 				url : this.HOST + 'get',
 				beforeSend : function(xhrObj) {
@@ -158,11 +158,11 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					self.parsePROV(data, function(g, commits) {
 
 						if (!self.currentVersion)
-							self.currentVersion = g.nodes()[g.nodes().length -1];
-							
+							self.currentVersion = g.nodes()[g.nodes().length - 1];
+
 						if (callback)
 							callback();
-										
+
 						self.initDagre(g, commits);
 					});
 				},
@@ -234,7 +234,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					if (!g.hasNode(triple.subject)) {
 						g.addNode(triple.subject);
 					}
-					
+
 					g.addEdge(null, triple.object, triple.subject, {});
 
 				}
@@ -247,42 +247,40 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 		getTypes : function() {
 			var self = this;
 			var query = 'SELECT DISTINCT ?type WHERE { ?s a ?type } LIMIT 20';
-			
+
 			$('#tab1').loadOverStart();
-			
-			this.executeSparql(query, function(resultset){
+
+			this.executeSparql(query, function(resultset) {
 				var results = resultset.results.bindings;
-				
-				results.forEach(function(result){
+
+				results.forEach(function(result) {
 					var $li = $('<li class="active" />').appendTo($('#types-list'));
 
-					var $a = $('<a href="#" />')
-					.append(result.type.value)
-					.appendTo($li);
-					
+					var $a = $('<a href="#" />').append(result.type.value).appendTo($li);
+
 					var countQuery = 'SELECT (COUNT(*) AS ?cnt) WHERE { ?s a <' + result.type.value + '> }';
-					
-					self.executeSparql(countQuery, function(data){
+
+					self.executeSparql(countQuery, function(data) {
 						var count = data.results.bindings;
-						
+
 						$a.append($('<span class="badge pull-right" />').text(count[0].cnt.value));
 					});
-					
+
 					//Prefetch columns
 					var columnQuery = 'SELECT DISTINCT ?p WHERE { ?s a <' + result.type.value + '>; ?p ?o }';
-					
-					self.executeSparql(countQuery, function(data){
+
+					self.executeSparql(countQuery, function(data) {
 						var predicates = data.results.bindings;
-						
+
 						$a.data('columns', predicates);
 					});
 
 				});
 				$('#tab1').loadOverStop();
-			},function(error){
-				
+			}, function(error) {
+
 			});
-			
+
 		},
 		parseCommit : function(triple, commit) {
 
@@ -340,33 +338,35 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			var maxWidth = 0;
 
-			$('.node')
-			.each(function(){
+			function roundUp(value) {
+				return (~~((value + 99) / 100) * 100);
+			}
+
+
+			$('.node').each(function() {
 				if ($(this).data('uri') === self.currentVersion)
-				$(this).attr('class','node-selected');
-				
+					$(this).attr('class', 'node-selected');
+
 				var w = parseInt($(this).attr('transform').match(/translate\((.*)\,/)[1]);
-				maxWidth = maxWidth > w ? maxWidth : w;
-			})
-			.on('click', function() {
+				maxWidth = roundUp(maxWidth > w ? maxWidth : w);
+			}).on('click', function() {
 				self.currentVersion = $(this).data('uri');
 				$('.node-selected').attr('class', "node");
 				$(this).attr('class', "node-selected");
-			})
-			.hover(function() {
+			}).hover(function() {
 
 				var offset = $(this).offset();
 				var width = $(this).outerWidth();
 
 				var commit = $(this).data('commit');
 				var $commitDetail = $('#commit-detail');
-				
+
 				if (commit.message)
 					$commitDetail.find('.graph-message').text(commit.message.split('"')[1]);
 
 				if (commit.iri)
 					$commitDetail.find('.graph-hash').text(commit.iri);
-				
+
 				if (commit.author)
 					self.authenticator.getUser(commit.author, function(user) {
 						$commitDetail.find('.graph-photo').html($('<img />').attr('src', user.image.url));
@@ -376,8 +376,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					$commitDetail.find('.graph-photo').html($('<img />').attr('src', config.defaultAvatar));
 					$commitDetail.find('.graph-name').html($('<a />').attr('href', commit.author).text('Anonymous'));
 				}
-					
-				
+
 				if (commit.timestamp)
 					$commitDetail.find('.graph-time').text(commit.timestamp.split('"')[1]);
 
@@ -392,9 +391,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			$('#graph > svg').attr('width', maxWidth);
 			/*.draggable({
-				axis : "x"
-			});*/
-			
+			 axis : "x"
+			 });*/
+
 			$('#network > .panel-body').loadOverStop();
 
 		},

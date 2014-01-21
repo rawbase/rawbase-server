@@ -259,7 +259,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					.append(result.type.value)
 					.appendTo($li);
 					
-					var countQuery = 'SELECT COUNT(*) AS ?cnt WHERE { ?s a <' + result.type.value + '> }';
+					var countQuery = 'SELECT (COUNT(*) AS ?cnt) WHERE { ?s a <' + result.type.value + '> }';
 					
 					self.executeSparql(countQuery, function(data){
 						var count = resultset.results.bindings;

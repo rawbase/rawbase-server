@@ -305,7 +305,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 						$container.loadOverStart();
 
-						var query = 'SELECT ?s ?p ?o WHERE { ?s a <' + $(this).data('type') + '>; ?p ?o }';
+						var query = 'SELECT ?s ?p ?o WHERE { ?s a <' + $(this).data('type') + '>; ?p ?o } LIMIT 100';
 
 						self.executeSparql(query, function(results) {
 							self.buildGrid($container, results, true);
@@ -708,7 +708,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				while (results.length > 0) {
 					var result = results.pop();
 
-					if (data[result.s.value])
+					if (!data[result.s.value])
 						data[result.s.value] = {
 							subject : result.s.value
 						};

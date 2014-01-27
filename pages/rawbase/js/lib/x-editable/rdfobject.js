@@ -50,9 +50,24 @@
 					$(element).empty();
 					return;
 				}
+				
+				function replaceNS(value) {
+					var namespaces = {
+						xsd: 'http://www.w3.org/2001/XMLSchema#'
+					};
+					
+					for (var ns in namespaces) {
+						var uri = namespaces[ns];
+						if (value.indexOf(uri)){
+							return value.replace(uri, ns+':');
+						}
+					}
+					return '<' + value + '>';
+				}
+				
 				var html = '<b>' + $('<div>').text(value.value).html() + '</b>';
 				html += object['xml:lang'] ? '@' + object['xml:lang'] : '';
-				html += object['datatype'] ? '^^' + object['datatype'] : '';
+				html += object['datatype'] ? '^^' + replaceNS(object['datatype']) : '';
 
 				$(element).html(html);
 

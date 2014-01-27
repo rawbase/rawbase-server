@@ -6,7 +6,7 @@
     text-align: center;
 }
 
-#result-grid {
+.result-grid {
   background: white;
   outline: 0;
   border: 1px solid gray;

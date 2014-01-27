@@ -126,7 +126,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 				switch ($('#query-language-select').val()) {
 					case 'sparql':
-						self.executeSparql($('#query-text').val(), self.buildGrid, function(err) {
+						self.executeSparql($('#query-text').val(), function(results) {
+							self.buildGrid("#tab2 > .result-grid", results);
+						}, function(err) {
 
 						});
 						break;
@@ -272,13 +274,18 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				var results = resultset.results.bindings;
 
 				$(results).each(function(i, result) {
-					var $panel = $('<div class="panel panel-primary" />').appendTo($('#tab1 > .panel-group'));
+					var $panel = $('<div class="panel panel-default" />').appendTo($('#tab1 > .panel-group'));
 
 					var $title = $('<h4 class="panel-title" />').appendTo($('<div class="panel-heading" />').appendTo($panel));
 
-					var $collapse = $('<div id="#collapse' + i + '" class="panel-collapse collapse in" />').append('<div class="panel-body" />').appendTo($panel);
-
+					var $collapse = $('<div id="collapse' + i + '" class="panel-collapse collapse" />').data('type',result.type.value).append($('<div class="panel-body" />').append($('<div class="result-grid" />'))).appendTo($panel);
+					
 					var $a = $('<a data-toggle="collapse" data-parent="#accordion" href="#collapse' + i + '" />').append(result.type.value).appendTo($title);
+
+					/*$a.click(function() {
+						$(this).parents('.panel').find('.collapse').collapse('toggle');
+
+					});*/
 
 					var countQuery = 'SELECT (COUNT(*) AS ?cnt) WHERE { ?s a <' + result.type.value + '> }';
 
@@ -291,13 +298,41 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					//Prefetch columns
 					var columnQuery = 'SELECT DISTINCT ?p WHERE { ?s a <' + result.type.value + '>; ?p ?o }';
 
-					self.executeSparql(countQuery, function(data) {
+					self.executeSparql(columnQuery, function(data) {
 						var predicates = data.results.bindings;
 
-						$a.data('columns', predicates);
-					});
+						//$a.data('columns', predicates);
 
+						$collapse.on('hide.bs.collapse', function() {
+							$(this).find('.result-grid').empty();
+						});
+
+						$collapse.on('show.bs.collapse', function() {
+							
+							var $container = $(this).find('.result-grid');
+							
+							$container.loadOverStart();
+							
+							var query = 'SELECT * WHERE { ?subject a <' + $(this).data('type') + '> . ';
+
+							//$($(this).data('columns')).each(function(i, property) {
+							$(predicates).each(function(j, property) {
+								query += 'OPTIONAL { ?subject <' + property.p.value + '> ?' + j + ' } ';
+							});
+
+							query += ' }';
+
+							self.executeSparql(query, function(results) {
+								self.buildGrid($container, results);
+								$container.loadOverStop();
+							}, function() {
+
+							});
+						});
+
+					});
 				});
+
 				$('#tab1').loadOverStop();
 			}, function(error) {
 
@@ -631,7 +666,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			}
 
 		},
-		buildGrid : function(resultset) {
+		buildGrid : function(container, resultset) {
 			function requiredFieldValidator(value) {
 				if (value == null || value == undefined || !value.length) {
 					return {
@@ -756,7 +791,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					results[i] = item;
 				}
 
-				grid = new Slick.Grid("#result-grid", results, columns, options);
+				grid = new Slick.Grid(container, results, columns, options);
 
 				grid.setSelectionModel(new Slick.CellSelectionModel());
 

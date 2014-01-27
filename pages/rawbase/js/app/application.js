@@ -1,4 +1,4 @@
-define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 'jquery.openid', 'jqueryui/jquery-ui.min', 'jqueryui-editable.min', 'slickgrid/lib/jquery.event.drag-2.2', 'n3', 'jquery.tipsy', 'bootstrap-select.min', 'slickgrid/slick.core', 'slickgrid/slick.formatters', 'slickgrid/slick.grid', 'slickgrid/slick.editors', 'slickgrid/plugins/slick.cellrangedecorator', 'slickgrid/plugins/slick.cellrangeselector', 'slickgrid/plugins/slick.cellselectionmodel', 'loadover'], function($, Authenticator) {"use strict";
+define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 'jquery.openid', 'jqueryui/jquery-ui.min', 'jqueryui-editable.min', 'slickgrid/lib/jquery.event.drag-2.2', 'n3', 'jquery.tipsy', 'bootstrap-select.min', 'slickgrid/slick.core', 'slickgrid/slick.formatters', 'slickgrid/slick.grid', 'slickgrid/slick.editors', 'slickgrid/plugins/slick.cellrangedecorator', 'slickgrid/plugins/slick.cellrangeselector', 'slickgrid/plugins/slick.cellselectionmodel', 'loadover', 'x-editable/rdfobject'], function($, Authenticator) {"use strict";
 
 	function Application() {
 		this.HOST = config.host;
@@ -146,6 +146,24 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			$('#network > .panel-body').loadOverStart();
 
+			/*var query = 'CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <urn:rawbase:provenance> { ?s ?p ?o }}';
+
+			 this.executeSparql(query, function(data){
+			 self.parsePROV(data, function(g, commits) {
+
+			 if (!self.currentVersion)
+			 self.currentVersion = g.nodes()[g.nodes().length - 1];
+
+			 if (callback)
+			 callback();
+
+			 self.initDagre(g, commits);
+			 });
+
+			 },function(error){
+
+			 }, true);*/
+
 			$.ajax({
 				url : this.HOST + 'get',
 				beforeSend : function(xhrObj) {
@@ -253,10 +271,14 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			this.executeSparql(query, function(resultset) {
 				var results = resultset.results.bindings;
 
-				results.forEach(function(result) {
-					var $li = $('<li class="active" />').appendTo($('#types-list'));
+				$(results).each(function(i, result) {
+					var $panel = $('<div class="panel panel-primary" />').appendTo($('#tab1 > .panel-group'));
 
-					var $a = $('<a href="#" />').append(result.type.value).appendTo($li);
+					var $title = $('<h4 class="panel-title" />').appendTo($('<div class="panel-heading" />').appendTo($panel));
+
+					var $collapse = $('<div id="#collapse' + i + '" class="panel-collapse collapse in" />').append('<div class="panel-body" />').appendTo($panel);
+
+					var $a = $('<a data-toggle="collapse" data-parent="#accordion" href="#collapse' + i + '" />').append(result.type.value).appendTo($title);
 
 					var countQuery = 'SELECT (COUNT(*) AS ?cnt) WHERE { ?s a <' + result.type.value + '> }';
 
@@ -338,17 +360,12 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			var maxWidth = 0;
 
-			function roundUp(value) {
-				return (~~((value + 99) / 100) * 100);
-			}
-
-
 			$('.node').each(function() {
 				if ($(this).data('uri') === self.currentVersion)
 					$(this).attr('class', 'node-selected');
 
 				var w = parseInt($(this).attr('transform').match(/translate\((.*)\,/)[1]);
-				maxWidth = roundUp(maxWidth > w ? maxWidth : w);
+				maxWidth = maxWidth > w ? maxWidth : w;
 			}).on('click', function() {
 				self.currentVersion = $(this).data('uri');
 				$('.node-selected').attr('class', "node");
@@ -389,7 +406,12 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				$('#commit-detail').hide();
 			});
 
-			$('#graph > svg').attr('width', maxWidth);
+			function roundUp(value) {
+				return (~~((value + 99) / 100) * 100);
+			}
+
+
+			$('#graph > svg').attr('width', roundUp(maxWidth));
 			/*.draggable({
 			 axis : "x"
 			 });*/
@@ -451,6 +473,39 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			var self = this;
 			var query = 'SELECT ?p ?o  WHERE { <' + uri + '> ?p ?o }';
 
+			function buildRow(property, object) {
+
+				var $tdProperty = $('<td />').append(processUri(property).attr('name', 'p'));
+				var $tdValue = $('<td />').append(processObject(object).attr('name', 'o'));
+
+				return $('<tr />').append($tdProperty, $tdValue);
+			}
+
+			function processObject(object) {
+				return $('<a href="#" id="rdfobject" data-type="rdfobject" data-pk="1" data-title="Please, fill value">').editable({
+					value : object,
+					validate : function(value) {
+						if (value.value == '')
+							return 'Value is required!';
+					},
+					display : function(value) {
+						if (!value) {
+							$(this).empty();
+							return;
+						}
+						var html = '<b>' + $('<div>').text(value.value).html() + '</b>';
+						html += object['xml:lang'] ? '@' + object['xml:lang'] : '';
+						html += object['datatype'] ? '^^' + object['datatype'] : '';
+
+						$(this).html(html);
+					}
+				});
+			}
+
+			function processUri(uri) {
+				return $('<a />').attr('href', uri.value).text(uri.value).editable();
+			}
+
 			function processLiteral(l) {
 				if (l['xml:lang']) {
 
@@ -494,13 +549,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				$tbody.empty();
 
 				for (var i = 0; i < results.length; i++) {
-					var $row = $('<tr />');
 
-					var p = results[i].p;
-					$('<td />').append(processBinding(p).attr('name', 'p')).appendTo($row);
-
-					var o = results[i].o;
-					$('<td />').append(processBinding(o).attr('name', 'o')).appendTo($row);
+					var $row = buildRow(results[i].p, results[i].o);
 
 					var $clear = $('<a />').addClass('glyphicon glyphicon-minus-sign').attr('href', '#').on('click', deleteRow);
 					$row.append($('<td />').append($clear));
@@ -514,14 +564,14 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			});
 
 		},
-		executeSparql : function(query, success, error) {
+		executeSparql : function(query, success, error, graph) {
 			var self = this;
 			var url = this.HOST + "sparql";
 
 			$.ajax({
 				url : url,
 				beforeSend : function(xhrObj) {
-					xhrObj.setRequestHeader("Accept", "application/sparql-results+json");
+					xhrObj.setRequestHeader("Accept", graph ? "text/turtle" : "application/sparql-results+json");
 				},
 				data : {
 					query : query,

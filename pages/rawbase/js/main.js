@@ -74,6 +74,9 @@
             'dagre-d3.min': {
             	deps: ['d3/d3'],
             	exports: 'dagreD3'
+            },
+            'x-editable/rdfobject': {
+            	deps: ['jqueryui-editable.min']
             }
         },
     });

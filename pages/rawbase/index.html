@@ -12,6 +12,7 @@
 		<link href="rawbase/css/grid.css" rel="stylesheet" type="text/css" />
 		<link href="rawbase/css/jqueryui-editable.css" rel="stylesheet" type="text/css" />
 		<link href="rawbase/css/loadover.css" rel="stylesheet" type="text/css" />
+		<link href="rawbase/css/x-editable/rdfobject.css" rel="stylesheet" type="text/css" />
 		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 		<!--[if lt IE 9]>
@@ -61,9 +62,7 @@
 			<div class="panel-body">
 				<div class="tab-content">
 					<div class="tab-pane active" id="tab1">
-						<ul id="types-list" class="nav nav-pills nav-stacked">
-
-						</ul>
+						<div class="panel-group" id="accordion"></div>
 					</div>
 					<div class="tab-pane" id="tab2">
 						<div class="query-form">
@@ -106,6 +105,12 @@
 								</button> </span>
 						</div>
 						<table id="resource-editor" class="table table-bordered table-striped" style="clear: both">
+							<!--<thead>
+								<tr>
+									<th>Property</th>
+									<th>Value</th>
+								</tr>
+							</thead>-->
 							<tbody>
 								<!-- <tr>
 								<td width="35%">Simple text field</td>

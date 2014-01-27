@@ -305,7 +305,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 						$container.loadOverStart();
 
-						var query = 'SELECT ?s ?p ?o WHERE { ?s a <' + $(this).data('type') + '>; ?p ?o ';
+						var query = 'SELECT ?s ?p ?o WHERE { ?s a <' + $(this).data('type') + '>; ?p ?o }';
 
 						self.executeSparql(query, function(results) {
 							self.buildGrid($container, results, true);

@@ -278,14 +278,14 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 					var $title = $('<h4 class="panel-title" />').appendTo($('<div class="panel-heading" />').appendTo($panel));
 
-					var $collapse = $('<div id="collapse' + i + '" class="panel-collapse collapse" />').data('type',result.type.value).append($('<div class="panel-body" />').append($('<div class="result-grid" />'))).appendTo($panel);
-					
+					var $collapse = $('<div id="collapse' + i + '" class="panel-collapse collapse" />').data('type', result.type.value).append($('<div class="panel-body" />').append($('<div class="result-grid" />'))).appendTo($panel);
+
 					var $a = $('<a data-toggle="collapse" data-parent="#accordion" href="#collapse' + i + '" />').append(result.type.value).appendTo($title);
 
 					/*$a.click(function() {
-						$(this).parents('.panel').find('.collapse').collapse('toggle');
+					 $(this).parents('.panel').find('.collapse').collapse('toggle');
 
-					});*/
+					 });*/
 
 					var countQuery = 'SELECT (COUNT(*) AS ?cnt) WHERE { ?s a <' + result.type.value + '> }';
 
@@ -295,41 +295,24 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						$a.append($('<span class="badge pull-right" />').text(count[0].cnt.value));
 					});
 
-					//Prefetch columns
-					var columnQuery = 'SELECT DISTINCT ?p WHERE { ?s a <' + result.type.value + '>; ?p ?o }';
+					$collapse.on('hide.bs.collapse', function() {
+						$(this).find('.result-grid').empty();
+					});
 
-					self.executeSparql(columnQuery, function(data) {
-						var predicates = data.results.bindings;
+					$collapse.on('show.bs.collapse', function() {
 
-						//$a.data('columns', predicates);
+						var $container = $(this).find('.result-grid');
 
-						$collapse.on('hide.bs.collapse', function() {
-							$(this).find('.result-grid').empty();
+						$container.loadOverStart();
+
+						var query = 'SELECT ?s ?p ?o WHERE { ?s a <' + $(this).data('type') + '>; ?p ?o ';
+
+						self.executeSparql(query, function(results) {
+							self.buildGrid($container, results, true);
+							$container.loadOverStop();
+						}, function() {
+
 						});
-
-						$collapse.on('show.bs.collapse', function() {
-							
-							var $container = $(this).find('.result-grid');
-							
-							$container.loadOverStart();
-							
-							var query = 'SELECT * WHERE { ?subject a <' + $(this).data('type') + '> . ';
-
-							//$($(this).data('columns')).each(function(i, property) {
-							$(predicates).each(function(j, property) {
-								query += 'OPTIONAL { ?subject <' + property.p.value + '> ?' + j + ' } ';
-							});
-
-							query += ' }';
-
-							self.executeSparql(query, function(results) {
-								self.buildGrid($container, results);
-								$container.loadOverStop();
-							}, function() {
-
-							});
-						});
-
 					});
 				});
 
@@ -666,7 +649,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			}
 
 		},
-		buildGrid : function(container, resultset) {
+		buildGrid : function(container, resultset, pivotted) {
 			function requiredFieldValidator(value) {
 				if (value == null || value == undefined || !value.length) {
 					return {
@@ -696,71 +679,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						editor : Slick.Editors.LongText
 					});
 				});
-
-				/* var columns = [
-				 {
-				 id: "title",
-				 name: "Title",
-				 field: "title",
-				 width: 120,
-				 cssClass: "cell-title",
-				 editor: Slick.Editors.Text,
-				 validator: requiredFieldValidator
-				 },
-
-				 {
-				 id: "desc",
-				 name: "Description",
-				 field: "description",
-				 width: 100,
-				 editor: Slick.Editors.LongText
-				 },
-
-				 {
-				 id: "duration",
-				 name: "Duration",
-				 field: "duration",
-				 editor: Slick.Editors.Text
-				 },
-
-				 {
-				 id: "%",
-				 name: "% Complete",
-				 field: "percentComplete",
-				 width: 80,
-				 resizable: false,
-				 formatter: Slick.Formatters.PercentCompleteBar,
-				 editor: Slick.Editors.PercentComplete
-				 },
-
-				 {
-				 id: "start",
-				 name: "Start",
-				 field: "start",
-				 minWidth: 60,
-				 editor: Slick.Editors.Date
-				 },
-
-				 {
-				 id: "finish",
-				 name: "Finish",
-				 field: "finish",
-				 minWidth: 60,
-				 editor: Slick.Editors.Date
-				 },
-
-				 {
-				 id: "effort-driven",
-				 name: "Effort Driven",
-				 width: 80,
-				 minWidth: 20,
-				 maxWidth: 80,
-				 cssClass: "cell-effort-driven",
-				 field: "effortDriven",
-				 formatter: Slick.Formatters.Checkmark,
-				 editor: Slick.Editors.Checkbox
-				 }
-				 ];*/
 				return columns;
 			}
 
@@ -779,19 +697,62 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				headerRowHeight : 30
 			};
 
+			function pivot(results) {
+
+				//Result needs headers s p o
+				var defObj = {
+					'subject' : null
+				};
+				var data = {};
+
+				while (results.length > 0) {
+					var result = results.pop();
+
+					if (data[result.s.value])
+						data[result.s.value] = {
+							subject : result.s.value
+						};
+
+					data[result.s.value][result.p.value] = result.o.value;
+
+					defObj[result.p.value] = null;
+				}
+
+				for (var subject in data) {
+					results.push($.extend({}, defObj, data[subject]));
+					delete data[subject];
+				}
+
+				var columns = [];
+				for (var label in defObj) {
+					columns.push({
+						id : label,
+						name : label,
+						field : label,
+						minWidth : 120,
+						editor : Slick.Editors.LongText
+					});
+				}
+				return new Slick.Grid(container, results, columns, options);
+			}
+
 			$(function() {
 				var results = resultset.results.bindings;
 
-				for (var i = 0; i < results.length; i++) {
-					var item = {};
-					for (var key in results[i]) {
-						item[key] = results[i][key].value;
+				if (pivotted) {
+					grid = pivot(results);
+				} else {
+					for (var i = 0; i < results.length; i++) {
+						var item = {};
+						for (var key in results[i]) {
+							item[key] = results[i][key].value;
+						}
+
+						results[i] = item;
 					}
+					grid = new Slick.Grid(container, results, columns, options);
 
-					results[i] = item;
 				}
-
-				grid = new Slick.Grid(container, results, columns, options);
 
 				grid.setSelectionModel(new Slick.CellSelectionModel());
 

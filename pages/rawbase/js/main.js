@@ -39,11 +39,17 @@
             'slickgrid/slick.grid': {
                 deps: ['jquery','slickgrid/slick.core']
             },
-            'slick.editors': {
+            'slickgrid/slick.editors': {
                 deps: ['jquery','slickgrid/slick.core']
             },
-            'slick.cellrangedecorator' : {
+            'slickgrid/slick.cellrangedecorator' : {
                 deps:  ['jquery','slickgrid/slick.core'] 
+            },
+            'slickgrid/slick.dataview' : {
+                deps:  ['jquery','slickgrid/slick.core','slickgrid/slick.grid'] 
+            },
+            'slickgrid/controls/slick.pager': {
+                deps: ['jquery','slickgrid/slick.core']
             },
             'slickgrid/plugins/slick.cellrangeselector': {
                 deps: ['jquery','slickgrid/slick.core']

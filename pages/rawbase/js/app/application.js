@@ -684,16 +684,16 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				grid.setColumns(columns);
 
 				var results = resultset.results.bindings;
-				dataView.beginUpdate();
+				dataview.beginUpdate();
 				for (var i = 0; i < results.length; i++) {
 					var item = {};
 					for (var key in results[i]) {
 						item[key] = results[i][key].value;
 					}
 
-					dataView.addItem(item);
+					dataview.addItem(item);
 				}
-				dataView.endUpdate();
+				dataview.endUpdate();
 				end();
 			}
 
@@ -732,12 +732,12 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				}
 				grid.setColumns(columns);
 				
-				dataView.beginUpdate();
+				dataview.beginUpdate();
 				for (var subject in data) {
-					dataView.addItem($.extend({}, defObj, data[subject]));
+					dataview.addItem($.extend({}, defObj, data[subject]));
 					delete data[subject];
 				}
-				dataView.endUpdate();
+				dataview.endUpdate();
 				
 				end();
 			}
@@ -746,19 +746,19 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				//load data incrementally
 				var i = 0;
 				
-				var dataView = new Slick.Data.DataView({
+				var dataview = new Slick.Data.DataView({
 					inlineFilters : true
 				});
-				var grid = new Slick.Grid($container, dataView, [], options);
-				var pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
+				var grid = new Slick.Grid($container, dataview, [], options);
+				var pager = new Slick.Controls.Pager(dataview, grid, $("#pager"));
 
 				// wire up model events to drive the grid
-				dataView.onRowCountChanged.subscribe(function(e, args) {
+				dataview.onRowCountChanged.subscribe(function(e, args) {
 					grid.updateRowCount();
 					grid.render();
 				});
 
-				dataView.onRowsChanged.subscribe(function(e, args) {
+				dataview.onRowsChanged.subscribe(function(e, args) {
 					grid.invalidateRows(args.rows);
 					grid.render();
 				});
@@ -786,9 +786,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 					self.executeSparql(query, function(resultset) {
 						if (pivotted) {
-							pivotData(resultset, grid, dataView, next);
+							pivotData(resultset, grid, dataview, next);
 						} else {
-							standardData(resultset, grid, dataView, next);
+							standardData(resultset, grid, dataview, next);
 						}
 					}, function(err) {
 

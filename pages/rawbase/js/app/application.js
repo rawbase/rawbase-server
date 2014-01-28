@@ -754,7 +754,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				var dataView = new Slick.Data.DataView({
 					inlineFilters : true
 				});
-				var grid = new Slick.Grid(container, dataView, columns, options);
+				var grid = new Slick.Grid(container, dataView, [], options);
 				var pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
 
 				// wire up model events to drive the grid
@@ -807,7 +807,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					}
 				};
 				
-				getNextPage()
+				getNextPage();
 
 			});
 		}

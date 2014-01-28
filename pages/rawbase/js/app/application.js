@@ -686,7 +686,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				var results = resultset.results.bindings;
 				dataview.beginUpdate();
 				for (var i = 0; i < results.length; i++) {
-					var item = {};
+					var item = {id: 'id_' + i};
 					for (var key in results[i]) {
 						item[key] = results[i][key].value;
 					}
@@ -701,7 +701,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				var results = resultset.results.bindings;
 				//Result needs headers s p o
 				var defObj = {
-					'subject' : null
+					'id' : null
 				};
 				var data = {};
 
@@ -710,7 +710,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 					if (!data[result.s.value])
 						data[result.s.value] = {
-							subject : result.s.value
+							id : result.s.value
 						};
 
 					data[result.s.value][result.p.value] = result.o.value;

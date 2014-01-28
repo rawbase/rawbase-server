@@ -722,6 +722,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				}
 
 				var columns = grid.getColumns();
+				
+				//TEST PURPOSE
+				if (columns.length == 0){
 				for (var label in defObj) {
 					if (!grid.getColumnIndex(label)) {
 						columns.push({
@@ -734,6 +737,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					}
 				}
 				grid.setColumns(columns);
+				}
 				
 				dataview.beginUpdate();
 				for (var subject in data) {

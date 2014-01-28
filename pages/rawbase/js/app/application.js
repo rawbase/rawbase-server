@@ -299,9 +299,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 					$collapse.on('show.bs.collapse', function() {
 
-						var query = 'SELECT ?s ?p ?o WHERE { ?s a <' + $(this).data('type') + '>; ?p ?o } LIMIT 100';
+						var query = 'SELECT ?s ?p ?o WHERE { ?s a <' + $(this).data('type') + '>; ?p ?o }';
 
-					    self.buildGrid($(this).find('.result-grid'),query, results, 500, true);
+					    self.buildGrid($(this).find('.result-grid'), query, 500, true);
 							
 					});
 				});
@@ -775,7 +775,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 				function getNextPage() {
 					if (pageSize > 0)
-						query += 'LIMIT ' + (i + 1) * pageSize + ' OFFSET ' + i * pageSize;
+						query += ' LIMIT ' + (i + 1) * pageSize + ' OFFSET ' + i * pageSize;
 						
 					function next() {
 						if (pageSize > 0 || results.length >= pageSize) {

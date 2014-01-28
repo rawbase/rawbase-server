@@ -270,7 +270,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 			this.executeSparql(query, function(resultset) {
 				var results = resultset.results.bindings;
-
+				$('#tab1 > .panel-group').empty();
 				$(results).each(function(i, result) {
 					var $panel = $('<div class="panel panel-default" />').appendTo($('#tab1 > .panel-group'));
 
@@ -381,6 +381,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				self.currentVersion = $(this).data('uri');
 				$('.node-selected').attr('class', "node");
 				$(this).attr('class', "node-selected");
+				
+				self.getTypes();
+				
 			}).hover(function() {
 
 				var offset = $(this).offset();
@@ -652,7 +655,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				asyncEditorLoading : true,
 				forceFitColumns : false,
 				autoEdit : false,
-				headerRowHeight : 30
+				headerRowHeight : 30,
+				defaultColumnWidth : 100,
 			};
 			
 			function requiredFieldValidator(value) {

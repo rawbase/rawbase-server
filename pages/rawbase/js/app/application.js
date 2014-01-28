@@ -650,7 +650,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				enableAddRow : true,
 				enableCellNavigation : true,
 				asyncEditorLoading : true,
-				forceFitColumns : true,
+				forceFitColumns : false,
 				autoEdit : false,
 				headerRowHeight : 30
 			};
@@ -788,10 +788,10 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						limitQuery += ' LIMIT ' + (i + 1) * pageSize + ' OFFSET ' + i * pageSize;
 						
 					function next() {
-						if (pageSize > 0 || results.length >= pageSize) {
+						/*if (pageSize > 0 || results.length >= pageSize) {
 							i++;
 							getNextPage();
-						}
+						}*/
 					}
 
 					self.executeSparql(limitQuery, function(resultset) {

@@ -276,7 +276,10 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 					var $title = $('<h4 class="panel-title" />').appendTo($('<div class="panel-heading" />').appendTo($panel));
 
-					var $collapse = $('<div id="collapse' + i + '" class="panel-collapse collapse" />').data('type', result.type.value).append($('<div class="panel-body" />').append($('<div class="result-grid" />'))).appendTo($panel);
+					var $collapse = $('<div id="collapse' + i + '" class="panel-collapse collapse" />').data('type', result.type.value).appendTo($panel);
+					$collapse.append($('<div class="panel-body" />').append($('<div class="result-grid" />')).append($('<div class="pager"/>')));
+
+
 
 					var $a = $('<a data-toggle="collapse" data-parent="#accordion" href="#collapse' + i + '" />').append(result.type.value).appendTo($title);
 
@@ -750,8 +753,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					inlineFilters : true
 				});
 				var grid = new Slick.Grid($container, dataview, [], options);
-				var pager = new Slick.Controls.Pager(dataview, grid, $("#pager"));
-
+				var pager = new Slick.Controls.Pager(dataview, grid, $container.siblings(".pager"));
+				pager.setPageSize(pageSize);
 				// wire up model events to drive the grid
 				dataview.onRowCountChanged.subscribe(function(e, args) {
 					grid.updateRowCount();

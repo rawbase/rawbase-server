@@ -13,6 +13,8 @@
   height: 300px;
 }
 
+.pager { width:100%;height:20px; }
+
 !important
 .slick-header-column {
 	height: 30px;

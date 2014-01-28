@@ -640,7 +640,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 		},
 		buildGrid : function($container, query, pageSize, pivotted) {
-
+			var self = this;
+			
 			var options = {
 				editable : true,
 				enableAddRow : true,

@@ -786,9 +786,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 					self.executeSparql(query, function(resultset) {
 						if (pivotted) {
-							pivotData(resultset, grid, dataview, next);
+							pivotData(resultset, grid, dataView, next);
 						} else {
-							standardData(resultset, grid, dataview, next);
+							standardData(resultset, grid, dataView, next);
 						}
 					}, function(err) {
 

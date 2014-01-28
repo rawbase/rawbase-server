@@ -128,11 +128,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 				switch ($('#query-language-select').val()) {
 					case 'sparql':
-						self.executeSparql($('#query-text').val(), function(results) {
-							self.buildGrid("#tab2 > .result-grid", results, 0);
-						}, function(err) {
-
-						});
+							self.buildGrid($('#tab2 > .result-grid'), $('#query-text').val(), 0);
 						break;
 					case 'update':
 						self.executeSparqlUpdate($('#query-text').val(), $('#commit-message').val(), function() {
@@ -303,18 +299,10 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 					$collapse.on('show.bs.collapse', function() {
 
-						var $container = $(this).find('.result-grid');
-
-						$container.loadOverStart();
-
 						var query = 'SELECT ?s ?p ?o WHERE { ?s a <' + $(this).data('type') + '>; ?p ?o } LIMIT 100';
 
-						self.executeSparql(query, function(results) {
-							self.buildGrid($container, results, 500, true);
-							$container.loadOverStop();
-						}, function() {
-
-						});
+					    self.buildGrid($(this).find('.result-grid'),query, results, 500, true);
+							
 					});
 				});
 
@@ -651,7 +639,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			}
 
 		},
-		buildGrid : function(container, query, pageSize, pivotted) {
+		buildGrid : function($container, query, pageSize, pivotted) {
 
 			var options = {
 				editable : true,
@@ -754,7 +742,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				var dataView = new Slick.Data.DataView({
 					inlineFilters : true
 				});
-				var grid = new Slick.Grid(container, dataView, [], options);
+				var grid = new Slick.Grid($container, dataView, [], options);
 				var pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
 
 				// wire up model events to drive the grid

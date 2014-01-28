@@ -140,6 +140,8 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						break;
 				}
 			});
+			
+			$('#types-reload').on('click',function(){self.getTypes();});
 		},
 		getPROV : function(callback) {
 			var self = this;
@@ -381,8 +383,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				self.currentVersion = $(this).data('uri');
 				$('.node-selected').attr('class', "node");
 				$(this).attr('class', "node-selected");
-				
-				self.getTypes();
 				
 			}).hover(function() {
 

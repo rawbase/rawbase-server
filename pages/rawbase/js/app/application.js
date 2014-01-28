@@ -766,9 +766,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					grid.render();
 				});
 
-				return grid;
-				
-
 				function getNextPage() {
 					if (pageSize > 0)
 						query += 'LIMIT ' + (i + 1) * pageSize + ' OFFSET ' + i * pageSize;

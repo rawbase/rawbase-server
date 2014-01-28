@@ -127,7 +127,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				switch ($('#query-language-select').val()) {
 					case 'sparql':
 						self.executeSparql($('#query-text').val(), function(results) {
-							self.buildGrid("#tab2 > .result-grid", results);
+							self.buildGrid("#tab2 > .result-grid", results, 0);
 						}, function(err) {
 
 						});
@@ -308,7 +308,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						var query = 'SELECT ?s ?p ?o WHERE { ?s a <' + $(this).data('type') + '>; ?p ?o } LIMIT 100';
 
 						self.executeSparql(query, function(results) {
-							self.buildGrid($container, results, true);
+							self.buildGrid($container, results, 500, true);
 							$container.loadOverStop();
 						}, function() {
 
@@ -649,7 +649,18 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 			}
 
 		},
-		buildGrid : function(container, resultset, pivotted) {
+		buildGrid : function(container, query, pageSize, pivotted) {
+
+			var options = {
+				editable : true,
+				enableAddRow : true,
+				enableCellNavigation : true,
+				asyncEditorLoading : true,
+				forceFitColumns : true,
+				autoEdit : false,
+				headerRowHeight : 30
+			};
+			
 			function requiredFieldValidator(value) {
 				if (value == null || value == undefined || !value.length) {
 					return {
@@ -668,9 +679,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				return '<a href="' + value + '">' + value + '</a>';
 			}
 
-			function buildColumns(head) {
-				var columns = [];
-				head.vars.forEach(function(c) {
+			function standardData(resultset, grid, dataview) {
+				var columns = grid.getColumns();
+				resultset.head.vars.forEach(function(c) {
 					columns.push({
 						id : c,
 						name : c,
@@ -679,26 +690,22 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						editor : Slick.Editors.LongText
 					});
 				});
-				return columns;
+				grid.setColumns(columns);
+
+				var results = resultset.results.bindings;
+
+				for (var i = 0; i < results.length; i++) {
+					var item = {};
+					for (var key in results[i]) {
+						item[key] = results[i][key].value;
+					}
+
+					dataView.addItem(item);
+				}
 			}
 
-			var grid;
-			var data = [];
-
-			var columns = buildColumns(resultset.head);
-
-			var options = {
-				editable : true,
-				enableAddRow : true,
-				enableCellNavigation : true,
-				asyncEditorLoading : true,
-				forceFitColumns : true,
-				autoEdit : false,
-				headerRowHeight : 30
-			};
-
-			function pivot(results) {
-
+			function pivotData(resultset, grid, dataview) {
+				var results = resultset.results.bindings;
 				//Result needs headers s p o
 				var defObj = {
 					'subject' : null
@@ -719,40 +726,45 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				}
 
 				for (var subject in data) {
-					results.push($.extend({}, defObj, data[subject]));
+					dataView.addItem($.extend({}, defObj, data[subject]));
 					delete data[subject];
 				}
 
-				var columns = [];
+				var columns = grid.getColumns();
 				for (var label in defObj) {
-					columns.push({
-						id : label,
-						name : label,
-						field : label,
-						minWidth : 120,
-						editor : Slick.Editors.LongText
-					});
+					if (!grid.getColumnIndex(label)) {
+						columns.push({
+							id : label,
+							name : label,
+							field : label,
+							minWidth : 120,
+							editor : Slick.Editors.LongText
+						});
+					}
 				}
-				return new Slick.Grid(container, results, columns, options);
+				grid.setColumns(columns);
 			}
 
 			$(function() {
-				var results = resultset.results.bindings;
+				//load data incrementally
+				var i = 0;
+				
+				var dataView = new Slick.Data.DataView({
+					inlineFilters : true
+				});
+				var grid = new Slick.Grid(container, dataView, columns, options);
+				var pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
 
-				if (pivotted) {
-					grid = pivot(results);
-				} else {
-					for (var i = 0; i < results.length; i++) {
-						var item = {};
-						for (var key in results[i]) {
-							item[key] = results[i][key].value;
-						}
+				// wire up model events to drive the grid
+				dataView.onRowCountChanged.subscribe(function(e, args) {
+					grid.updateRowCount();
+					grid.render();
+				});
 
-						results[i] = item;
-					}
-					grid = new Slick.Grid(container, results, columns, options);
-
-				}
+				dataView.onRowsChanged.subscribe(function(e, args) {
+					grid.invalidateRows(args.rows);
+					grid.render();
+				});
 
 				grid.setSelectionModel(new Slick.CellSelectionModel());
 
@@ -763,6 +775,38 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					grid.updateRowCount();
 					grid.render();
 				});
+
+				return grid;
+				
+
+				function getNextPage() {
+					if (pageSize > 0)
+						query += 'LIMIT ' + (i + 1) * pageSize + ' OFFSET ' + i * pageSize;
+
+					self.executeSparql(query, function(results) {
+						if (pivotted) {
+							pivotData(resultset, grid, dataview);
+						} else {
+							standardData(resultset, grid, dataview);
+						}
+					}, function(err) {
+
+					});
+				}
+
+				function loadGrid(columns, results) {
+					dataView.beginUpdate();
+					dataView.setItems(results);
+					dataView.endUpdate();
+
+					if (pageSize == 0 || results.length >= pageSize) {
+						i++;
+						getNextPage();
+					}
+				};
+				
+				getNextPage()
+
 			});
 		}
 	};

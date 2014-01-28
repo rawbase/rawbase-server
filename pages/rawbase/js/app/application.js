@@ -752,9 +752,11 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				var dataview = new Slick.Data.DataView({
 					inlineFilters : true
 				});
+				dataview.setPagingOptions({pageSize:pageSize});
+				
 				var grid = new Slick.Grid($container, dataview, [], options);
 				var pager = new Slick.Controls.Pager(dataview, grid, $container.siblings(".pager"));
-				pager.setPageSize(pageSize);
+				
 				// wire up model events to drive the grid
 				dataview.onRowCountChanged.subscribe(function(e, args) {
 					grid.updateRowCount();

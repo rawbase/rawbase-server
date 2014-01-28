@@ -670,7 +670,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				return '<a href="' + value + '">' + value + '</a>';
 			}
 
-			function standardData(resultset, grid, dataview) {
+			function standardData(resultset, grid, dataview, end) {
 				var columns = grid.getColumns();
 				resultset.head.vars.forEach(function(c) {
 					columns.push({
@@ -684,7 +684,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				grid.setColumns(columns);
 
 				var results = resultset.results.bindings;
-
+				dataView.beginUpdate();
 				for (var i = 0; i < results.length; i++) {
 					var item = {};
 					for (var key in results[i]) {
@@ -693,9 +693,11 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 
 					dataView.addItem(item);
 				}
+				dataView.endUpdate();
+				end();
 			}
 
-			function pivotData(resultset, grid, dataview) {
+			function pivotData(resultset, grid, dataview, end) {
 				var results = resultset.results.bindings;
 				//Result needs headers s p o
 				var defObj = {
@@ -716,11 +718,6 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					defObj[result.p.value] = null;
 				}
 
-				for (var subject in data) {
-					dataView.addItem($.extend({}, defObj, data[subject]));
-					delete data[subject];
-				}
-
 				var columns = grid.getColumns();
 				for (var label in defObj) {
 					if (!grid.getColumnIndex(label)) {
@@ -734,6 +731,15 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					}
 				}
 				grid.setColumns(columns);
+				
+				dataView.beginUpdate();
+				for (var subject in data) {
+					dataView.addItem($.extend({}, defObj, data[subject]));
+					delete data[subject];
+				}
+				dataView.endUpdate();
+				
+				end();
 			}
 
 			$(function() {
@@ -756,7 +762,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 					grid.invalidateRows(args.rows);
 					grid.render();
 				});
-
+				
 				grid.setSelectionModel(new Slick.CellSelectionModel());
 
 				grid.onAddNewRow.subscribe(function(e, args) {
@@ -770,27 +776,23 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				function getNextPage() {
 					if (pageSize > 0)
 						query += 'LIMIT ' + (i + 1) * pageSize + ' OFFSET ' + i * pageSize;
+						
+					function next() {
+						if (pageSize > 0 || results.length >= pageSize) {
+							i++;
+							getNextPage();
+						}
+					}
 
-					self.executeSparql(query, function(results) {
+					self.executeSparql(query, function(resultset) {
 						if (pivotted) {
-							pivotData(resultset, grid, dataview);
+							pivotData(resultset, grid, dataview, next);
 						} else {
-							standardData(resultset, grid, dataview);
+							standardData(resultset, grid, dataview, next);
 						}
 					}, function(err) {
 
 					});
-				}
-
-				function loadGrid(columns, results) {
-					dataView.beginUpdate();
-					dataView.setItems(results);
-					dataView.endUpdate();
-
-					if (pageSize == 0 || results.length >= pageSize) {
-						i++;
-						getNextPage();
-					}
 				};
 				
 				getNextPage();

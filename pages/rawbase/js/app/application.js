@@ -774,8 +774,9 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 				});
 
 				function getNextPage() {
+					var limitQuery = query;
 					if (pageSize > 0)
-						query += ' LIMIT ' + (i + 1) * pageSize + ' OFFSET ' + i * pageSize;
+						limitQuery += ' LIMIT ' + (i + 1) * pageSize + ' OFFSET ' + i * pageSize;
 						
 					function next() {
 						if (pageSize > 0 || results.length >= pageSize) {
@@ -784,7 +785,7 @@ define(['jquery', 'app/authenticator', 'd3/d3', 'd3/d3.layout', 'dagre-d3.min', 
 						}
 					}
 
-					self.executeSparql(query, function(resultset) {
+					self.executeSparql(limitQuery, function(resultset) {
 						if (pivotted) {
 							pivotData(resultset, grid, dataview, next);
 						} else {

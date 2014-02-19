@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.jena.fuseki.server;
+package be.ugent.mmlab.triplestore;
 
 import org.apache.jena.fuseki.FusekiException ;
 import org.apache.jena.iri.IRI ;

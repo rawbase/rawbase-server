@@ -18,6 +18,7 @@
 
 package org.apache.jena.fuseki.server;
 
+import be.ugent.mmlab.triplestore.RawbaseDatasetVocab;
 import be.ugent.mmlab.triplestore.RawbaseStore;
 import java.lang.reflect.Method ;
 import java.util.ArrayList ;

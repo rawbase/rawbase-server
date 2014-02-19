@@ -26,7 +26,6 @@ import com.hp.hpl.jena.sparql.modify.UsingList;
 import com.hp.hpl.jena.update.UpdateAction;
 import com.hp.hpl.jena.update.UpdateException;
 import com.hp.hpl.jena.update.UpdateFactory;
-
 import com.hp.hpl.jena.update.UpdateRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

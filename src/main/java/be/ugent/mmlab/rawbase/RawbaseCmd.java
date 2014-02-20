@@ -30,7 +30,6 @@ import org.apache.jena.atlas.lib.Lib ;
 import org.apache.jena.atlas.lib.StrUtils ;
 import org.apache.jena.atlas.logging.LogCtl ;
 import org.apache.jena.fuseki.mgt.ManagementServer ;
-import org.apache.jena.fuseki.server.FusekiConfig ;
 import org.apache.jena.fuseki.server.SPARQLServer ;
 import org.apache.jena.fuseki.server.ServerConfig ;
 import org.apache.jena.riot.Lang ;
@@ -43,6 +42,7 @@ import arq.cmd.CmdException ;
 import arq.cmdline.ArgDecl ;
 import arq.cmdline.CmdARQ ;
 import arq.cmdline.ModDatasetAssembler ;
+import be.ugent.mmlab.rawbase.server.RawbaseFusekiConfig;
 import be.ugent.mmlab.rawbase.server.RawbaseSPARQLServer;
 
 import com.hp.hpl.jena.query.ARQ ;
@@ -449,10 +449,10 @@ public class RawbaseCmd extends CmdARQ
         if ( fusekiConfigFile != null )
         {
             Fuseki.configLog.info("Configuration file: "+fusekiConfigFile) ;
-            serverConfig = FusekiConfig.configure(fusekiConfigFile) ;
+            serverConfig = RawbaseFusekiConfig.configure(fusekiConfigFile) ;
         }
         else
-            serverConfig = FusekiConfig.defaultConfiguration(datasetPath, dsg, allowUpdate, listenLocal) ;
+            serverConfig = RawbaseFusekiConfig.defaultConfiguration(datasetPath, dsg, allowUpdate, listenLocal) ;
         
         // TODO Get from parsing config file.
         serverConfig.port = port ;

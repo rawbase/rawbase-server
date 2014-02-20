@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package be.ugent.mmlab.triplestore;
+package be.ugent.mmlab.rawbase.server;
 
 import org.apache.jena.fuseki.FusekiException ;
 import org.apache.jena.iri.IRI ;
@@ -26,11 +26,11 @@ import com.hp.hpl.jena.rdf.model.Property ;
 import com.hp.hpl.jena.rdf.model.Resource ;
 import com.hp.hpl.jena.rdf.model.ResourceFactory ;
 
-public class RawbaseDatasetVocab
+public class VirtuosoDatasetVocab
 {
     public static String NS = "http://jena.apache.org/fusekivirtuosoExt#" ;
 
-    public static final Resource tDataset = resource("RawbaseDataset") ;
+    public static final Resource tDataset = resource("VirtuosoDataset") ;
 
     public static final Property pjdbcURL = property("jdbcURL") ;
     public static final Property puser = property("user") ;
@@ -54,4 +54,3 @@ public class RawbaseDatasetVocab
         return uri ;
     }
 }
-

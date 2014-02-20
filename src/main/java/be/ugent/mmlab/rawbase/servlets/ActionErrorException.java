@@ -16,14 +16,17 @@
  * limitations under the License.
  */
 
-package org.apache.jena.fuseki;
+package be.ugent.mmlab.rawbase.servlets;
 
-import com.hp.hpl.jena.sparql.ARQException ;
-
-public class FusekiException extends ARQException
+class ActionErrorException extends RuntimeException
 {
-    public FusekiException(String msg, Throwable cause)    { super(msg, cause) ; }
-    public FusekiException(String msg)                     { super(msg) ; }
-    public FusekiException(Throwable cause)                { super(cause) ; }
-    public FusekiException()                               { super() ; }
+    final Throwable exception ;
+    final String message ;
+    final int rc ;
+    ActionErrorException(Throwable ex, String message, int rc)
+    {
+        this.exception = ex ;
+        this.message = message ;
+        this.rc = rc ;
+    }
 }

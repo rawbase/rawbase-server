@@ -22,13 +22,13 @@
     <packaging>jar</packaging>
     <name>R&amp;Wbase</name>
     <version>0.1</version>
-    <description>R&amp;Wbase is a distributed triple versioning control sytem based on Fuseki. Fuseki is a SPARQL 1.1 Server which provides query, update and graph store protocol endpoints that can be used to expose  triple store(s) over HTTP. This version of Fuseki is extended to include sparql endpoints over Openlink Virtuoso Triple Stores.</description>
+    <description>R&amp;Wbase is a distributed triple versioning control sytem based on Fuseki with Virtuoso back-end. Fuseki is a SPARQL 1.1 Server which provides query, update and graph store protocol endpoints that can be used to expose  triple store(s) over HTTP. This version of Fuseki is extended to include sparql endpoints over Openlink Virtuoso Triple Stores.</description>
     <url>http://rawbase.github.io</url>
 
     <parent>
         <groupId>org.apache.jena</groupId>
         <artifactId>jena-parent</artifactId>
-        <version>5</version>
+        <version>8</version>
         <relativePath>../jena-parent</relativePath>
     </parent> 
 
@@ -61,9 +61,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:https://svn.apache.org/repos/asf/jena/tags/jena-2.10.0/jena-fuseki</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/jena/tags/jena-2.10.0/jena-fuseki</developerConnection>
-        <url>https://svn.apache.org/repos/asf/jena/tags/jena-2.10.0/jena-fuseki</url>
+        <connection></connection>
+        <developerConnection></developerConnection>
+        <url></url>
     </scm>
 
     <properties>
@@ -77,8 +77,7 @@
         <assembly.soh.name>${this.root}</assembly.soh.name>
         <assembly.zip.name>${this.root}</assembly.zip.name>
 
-        <ver.jetty>8.1.8.v20121106</ver.jetty>  <!-- Has stray print "Null identity service..." -->
-        <!-- <ver.jetty>8.1.7.v20120910</ver.jetty> -->
+        <ver.jetty>8.1.11.v20130520</ver.jetty>
         <ver.velocity>1.7</ver.velocity>
 
         <ver.commons-fileupload>1.2.2</ver.commons-fileupload>
@@ -94,13 +93,13 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
-            <version>2.10.1</version>
+            <version>2.11.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
-            <version>2.10.1</version>
+            <version>2.11.1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
@@ -108,13 +107,13 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
-            <version>2.10.1</version>
+            <version>2.11.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-tdb</artifactId>
-            <version>0.10.1</version>
+            <version>1.0.1</version>
         </dependency>
 
         <!--
@@ -186,6 +185,18 @@
             <artifactId>jetty-xml</artifactId>
             <version>${ver.jetty}</version>
         </dependency> 
+        
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-security</artifactId>
+            <version>${ver.jetty}</version>
+        </dependency> 
+    
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>${ver.jetty}</version>
+        </dependency> 
 
         <dependency>
             <groupId>org.apache.velocity</groupId>
@@ -237,14 +248,30 @@
             </exclusions> 
         </dependency>
         <dependency>
-            <groupId>org.expressme</groupId>
-            <artifactId>JOpenId</artifactId>
-            <version>1.08</version>
-        </dependency>
-        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-fuseki</artifactId>
+            <version>1.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>org.apache.jena</artifactId>
+                    <groupId>jena-spatial</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jena-spatial</artifactId>
+                    <groupId>org.apache.jena</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.expressme</groupId>
+            <artifactId>JOpenId</artifactId>
+            <version>1.08</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 

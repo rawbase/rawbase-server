@@ -39,7 +39,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.jena.atlas.io.IO;
-import org.apache.jena.atlas.web.MediaType;
+import org.apache.jena.atlas.lib.StrUtils;
+import org.apache.jena.atlas.web.ContentType;
 import static org.apache.jena.fuseki.Fuseki.requestLog;
 import org.apache.jena.fuseki.FusekiLib;
 import org.apache.jena.fuseki.HttpNames;
@@ -47,7 +48,8 @@ import static org.apache.jena.fuseki.HttpNames.paramRequest;
 import static org.apache.jena.fuseki.HttpNames.paramUpdate;
 import static org.apache.jena.fuseki.HttpNames.paramUsingGraphURI;
 import static org.apache.jena.fuseki.HttpNames.paramUsingNamedGraphURI;
-import org.apache.jena.fuseki.server.DatasetRef;
+import static org.apache.jena.fuseki.server.CounterName.UpdateExecErrors;
+import org.apache.jena.fuseki.servlets.HttpAction;
 import org.apache.jena.fuseki.servlets.SPARQL_Protocol;
 import org.apache.jena.iri.IRI;
 import org.apache.jena.riot.WebContent;
@@ -55,24 +57,11 @@ import org.apache.jena.riot.system.IRIResolver;
 import org.apache.jena.web.HttpSC;
 
 public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
+    // Base URI used to isolate parsing from the current directory of the server. 
+    private static String UpdateParseBase = "http://example/base/";
+    private static IRIResolver resolver = IRIResolver.create(UpdateParseBase);
 
-    private static String updateParseBase = "http://example/base/";
-    private static IRIResolver resolver = IRIResolver.create(updateParseBase);
-
-    private class HttpActionUpdate extends HttpActionProtocol {
-
-        public HttpActionUpdate(long id, DatasetRef desc, HttpServletRequest request, HttpServletResponse response, boolean verbose) {
-            super(id, desc, request, response, verbose);
-        }
-    }
-
-    public SPARQL_UpdateRawbase(boolean verbose) {
-        super(verbose);
-    }
-
-    public SPARQL_UpdateRawbase() {
-        this(false);
-    }
+    public SPARQL_UpdateRawbase()   { super() ; }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -93,15 +82,16 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
     }
 
     @Override
-    protected void perform(long id, DatasetRef desc, HttpServletRequest request, HttpServletResponse response) {
+    protected void perform(HttpAction action) {
+
         // validate -> action.
-        validate(request);
-        HttpActionUpdate action = new HttpActionUpdate(id, desc, request, response, verbose_debug);
+        //validate(request);
+        //HttpActionUpdate action = new HttpActionUpdate(id, desc, request, response, verbose_debug);
 
         // WebContent needs to migrate to using ContentType.
         String ctStr;
         {
-            MediaType incoming = FusekiLib.contentType(request);
+            ContentType incoming = FusekiLib.getContentType(action);
             if (incoming == null) {
                 ctStr = WebContent.contentTypeSPARQLUpdate;
             } else {
@@ -113,128 +103,121 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
             executeBody(action);
             return;
         }
-        if (WebContent.contentTypeForm.equals(ctStr)) {
+        if (WebContent.contentTypeHTMLForm.equals(ctStr)) {
             executeForm(action);
             return;
         }
-        error(HttpSC.UNSUPPORTED_MEDIA_TYPE_415, "Bad content type: " + request.getContentType());
+        error(HttpSC.UNSUPPORTED_MEDIA_TYPE_415, "Bad content type: " + action.request.getContentType());
     }
+    
     protected static List<String> paramsForm = Arrays.asList(paramRequest, paramUpdate,
             paramUsingGraphURI, paramUsingNamedGraphURI);
     protected static List<String> paramsPOST = Arrays.asList(paramUsingGraphURI, paramUsingNamedGraphURI);
 
+   
     @Override
-    protected void validate(HttpServletRequest request) {
-        if (!HttpNames.METHOD_POST.equals(request.getMethod().toUpperCase())) {
-            errorMethodNotAllowed("SPARQL Update : use POST");
-        }
-
-        String ctStr;
-        {
-            MediaType incoming = FusekiLib.contentType(request);
-            if (incoming == null) {
-                ctStr = WebContent.contentTypeSPARQLUpdate;
-            } else {
-                ctStr = incoming.getContentType();
-            }
-        }
+    protected void validate(HttpAction action)
+    {
+        HttpServletRequest request = action.request ;
+        
+        if ( ! HttpNames.METHOD_POST.equalsIgnoreCase(request.getMethod()) )
+            errorMethodNotAllowed("SPARQL Update : use POST") ;
+        
+        ContentType incoming = FusekiLib.getContentType(action) ;
+        String ctStr = ( incoming == null ) ? WebContent.contentTypeSPARQLUpdate : incoming.getContentType() ;
         // ----
-
-        if (WebContent.contentTypeSPARQLUpdate.equals(ctStr)) {
-            String charset = request.getCharacterEncoding();
-            if (charset != null && !charset.equalsIgnoreCase(WebContent.charsetUTF8)) {
-                errorBadRequest("Bad charset: " + charset);
-            }
-            validate(request, paramsPOST);
-            return;
+        
+        if ( WebContent.contentTypeSPARQLUpdate.equals(ctStr) )
+        {
+            String charset = request.getCharacterEncoding() ;
+            if ( charset != null && ! charset.equalsIgnoreCase(WebContent.charsetUTF8) )
+                errorBadRequest("Bad charset: "+charset) ;
+            validate(request, paramsPOST) ;
+            return ;
         }
-
-        if (WebContent.contentTypeForm.equals(ctStr)) {
-            int x = countParamOccurences(request, paramUpdate) + countParamOccurences(request, paramRequest);
-            if (x == 0) {
-                errorBadRequest("SPARQL Update: No 'update=' parameter");
-            }
-            if (x != 1) {
-                errorBadRequest("SPARQL Update: Multiple 'update=' parameters");
-            }
-
-            String requestStr = request.getParameter(paramUpdate);
-            if (requestStr == null) {
-                requestStr = request.getParameter(paramRequest);
-            }
-            if (requestStr == null) {
-                errorBadRequest("SPARQL Update: No update= in HTML form");
-            }
-            validate(request, paramsForm);
-            return;
+        
+        if ( WebContent.contentTypeHTMLForm.equals(ctStr) )
+        {
+            int x = countParamOccurences(request, paramUpdate) + countParamOccurences(request, paramRequest) ;
+            if ( x == 0 )
+                errorBadRequest("SPARQL Update: No 'update=' parameter") ;
+            if ( x != 1 )
+                errorBadRequest("SPARQL Update: Multiple 'update=' parameters") ;
+            
+            String requestStr = request.getParameter(paramUpdate) ;
+            if ( requestStr == null )
+                requestStr = request.getParameter(paramRequest) ;
+            if ( requestStr == null )
+                errorBadRequest("SPARQL Update: No update= in HTML form") ;
+            validate(request, paramsForm) ;
+            return ;
         }
-
-        error(HttpSC.UNSUPPORTED_MEDIA_TYPE_415, "Must be " + WebContent.contentTypeSPARQLUpdate + " or " + WebContent.contentTypeForm + " (got " + ctStr + ")");
+        
+        error(HttpSC.UNSUPPORTED_MEDIA_TYPE_415, "Must be "+WebContent.contentTypeSPARQLUpdate+" or "+WebContent.contentTypeHTMLForm+" (got "+ctStr+")") ;
     }
 
-    protected void validate(HttpServletRequest request, Collection<String> params) {
-        if (params != null) {
-            Enumeration<String> en = request.getParameterNames();
-            for (; en.hasMoreElements();) {
-                String name = en.nextElement();
-                if (!params.contains(name)) {
-                    warning("SPARQL Update: Unrecognize request parameter (ignored): " + name);
-                }
+    protected void validate(HttpServletRequest request, Collection<String> params)
+    {
+        if ( params != null )
+        {
+            Enumeration<String> en = request.getParameterNames() ;
+            for ( ; en.hasMoreElements() ; )
+            {
+                String name = en.nextElement() ;
+                if ( ! params.contains(name) )
+                    warning("SPARQL Update: Unrecognize request parameter (ignored): "+name) ;
             }
         }
     }
 
-    private void executeBody(HttpActionUpdate action) {
-        InputStream input = null;
-        try {
-            input = action.request.getInputStream();
-        } catch (IOException ex) {
-            errorOccurred(ex);
-        }
+    private void executeBody(HttpAction action)
+    {
+        InputStream input = null ;
+        try { input = action.request.getInputStream() ; }
+        catch (IOException ex) { errorOccurred(ex) ; }
 
-        if (super.verbose_debug || action.verbose) {
+        if ( action.verbose )
+        {
             // Verbose mode only .... capture request for logging (does not scale). 
-            String requestStr = null;
-            try {
-                requestStr = IO.readWholeFileAsUTF8(input);
-            } catch (IOException ex) {
-                IO.exception(ex);
-            }
-            requestLog.info(format("[%d] Update = %s", action.id, formatForLog(requestStr)));
-
+            String requestStr = null ;
+            try { requestStr = IO.readWholeFileAsUTF8(input) ; }
+            catch (IOException ex) { IO.exception(ex) ; }
+            requestLog.info(format("[%d] Update = %s", action.id, formatForLog(requestStr))) ;
+            
             input = new ByteArrayInputStream(requestStr.getBytes());
             requestStr = null;
         }
-
-        execute(action, input);
-        successNoContent(action);
+        
+        execute(action, input) ;
+        successNoContent(action) ;
     }
 
-    private void executeForm(HttpActionUpdate action) {
-        String requestStr = action.request.getParameter(paramUpdate);
-        if (requestStr == null) {
-            requestStr = action.request.getParameter(paramRequest);
-        }
-
-        if (super.verbose_debug || action.verbose) //requestLog.info(format("[%d] Form update = %s", action.id, formatForLog(requestStr))) ;
-        {
-            requestLog.info(format("[%d] Form update = \n%s", action.id, requestStr));
-        }
-
+    private void executeForm(HttpAction action)
+    {
+        String requestStr = action.request.getParameter(paramUpdate) ;
+        if ( requestStr == null )
+            requestStr = action.request.getParameter(paramRequest) ;
+        
+        if ( action.verbose )
+            //requestLog.info(format("[%d] Form update = %s", action.id, formatForLog(requestStr))) ;
+            requestLog.info(format("[%d] Form update = \n%s", action.id, requestStr)) ;
         // A little ugly because we are taking a copy of the string, but hopefully shouldn't be too big if we are in this code-path
         // If we didn't want this additional copy, we could make the parser take a Reader in addition to an InputStream
-        ByteArrayInputStream input = new ByteArrayInputStream(requestStr.getBytes());
+        byte[] b = StrUtils.asUTF8bytes(requestStr) ;
+        ByteArrayInputStream input = new ByteArrayInputStream(b);
         requestStr = null;  // free it early at least
-
         execute(action, input);
-        successPage(action, "Update succeeded");
+        successPage(action,"Update succeeded") ;
     }
 
-    private void execute(HttpActionUpdate action, InputStream input) {
-        HttpServletRequest request = action.request;
-        String currentCommit = request.getParameter("rwb-version");
-        String user = request.getParameter("rwb-user");
-        String message = request.getParameter("rwb-message");
+    private void execute(HttpAction action, InputStream input)
+    {
+        UsingList usingList = processProtocol(action.request) ;
+        
+        //MVS: Added commit functionality for rawbase
+        String currentCommit = action.getRequest().getParameter("rwb-version");
+        String user = action.getRequest().getParameter("rwb-user");
+        String message = action.getRequest().getParameter("rwb-message");
 
         if (user == null || user.isEmpty()) {
             user = "anonymous";
@@ -253,9 +236,6 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
             //Start Commit + start transaction
             RawbaseCommitManager.getInstance().startCommit(user, user, message, currentCommit);
 
-
-            UsingList usingList = processProtocol(action.request);
-
             // If the dsg is transactional, then we can parse and execute the update in a streaming fashion.
             // If it isn't, we need to read the entire update request before performing any updates, because
             // we have to attempt to make the request atomic in the face of malformed queries
@@ -272,31 +252,35 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
                     return;
                 }
             }
-
-            action.beginWrite();
-            try {
-                if (action.isTransactional()) {
-                    UpdateAction.parseExecute(usingList, action.getActiveDSG(), input, Syntax.syntaxARQ);
-                } else {
-                    UpdateAction.execute(req, action.getActiveDSG());
-                }
-                action.commit();
-                
-                //SAM
-                //action.abort();
-                RawbaseCommitManager.getInstance().storeCommit();
-                
-                action.endWrite();
-            } catch (UpdateException ex) {
-                action.abort();
-                errorBadRequest(ex.getMessage());
-            } catch (RawbaseException ex) {
-                action.abort();
-                throw ex;
-            } catch (Exception ex) {
-                action.abort();
-                errorBadRequest(ex.getMessage());
+            
+            action.beginWrite() ;
+        try {
+            if (req == null )
+                UpdateAction.parseExecute(usingList, action.getActiveDSG(), input, UpdateParseBase, Syntax.syntaxARQ);
+            else
+                UpdateAction.execute(req, action.getActiveDSG()) ;
+            action.commit() ;
+            
+            //MVS: When action is done, store the commit
+            RawbaseCommitManager.getInstance().storeCommit();
+            
+        } catch (UpdateException ex) {
+            action.abort() ;
+            incCounter(action.srvRef, UpdateExecErrors) ;
+            errorOccurred(ex.getMessage()) ;
+        } catch (QueryParseException ex) {
+            action.abort() ;
+            // Counter inc'ed further out.
+            errorBadRequest(messageForQPE(ex)) ;
+        } catch (Throwable ex) {
+            if ( ! ( ex instanceof ActionErrorException ) )
+            {
+                try { action.abort() ; } catch (Exception ex2) {}
+                errorOccurred(ex.getMessage(), ex) ;
             }
+        } finally { action.endWrite(); }
+            
+
 
 
         } catch (RawbaseException ex) {
@@ -354,4 +338,6 @@ public class SPARQL_UpdateRawbase extends SPARQL_Protocol {
         }
 
     }
+
+   
 }

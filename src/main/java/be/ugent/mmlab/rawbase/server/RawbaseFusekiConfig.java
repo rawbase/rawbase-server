@@ -17,8 +17,8 @@
  */
 package be.ugent.mmlab.rawbase.server;
 
-import be.ugent.mmlab.triplestore.RawbaseStore;
-import be.ugent.mmlab.triplestore.VirtuosoStore;
+import be.ugent.mmlab.rawbase.triplestore.RawbaseStore;
+import be.ugent.mmlab.rawbase.triplestore.VirtuosoStore;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;

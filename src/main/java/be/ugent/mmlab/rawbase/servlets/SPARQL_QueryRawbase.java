@@ -26,10 +26,26 @@ import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
+import org.apache.jena.fuseki.servlets.HttpAction;
 import org.apache.jena.fuseki.servlets.SPARQL_QueryDataset;
 
 public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
 
+    @Override
+    protected void validateRequest(HttpAction action) {
+        
+    }
+    
+    @Override
+    protected void validateQuery(HttpAction action, Query query) {
+        String version = action.request.getParameter("rwb-version");
+        if (version != null){
+            query.addGraphURI(version);
+        }
+    }
+
+    
+    
     @Override
     protected QueryExecution createQueryExecution(Query query, Dataset dataset) {
 

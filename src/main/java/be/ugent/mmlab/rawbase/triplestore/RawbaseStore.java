@@ -1,4 +1,4 @@
-package be.ugent.mmlab.triplestore;
+package be.ugent.mmlab.rawbase.triplestore;
 
 import be.ugent.mmlab.rawbase.jena.RawbaseCommitManager;
 import be.ugent.mmlab.rawbase.jena.RawbaseDataSet;

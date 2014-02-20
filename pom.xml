@@ -381,7 +381,7 @@
                             -->
                             <archive>
                                 <manifest>
-                                    <mainClass>org.apache.jena.fuseki.FusekiCmd</mainClass>
+                                    <mainClass>be.ugent.mmlab.rawbase.RawbaseCmd</mainClass>
                                 </manifest>
                             </archive>
                             <descriptors>

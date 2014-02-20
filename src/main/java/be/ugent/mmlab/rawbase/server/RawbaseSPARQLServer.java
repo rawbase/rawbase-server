@@ -283,7 +283,7 @@ public class RawbaseSPARQLServer extends SPARQLServer {
         DatasetRegistry.get().put(datasetPath, sDesc);
         serverLog.info(format("Dataset path = %s", datasetPath));
 
-        //MVS:
+        //Make distinction for Rawbase
         HttpServlet sparqlQuery = null;
         HttpServlet sparqlUpdate = null;
 

@@ -20,7 +20,5 @@ Jetty: http://www.eclipse.org/jetty/
   Apache License 2.0 
   (also avilable under Eclipse Public License 1.0)
 
-OpenLink Virtuoso: 
-  virt_jena.jar --> delta_jena.jar (upgraded version of    
-  virt_jena.jar for Jena 2.10.0, to be found in MMLab`s Git -->
-  POM for more details)
+OpenLink Virtuoso:
+  The Jena Virtuoso driver is merged into this project and modified according to R&Wbase needs 

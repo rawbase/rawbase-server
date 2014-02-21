@@ -2,4 +2,7 @@
 nbactions*
 .DS_Store
 config.js
+.project/
+.settings/
+.classpath
 .project

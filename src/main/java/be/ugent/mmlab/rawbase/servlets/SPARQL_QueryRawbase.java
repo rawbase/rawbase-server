@@ -26,6 +26,8 @@ import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
+import com.hp.hpl.jena.sparql.core.Prologue;
+import com.hp.hpl.jena.sparql.resultset.SPARQLResult;
 import org.apache.jena.fuseki.servlets.HttpAction;
 import org.apache.jena.fuseki.servlets.SPARQL_QueryDataset;
 
@@ -44,8 +46,14 @@ public class SPARQL_QueryRawbase extends SPARQL_QueryDataset {
         }
     }
 
-    
-    
+
+    @Override
+    protected void finishRequest(HttpAction action) {
+        //Add provenance link header
+        action.getResponse().addHeader("Link", null);
+        super.finishRequest(action); //To change body of generated methods, choose Tools | Templates.
+    }
+
     @Override
     protected QueryExecution createQueryExecution(Query query, Dataset dataset) {
 

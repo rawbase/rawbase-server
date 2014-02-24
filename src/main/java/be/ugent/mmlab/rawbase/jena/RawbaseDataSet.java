@@ -152,6 +152,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /**
      * Remove a named graph.
      */
+    @Override
     public void removeNamedModel(String name) {
         String exec_text = "sparql clear graph <" + name + ">";
 
@@ -167,6 +168,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /**
      * Change a named graph for another uisng the same name
      */
+    @Override
     public void replaceNamedModel(String name, Model model) {
         try {
             getConnection().setAutoCommit(false);
@@ -188,6 +190,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /**
      * Get the default graph as a Jena Model
      */
+    @Override
     public Model getDefaultModel() {
         return defaultModel;
     }
@@ -195,6 +198,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /**
      * Get a graph by name as a Jena Model
      */
+    @Override
     public Model getNamedModel(String name) {
         try {
             VirtuosoDataSource _ds = getDataSource();
@@ -211,11 +215,13 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
 
     /**
      * Does the dataset contain a model with the name supplied?
+     * @param name
+     * @return 
      */
+    @Override
     public boolean containsNamedModel(String name) {
-        String query = "select count(*) from (sparql select * where { graph `iri(??)` { ?s ?p ?o }})f";
+        String query = "SELECT TOP 1 * FROM RDF_QUAD WHERE G = iri_to_id(??)";
         ResultSet rs = null;
-        int ret = 0;
 
         checkOpen();
         try {
@@ -223,18 +229,19 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
             ps.setString(1, name);
             rs = ps.executeQuery();
             if (rs.next()) {
-                ret = rs.getInt(1);
+                return true;
             }
             rs.close();
         } catch (Exception e) {
             throw new JenaException(e);
         }
-        return (ret != 0);
+        return false;
     }
 
     /**
      * List the names
      */
+    @Override
     public Iterator<String> listNames() {
         String exec_text = "DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()";
         ResultSet rs = null;
@@ -258,6 +265,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /**
      * Get the lock for this dataset
      */
+    @Override
     public Lock getLock() {
         return lock;
     }
@@ -265,6 +273,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /**
      * Get the dataset in graph form
      */
+    @Override
     public DatasetGraph asDatasetGraph() {
         return new RawbaseDataSetGraph(this);
     }
@@ -272,6 +281,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /* (non-Javadoc)
      * @see com.hp.hpl.jena.query.Dataset#getContext()
      */
+    @Override
     public Context getContext() {
         // TODO Auto-generated method stub
         return context;
@@ -280,6 +290,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /* (non-Javadoc)
      * @see com.hp.hpl.jena.query.Dataset#supportsTransactions()
      */
+    @Override
     public boolean supportsTransactions() {
         // TODO Auto-generated method stub
         return false;
@@ -288,6 +299,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /* (non-Javadoc)
      * @see com.hp.hpl.jena.query.Dataset#begin(com.hp.hpl.jena.query.ReadWrite)
      */
+    @Override
     public void begin(ReadWrite readWrite) {
         // TODO Auto-generated method stub
         this.getTransactionHandler().begin();
@@ -297,6 +309,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /* (non-Javadoc)
      * @see com.hp.hpl.jena.query.Dataset#commit()
      */
+    @Override
     public void commit() {
         // TODO Auto-generated method stub
         this.getTransactionHandler().commit();
@@ -305,6 +318,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /* (non-Javadoc)
      * @see com.hp.hpl.jena.query.Dataset#abort()
      */
+    @Override
     public void abort() {
 
         this.getTransactionHandler().abort();
@@ -313,6 +327,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /* (non-Javadoc)
      * @see com.hp.hpl.jena.query.Dataset#isInTransaction()
      */
+    @Override
     public boolean isInTransaction() {
         // TODO Auto-generated method stub
         return false;
@@ -322,6 +337,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /* (non-Javadoc)
      * @see com.hp.hpl.jena.query.Dataset#end()
      */
+    @Override
     public void end() {
         // TODO Auto-generated method stub
     }
@@ -334,10 +350,12 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
             vd = vds;
         }
 
+        @Override
         public Graph getDefaultGraph() {
             return vd;
         }
 
+        @Override
         public Graph getGraph(Node graphNode) {
             try {
                 return new VirtGraph(graphNode.toString(), vd.getGraphUrl(),
@@ -347,6 +365,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
             }
         }
 
+        @Override
         public boolean containsGraph(Node graphNode) {
             return containsNamedModel(graphNode.toString());
         }
@@ -371,18 +390,22 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
             }
         }
 
+        @Override
         public Lock getLock() {
             return vd.getLock();
         }
 
+        @Override
         public long size() {
             return vd.size();
         }
 
+        @Override
         public void close() {
             vd.close();
         }
 
+        @Override
         public void setDefaultGraph(Graph g) {
             //SAM
             try {

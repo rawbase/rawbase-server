@@ -35,7 +35,11 @@ public class RawbaseQueryExecution extends VirtuosoQueryExecution {
 
     public RawbaseQueryExecution(String query, VirtGraph _graph) {
         super(query, _graph);
-        this.ds = new RawbaseDataSet(ds);
+        
+        if (_graph instanceof RawbaseDataSet)
+            this.ds = (RawbaseDataSet) _graph;
+        else 
+        this.ds = new RawbaseDataSet(_graph);
     }
 
     /**
@@ -140,8 +144,8 @@ public class RawbaseQueryExecution extends VirtuosoQueryExecution {
       return buf.toString();
     }
 
-    public ResultSet execSelect(Integer[] vPath) {
-        this.vPath = vPath;
+    @Override
+    public ResultSet execSelect() {
         ResultSet ret = null;
         
         java.sql.Statement stmt = null;

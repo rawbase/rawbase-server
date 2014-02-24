@@ -61,27 +61,23 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
 
     private final Lock lock = new LockMRSW();
 
-    static final String sinsert = "sparql insert into graph iri(??) { `iri(??)` `iri(??)` `bif:__rdf_long_from_batch_params(??,??,??)` }";
-    static final String sdelete = "sparql delete from graph iri(??) {`iri(??)` `iri(??)` `bif:__rdf_long_from_batch_params(??,??,??)`}";
-
-    public RawbaseDataSet() {
-        super();
-    }
-
     public RawbaseDataSet(String _graphName, VirtuosoDataSource _ds) {
         super(_graphName, _ds);
     }
 
     public RawbaseDataSet(VirtGraph g) {
+        super(g.getDataSource());
+        //super(user, null);
+        //this.graphName = g.getGraphName();
+        
+        //setReadFromAllGraphs(g.getReadFromAllGraphs());
+        //this.url_hostlist = g.getGraphUrl();
+        //this.user = g.getGraphUser();
+        //this.password = g.getGraphPassword();
+        //this.roundrobin = false;
+        //setFetchSize(g.getFetchSize());
+        //this.connection = g.getConnection();
 
-        this.graphName = g.getGraphName();
-        setReadFromAllGraphs(g.getReadFromAllGraphs());
-        this.url_hostlist = g.getGraphUrl();
-        this.user = g.getGraphUser();
-        this.password = g.getGraphPassword();
-        this.roundrobin = false;
-        setFetchSize(g.getFetchSize());
-        this.connection = g.getConnection();
     }
 
     public RawbaseDataSet(String url_hostlist, String user, String password) {

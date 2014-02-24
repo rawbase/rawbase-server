@@ -95,6 +95,12 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
         return defaultModel;
     }
 
+    @Override
+    public Statement createStatement() throws SQLException {
+        return super.createStatement(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+
     /**
      * Set the background graph. Can be set to null for none.
      */

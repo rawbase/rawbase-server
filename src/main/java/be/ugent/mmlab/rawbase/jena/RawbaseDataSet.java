@@ -98,26 +98,11 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     /**
      * Set a named graph.
      */
+    @Override
     public void addNamedModel(String name, Model model) throws LabelExistsException {
-        String query = "select count(*) from (sparql select * where { graph `iri(??)` { ?s ?p ?o }})f";
-        ResultSet rs = null;
-        int ret = 0;
-
-        checkOpen();
-        try {
-            java.sql.PreparedStatement ps = prepareStatement(query);
-            ps.setString(1, name);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                ret = rs.getInt(1);
-            }
-            rs.close();
-        } catch (Exception e) {
-            throw new JenaException(e);
-        }
 
         try {
-            if (ret != 0) {
+           if (containsNamedModel(name)) {
                 throw new LabelExistsException("A model with ID '" + name
                         + "' already exists.");
             }
@@ -220,7 +205,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
      */
     @Override
     public boolean containsNamedModel(String name) {
-        String query = "SELECT TOP 1 * FROM RDF_QUAD WHERE G = iri_to_id(??)";
+        String query = "SELECT TOP 1 * FROM RDF_QUAD WHERE G = iri_to_id(?)";
         ResultSet rs = null;
 
         checkOpen();

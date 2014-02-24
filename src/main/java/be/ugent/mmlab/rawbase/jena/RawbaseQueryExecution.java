@@ -1,8 +1,12 @@
 package be.ugent.mmlab.rawbase.jena;
 
-import be.ugent.mmlab.virtuoso.jena.VirtGraph;
-import be.ugent.mmlab.virtuoso.jena.VirtuosoQueryExecution;
+
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.shared.JenaException;
+import virtuoso.jena.driver.VirtDataset;
+import virtuoso.jena.driver.VirtGraph;
+import virtuoso.jena.driver.VirtuosoQueryExecution;
 
 /**
  *
@@ -13,14 +17,16 @@ import com.hp.hpl.jena.query.ResultSet;
 public class RawbaseQueryExecution extends VirtuosoQueryExecution {
 
     private Integer[] vPath; //CSV string serializing the path of deltas
+    private VirtGraph graph;
 
     public RawbaseQueryExecution(String query, VirtGraph _graph, Integer[] vPath) {
-        super(query, _graph);
+        this(query, _graph);
         this.vPath = vPath;
     }
 
     public RawbaseQueryExecution(String query, VirtGraph _graph) {
         super(query, _graph);
+        this.graph = _graph;
     }
 
     private String pathToString() {
@@ -36,9 +42,13 @@ public class RawbaseQueryExecution extends VirtuosoQueryExecution {
 
         return sb.toString();
     }
+    
+    public Dataset getDataset()
+    {
+      return new RawbaseDataSet(graph);
+    }
 
-    @Override
-    public String getVirtQueryString() {
+    private String getVosQuery() {
         StringBuilder sb = new StringBuilder("");
 
         if (getGraph().getRuleSet() != null) {
@@ -60,9 +70,32 @@ public class RawbaseQueryExecution extends VirtuosoQueryExecution {
         System.out.println("Query: " + query);
         return query;
     }
+    
+    
 
     public ResultSet execSelect(Integer[] vPath) {
         this.vPath = vPath;
-        return super.execSelect();
+        ResultSet ret = null;
+
+      try {
+        stmt = graph.createStatement();
+        if (timeout > 0)
+          stmt.setQueryTimeout((int)(timeout/1000));
+        java.sql.ResultSet rs = stmt.executeQuery(getVosQuery());
+
+        return new RResultSet(graph, rs);
+      }	catch(Exception e) {
+        throw new JenaException("Can not create ResultSet.:"+e);
+      }
+    }
+    
+    
+    //Extend inner class to provide access
+    public class RResultSet extends VResultSet{
+
+        public RResultSet(VirtGraph _g, java.sql.ResultSet _rs) {
+            super(_g, _rs);
+        }
+
     }
 }

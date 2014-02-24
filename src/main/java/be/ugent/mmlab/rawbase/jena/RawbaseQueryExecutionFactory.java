@@ -22,8 +22,7 @@
  */
 package be.ugent.mmlab.rawbase.jena;
 
-import be.ugent.mmlab.virtuoso.jena.VirtDataSet;
-import be.ugent.mmlab.virtuoso.jena.VirtGraph;
+
 import com.hp.hpl.jena.query.ARQ;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
@@ -42,6 +41,7 @@ import com.hp.hpl.jena.sparql.util.Context;
 import com.hp.hpl.jena.util.FileManager;
 import java.util.List;
 import org.apache.jena.atlas.logging.Log;
+import virtuoso.jena.driver.VirtGraph;
 
 public class RawbaseQueryExecutionFactory {
 

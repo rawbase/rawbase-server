@@ -23,6 +23,9 @@
 package be.ugent.mmlab.rawbase.jena;
 
 import be.ugent.mmlab.rawbase.jena.exceptions.RawbaseCommitException;
+import be.ugent.mmlab.virtuoso.jena.VirtDataSet;
+import be.ugent.mmlab.virtuoso.jena.VirtGraph;
+import be.ugent.mmlab.virtuoso.jena.VirtModel;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
@@ -31,7 +34,6 @@ import com.hp.hpl.jena.query.LabelExistsException;
 import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.shared.*;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.sparql.core.Quad;
@@ -41,69 +43,141 @@ import java.sql.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import javax.sql.DataSource;
-import virtuoso.jdbc4.VirtuosoDataSource;
-import virtuoso.jena.driver.VirtDataset;
-import virtuoso.jena.driver.VirtGraph;
-import virtuoso.jena.driver.VirtModel;
-import virtuoso.jena.driver.VirtResSetQIter;
+import org.apache.jena.atlas.iterator.Iter;
+import org.apache.jena.atlas.iterator.Transform;
+import virtuoso.jdbc3.VirtuosoDataSource;
 
 //http://www.openlinksw.com/schemas/virtrdf#
 //http://localhost:8890/DAV
 //http://www.w3.org/2002/07/owl#
-public class RawbaseDataSet extends VirtGraph implements Dataset {
+
+
+public class RawbaseDataSet2 extends VirtGraph implements Dataset {
 
     /**
      * Default model - may be null - according to Javadoc
      */
     Model defaultModel = null;
-    private final Context m_context = new Context();
-
     private final Lock lock = new LockMRSW();
+    private Context context = new Context();
 
-    static final String sinsert = "sparql insert into graph iri(??) { `iri(??)` `iri(??)` `bif:__rdf_long_from_batch_params(??,??,??)` }";
-    static final String sdelete = "sparql delete from graph iri(??) {`iri(??)` `iri(??)` `bif:__rdf_long_from_batch_params(??,??,??)`}";
-
-    public RawbaseDataSet() {
+    public RawbaseDataSet2() {
         super();
     }
 
-    public RawbaseDataSet(String _graphName, VirtuosoDataSource _ds) {
+    public RawbaseDataSet2(String _graphName, VirtuosoDataSource _ds) {
         super(_graphName, _ds);
     }
 
-    public RawbaseDataSet(VirtGraph g) {
+    public RawbaseDataSet2(VirtGraph g) {
 
         this.graphName = g.getGraphName();
         setReadFromAllGraphs(g.getReadFromAllGraphs());
         this.url_hostlist = g.getGraphUrl();
         this.user = g.getGraphUser();
         this.password = g.getGraphPassword();
-        this.roundrobin = false;
+        this.roundrobin = g.isRoundrobin();
         setFetchSize(g.getFetchSize());
         this.connection = g.getConnection();
     }
 
-    public RawbaseDataSet(String url_hostlist, String user, String password) {
+    public RawbaseDataSet2(String url_hostlist, String user, String password) {
         super(url_hostlist, user, password);
-    }
-
-    /**
-     * Get the default graph as a Jena Model
-     */
-    public Model getDefaultModel() {
-        return defaultModel;
     }
 
     /**
      * Set the background graph. Can be set to null for none.
      */
-    @Override
     public void setDefaultModel(Model model) {
-        if (!(model instanceof VirtDataset)) {
+        if (!(model instanceof VirtDataSet)) {
             throw new IllegalArgumentException("VirtDataSource supports only VirtModel as default model");
         }
         defaultModel = model;
+    }
+
+    /**
+     * Set a named graph.
+     */
+    @Override
+    public void addNamedModel(String name, Model model) throws LabelExistsException {
+
+        try {
+           if (containsNamedModel(name)) {
+                throw new LabelExistsException("A model with ID '" + name
+                        + "' already exists.");
+            }
+            Graph g = model.getGraph();
+            int count = 0;
+            java.sql.PreparedStatement ps = prepareStatement(sinsert);
+
+            for (Iterator i = g.find(Node.ANY, Node.ANY, Node.ANY); i.hasNext();) {
+                Triple t = (Triple) i.next();
+
+                ps.setString(1, name);
+                bindSubject(ps, 2, t.getSubject());
+                bindPredicate(ps, 3, t.getPredicate());
+                bindObject(ps, 4, t.getObject());
+                ps.addBatch();
+                count++;
+                if (count > BATCH_SIZE) {
+                    ps.executeBatch();
+                    ps.clearBatch();
+                    count = 0;
+                }
+            }
+            if (count > 0) {
+                ps.executeBatch();
+                ps.clearBatch();
+            }
+        } catch (Exception e) {
+            throw new JenaException(e);
+        }
+    }
+
+    /**
+     * Remove a named graph.
+     */
+    @Override
+    public void removeNamedModel(String name) {
+        String exec_text = "sparql clear graph <" + name + ">";
+
+        checkOpen();
+        try {
+            java.sql.Statement stmt = createStatement();
+            stmt.executeQuery(exec_text);
+        } catch (Exception e) {
+            throw new JenaException(e);
+        }
+    }
+
+    /**
+     * Change a named graph for another uisng the same name
+     */
+    @Override
+    public void replaceNamedModel(String name, Model model) {
+        try {
+            getConnection().setAutoCommit(false);
+            removeNamedModel(name);
+            addNamedModel(name, model);
+            getConnection().commit();
+            getConnection().setAutoCommit(true);
+        } catch (Exception e) {
+            try {
+                getConnection().rollback();
+            } catch (Exception e2) {
+                throw new JenaException(
+                        "Could not replace model, and could not rollback!", e2);
+            }
+            throw new JenaException("Could not replace model:", e);
+        }
+    }
+
+    /**
+     * Get the default graph as a Jena Model
+     */
+    @Override
+    public Model getDefaultModel() {
+        return defaultModel;
     }
 
     /**
@@ -112,7 +186,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     @Override
     public Model getNamedModel(String name) {
         try {
-            DataSource _ds = getDataSource();
+            VirtuosoDataSource _ds = getDataSource();
             if (_ds != null) {
                 return new VirtModel(new VirtGraph(name, _ds));
             } else {
@@ -126,9 +200,8 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
 
     /**
      * Does the dataset contain a model with the name supplied?
-     *
      * @param name
-     * @return
+     * @return 
      */
     @Override
     public boolean containsNamedModel(String name) {
@@ -151,88 +224,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
     }
 
     /**
-     * Set a named graph.
-     */
-    public void addNamedModel(String name, Model model, boolean checkExists) throws LabelExistsException {
-
-        //  try {
-        if (checkExists && containsNamedModel(name)) {
-            throw new LabelExistsException("A model with ID '" + name
-                    + "' already exists.");
-        }
-        Graph g = model.getGraph();
-        add(name, g.find(Node.ANY, Node.ANY, Node.ANY), null);
-        /*  int count = 0;
-         java.sql.PreparedStatement ps = prepareStatement(sinsert);
-
-         for (Iterator i = g.find(Node.ANY, Node.ANY, Node.ANY); i.hasNext();) {
-         Triple t = (Triple) i.next();
-
-         ps.setString(1, name);
-         bindSubject(ps, 2, t.getSubject());
-         bindPredicate(ps, 3, t.getPredicate());
-         bindObject(ps, 4, t.getObject());
-         ps.addBatch();
-         count++;
-         if (count > BATCH_SIZE) {
-         ps.executeBatch();
-         ps.clearBatch();
-         count = 0;
-         }
-         }
-         if (count > 0) {
-         ps.executeBatch();
-         ps.clearBatch();
-         }
-         } catch (Exception e) {
-         throw new JenaException(e);
-         }*/
-    }
-
-    /**
-     * Set a named graph.
-     */
-    @Override
-    public void addNamedModel(String name, Model model) throws LabelExistsException {
-        addNamedModel(name, model, true);
-    }
-
-    /**
-     * Remove a named graph.
-     */
-    @Override
-    public void removeNamedModel(String name) {
-        String exec_text = "sparql clear graph <" + name + ">";
-
-        checkOpen();
-        try {
-            java.sql.Statement stmt = createStatement();
-            stmt.executeQuery(exec_text);
-            stmt.close();
-        } catch (Exception e) {
-            throw new JenaException(e);
-        }
-    }
-
-    /**
-     * Change a named graph for another using the same name
-     */
-    @Override
-    public void replaceNamedModel(String name, Model model) {
-        try {
-            removeNamedModel(name);
-            addNamedModel(name, model);
-            getConnection().commit();
-            getConnection().setAutoCommit(true);
-        } catch (Exception e) {
-            throw new JenaException("Could not replace model:", e);
-        }
-    }
-
-    /**
      * List the names
-     *
-     * @return
      */
     @Override
     public Iterator<String> listNames() {
@@ -263,89 +255,6 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
         return lock;
     }
 
-    /* (non-Javadoc)
-     * @see com.hp.hpl.jena.query.Dataset#getContext()
-     */
-    @Override
-    public Context getContext() {
-        return m_context;
-    }
-
-    /* (non-Javadoc)
-     * @see com.hp.hpl.jena.query.Dataset#supportsTransactions()
-     */
-    @Override
-    public boolean supportsTransactions() {
-        return true;
-    }
-
-    /* (non-Javadoc)
-     * @see com.hp.hpl.jena.query.Dataset#begin(com.hp.hpl.jena.query.ReadWrite)
-     */
-    @Override
-    public void begin(ReadWrite readWrite) {
-        // TODO Auto-generated method stub
-        //this.getTransactionHandler().begin();
-        try {
-            getConnection().setAutoCommit(false);
-        } catch (Exception e) {
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see com.hp.hpl.jena.query.Dataset#commit()
-     */
-    @Override
-    public void commit() {
-        // TODO Auto-generated method stub
-        //this.getTransactionHandler().commit();
-        try {
-            getConnection().commit();
-        } catch (Exception e) {
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see com.hp.hpl.jena.query.Dataset#abort()
-     */
-    @Override
-    public void abort() {
-
-        //this.getTransactionHandler().abort();
-        try {
-            getConnection().rollback();
-        } catch (Exception e) {
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see com.hp.hpl.jena.query.Dataset#isInTransaction()
-     */
-    @Override
-    public boolean isInTransaction() {
-        // TODO Auto-generated method stub
-        //return false;
-        try {
-            return (!(getConnection().getAutoCommit()));
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-
-    /* (non-Javadoc)
-     * @see com.hp.hpl.jena.query.Dataset#end()
-     */
-    @Override
-    public void end() {
-        try {
-//      getConnection().commit();
-            getConnection().rollback();
-            getConnection().setAutoCommit(true);
-        } catch (Exception e) {
-        }
-    }
-
     /**
      * Get the dataset in graph form
      */
@@ -354,19 +263,75 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
         return new RawbaseDataSetGraph(this);
     }
 
-    private void add(String name, ExtendedIterator<Triple> it, Object object) {
-        while (it.hasNext()) {
-            Triple t = (Triple) it.next();
-            ResourceImpl g = new ResourceImpl(name);
-            RawbaseCommitManager.getInstance().add(new Quad(g.asNode(), t));
-        }
+    /* (non-Javadoc)
+     * @see com.hp.hpl.jena.query.Dataset#getContext()
+     */
+    @Override
+    public Context getContext() {
+        // TODO Auto-generated method stub
+        return context;
+    }
+
+    /* (non-Javadoc)
+     * @see com.hp.hpl.jena.query.Dataset#supportsTransactions()
+     */
+    @Override
+    public boolean supportsTransactions() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see com.hp.hpl.jena.query.Dataset#begin(com.hp.hpl.jena.query.ReadWrite)
+     */
+    @Override
+    public void begin(ReadWrite readWrite) {
+        // TODO Auto-generated method stub
+        this.getTransactionHandler().begin();
+
+    }
+
+    /* (non-Javadoc)
+     * @see com.hp.hpl.jena.query.Dataset#commit()
+     */
+    @Override
+    public void commit() {
+        // TODO Auto-generated method stub
+        this.getTransactionHandler().commit();
+    }
+
+    /* (non-Javadoc)
+     * @see com.hp.hpl.jena.query.Dataset#abort()
+     */
+    @Override
+    public void abort() {
+
+        this.getTransactionHandler().abort();
+    }
+
+    /* (non-Javadoc)
+     * @see com.hp.hpl.jena.query.Dataset#isInTransaction()
+     */
+    @Override
+    public boolean isInTransaction() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.hp.hpl.jena.query.Dataset#end()
+     */
+    @Override
+    public void end() {
+        // TODO Auto-generated method stub
     }
 
     public class RawbaseDataSetGraph implements DatasetGraph {
 
-        RawbaseDataSet vd = null;
+        RawbaseDataSet2 vd = null;
 
-        public RawbaseDataSetGraph(RawbaseDataSet vds) {
+        public RawbaseDataSetGraph(RawbaseDataSet2 vds) {
             vd = vds;
         }
 
@@ -390,7 +355,7 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
             return containsNamedModel(graphNode.toString());
         }
 
-        protected List<Node> getListGraphNodes() {
+        public Iterator<Node> listGraphNodes() {
             String exec_text = "DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()";
             ResultSet rs = null;
             int ret = 0;
@@ -404,15 +369,10 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
                 while (rs.next()) {
                     names.add(Node.createURI(rs.getString(1)));
                 }
-                return names;
+                return names.iterator();
             } catch (Exception e) {
                 throw new JenaException(e);
             }
-        }
-
-        @Override
-        public Iterator<Node> listGraphNodes() {
-            return getListGraphNodes().iterator();
         }
 
         @Override
@@ -431,13 +391,8 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
         }
 
         @Override
-        public Context getContext() {
-            return vd.m_context;
-        }
-
-        @Override
         public void setDefaultGraph(Graph g) {
-            //Code by SAM
+            //SAM
             try {
                 getConnection().setAutoCommit(false);
                 setDefaultModel(ModelFactory.createModelForGraph(g));
@@ -452,19 +407,8 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
                 }
                 throw new JenaException("Could not set the default model:", e);
             }
-            //New Code by Jena Driver
-            /*if (!(g instanceof RawbaseDataSet1))
-             throw new IllegalArgumentException("VirtDataSetGraph.setDefaultGraph() supports only VirtGraph as default graph");
-
-             vd = new RawbaseDataSet1((RawbaseDataSet1)g);*/
         }
 
-        /**
-         * Add the given graph to the dataset.
-         * <em>Replaces</em> any existing data for the named graph; to add data,
-         * get the graph and add triples to it, or add quads to the dataset. Do
-         * not assume that the same Java object is returned by {@link #getGraph}
-         */
         public void addGraph(Node graphName, Graph graph) {
             //SAM
             try {
@@ -481,16 +425,6 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
                 }
                 throw new JenaException("Could not add the named model:", e);
             }
-
-            //New code by Jena Driver
-            /*try {
-             vd.clearGraph(graphName.toString());
-             //??todo add optimize  when graph is VirtGraph
-             ExtendedIterator<Triple> it = graph.find(Node.ANY, Node.ANY, Node.ANY);
-             vd.add(graphName.toString(), it, null);
-             } catch (Exception e) {
-             throw new JenaException("Error in addGraph:"+e);
-             }*/
         }
 
         public void removeGraph(Node graphName) {
@@ -509,22 +443,13 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
                 }
                 throw new JenaException("Could not remove the named model:", e);
             }
-
-            //New code by Jena Driver
-            /*try {
-             vd.clearGraph(graphName.toString());
-             } catch (Exception e) {
-             throw new JenaException("Error in removeGraph:"+e);
-             }*/
         }
 
-        @Override
         public void add(Quad quad) {
             //add(quad.getGraph(), quad.getSubject(), quad.getPredicate(), quad.getObject());
             RawbaseCommitManager.getInstance().add(quad);
         }
 
-        @Override
         public void delete(Quad quad) {
             try {
                 //delete(quad.getGraph(), quad.getSubject(), quad.getPredicate(), quad.getObject());
@@ -534,8 +459,58 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
             }
         }
 
+        public void deleteAny(Node g, Node s, Node p, Node o) {
+            //SAM
+            vd.checkOpen();
+            ExtendedIterator<Triple> tripleIt = vd.find(s, p, o);
+            List<Triple> list = Iter.toList(tripleIt);
+            for (Triple q : list) {
+                delete(g, q.getSubject(), q.getPredicate(), q.getObject());
+            }
+
+
+        }
+
+        public Iterator<Quad> find() {
+            //SAM
+            vd.checkOpen();
+            return triples2quads(null, vd.find(null, null, null));
+        }
+
+        public Iterator<Quad> find(Quad quad) {
+            //SAM
+            vd.checkOpen();
+            return triples2quads(quad.getGraph(), vd.find(quad.getSubject(), quad.getPredicate(), quad.getObject()));
+        }
+
+        public Iterator<Quad> find(Node g, Node s, Node p, Node o) {
+            //SAM
+            vd.checkOpen();
+            return triples2quads(g, vd.find(s, p, o));
+        }
+
+        public Iterator<Quad> findNG(Node g, Node s, Node p, Node o) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public boolean contains(Node g, Node s, Node p, Node o) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public boolean contains(Quad quad) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public boolean isEmpty() {
+            return vd.isEmpty();
+        }
+
+        public Context getContext() {
+            return vd.getContext();
+        }
+
         public void add(Node g, Node s, Node p, Node o) {
-            add(new Quad(g, s, p, o));
+             add(new Quad(g, s, p, o));
 
         }
 
@@ -544,82 +519,17 @@ public class RawbaseDataSet extends VirtGraph implements Dataset {
 
         }
 
-        public void deleteAny(Node g, Node s, Node p, Node o) {
-            //SAM
-            vd.checkOpen();
-            ExtendedIterator<Triple> tripleIt = vd.find(s, p, o);
-            while (tripleIt.hasNext()) {
-                Triple q = tripleIt.next();
-                delete(g, q.getSubject(), q.getPredicate(), q.getObject());
-            }
+        protected Iter<Quad> triples2quads(final Node graphNode, Iterator<Triple> iter) {
+            Transform<Triple, Quad> transformNamedGraph = new Transform<Triple, Quad>() {
+                public Quad convert(Triple triple) {
+                    return new Quad(graphNode, triple);
+                }
+            };
 
+            return Iter.iter(iter).map(transformNamedGraph);
         }
-
-        public Iterator<Quad> find() {
-            //SAM
-            //vd.checkOpen();
-            //return triples2quads(null, vd.find(null, null, null));
-            return find(Node.ANY, Node.ANY, Node.ANY, Node.ANY);
-        }
-
-        public Iterator<Quad> find(Quad quad) {
-            return find(quad.getGraph(), quad.getSubject(), quad.getPredicate(), quad.getObject());
-        }
-
-        public Iterator<Quad> find(Node g, Node s, Node p, Node o) {
-            List<Node> graphs;
-            if (isWildcard(g)) {
-                graphs = getListGraphNodes();
-            } else {
-                graphs = new LinkedList();
-                graphs.add(g);
-            }
-
-            return new VirtResSetQIter(vd, graphs.iterator(), new Triple(s, p, o));
-        }
-
-        /**
-         * Find matching quads in the dataset in named graphs only - may include
-         * wildcards, Node.ANY or null
-         *
-         * @see Graph#find(Node,Node,Node)
-         */
-        @Override
-        public Iterator<Quad> findNG(Node g, Node s, Node p, Node o) {
-            return find(g, s, p, o);
-        }
-
-        /**
-         * Test whether the dataset (including default graph) contains a quad -
-         * may include wildcards, Node.ANY or null
-         */
-        public boolean contains(Node g, Node s, Node p, Node o) {
-            if (isWildcard(g)) {
-                boolean save = vd.getReadFromAllGraphs();
-                vd.setReadFromAllGraphs(true);
-                boolean ret = vd.graphBaseContains(null, new Triple(s, p, o));
-                vd.setReadFromAllGraphs(save);
-                return ret;
-            } else {
-                return vd.graphBaseContains(g.toString(), new Triple(s, p, o));
-            }
-        }
-
-        /**
-         * Test whether the dataset contains a quad (including default graph)-
-         * may include wildcards, Node.ANY or null
-         */
-        public boolean contains(Quad quad) {
-            return contains(quad.getGraph(), quad.getSubject(), quad.getPredicate(), quad.getObject());
-        }
-
-        public boolean isEmpty() {
-            return vd.isEmpty();
-        }
-
-        protected boolean isWildcard(Node g) {
-            return g == null || Node.ANY.equals(g);
-        }
-
+        
+        
+        
     }
 }

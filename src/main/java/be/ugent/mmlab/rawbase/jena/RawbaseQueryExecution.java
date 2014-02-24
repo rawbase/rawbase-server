@@ -11,7 +11,6 @@ import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.sparql.util.ModelUtils;
 import java.sql.ResultSetMetaData;
 import java.util.Iterator;
-import virtuoso.jena.driver.VirtDataset;
 import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtResSetIter2;
 import virtuoso.jena.driver.VirtuosoQueryExecution;

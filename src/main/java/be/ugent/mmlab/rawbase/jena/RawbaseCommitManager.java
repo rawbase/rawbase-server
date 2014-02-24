@@ -1,7 +1,5 @@
 package be.ugent.mmlab.rawbase.jena;
 
-import be.ugent.mmlab.virtuoso.jena.VirtDataSet;
-import be.ugent.mmlab.virtuoso.jena.VirtGraph;
 import be.ugent.mmlab.rawbase.jena.exceptions.RawbaseCommitException;
 import be.ugent.mmlab.rawbase.jena.exceptions.RawbaseException;
 import be.ugent.mmlab.rawbase.jena.vocabulary.PROV;
@@ -21,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.joda.time.DateTime;
+import virtuoso.jena.driver.VirtDataset;
+import virtuoso.jena.driver.VirtGraph;
 
 /**
  *
@@ -118,7 +118,7 @@ public class RawbaseCommitManager {
 
         String sparql = "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <" + RawbaseCommit.PROV_GRAPHNAME + "> { <" + uri + "> ?p ?o}";
 
-        QueryExecution qfac = QueryExecutionFactory.create(sparql, new VirtDataSet(getGraph()));
+        QueryExecution qfac = QueryExecutionFactory.create(sparql, new VirtDataset("rawbase", getGraph().getDataSource()));
 
         Model m = qfac.execConstruct();
 

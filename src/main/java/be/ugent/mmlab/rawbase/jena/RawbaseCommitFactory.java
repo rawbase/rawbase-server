@@ -4,9 +4,10 @@
  */
 package be.ugent.mmlab.rawbase.jena;
 
-import be.ugent.mmlab.virtuoso.jena.VirtGraph;
+
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import virtuoso.jena.driver.VirtGraph;
 
 /**
  *

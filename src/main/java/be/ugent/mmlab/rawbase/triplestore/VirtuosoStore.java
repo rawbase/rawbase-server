@@ -1,10 +1,10 @@
 package be.ugent.mmlab.rawbase.triplestore;
 
-import be.ugent.mmlab.virtuoso.jena.VirtDataSet;
-import be.ugent.mmlab.virtuoso.jena.VirtGraph;
-import be.ugent.mmlab.virtuoso.jena.VirtModel;
 
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
+import virtuoso.jena.driver.VirtDataset;
+import virtuoso.jena.driver.VirtGraph;
+import virtuoso.jena.driver.VirtModel;
 
 /**
  * @author Sam
@@ -74,7 +74,7 @@ public class VirtuosoStore {
 
     public DatasetGraph getDatasetGraph() {
 
-        VirtDataSet ds = new VirtDataSet(virtURL, user, pass);
+        VirtDataset ds = new VirtDataset(virtURL, user, pass);
         ds.setReadFromAllGraphs(readFromAllGraphs);
         return ds.asDatasetGraph();
 

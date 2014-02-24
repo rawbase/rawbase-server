@@ -4,8 +4,7 @@
  */
 package be.ugent.mmlab.rawbase.jena;
 
-import be.ugent.mmlab.virtuoso.jena.VirtGraph;
-import com.hp.hpl.jena.graph.Node;
+
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.core.Quad;
 import java.sql.SQLException;
@@ -13,6 +12,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.joda.time.DateTime;
+import virtuoso.jena.driver.VirtGraph;
 
 /**
  *

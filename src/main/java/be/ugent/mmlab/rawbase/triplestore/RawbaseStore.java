@@ -45,7 +45,4 @@ public class RawbaseStore extends VirtuosoStore {
         return ds.asDatasetGraph();
     }
 
-
-    
-    
 }

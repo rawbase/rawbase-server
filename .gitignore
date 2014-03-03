@@ -6,3 +6,7 @@ config.js
 .settings/
 .classpath
 .project
+*.class
+*.jar
+*.war
+*.ear

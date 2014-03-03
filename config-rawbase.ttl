@@ -30,8 +30,7 @@ fuvirtext:RawbaseDataset  rdfs:subClassOf  ja:RDFDataset .
     .
 
 <#rawbase_dataset> rdf:type      fuvirtext:RawbaseDataset ;
-    fuvirtext:jdbcURL             "jdbc:virtuoso://monn.elis.ugent.be:1111" ;
-    #fuvirtext:jdbcURL             "jdbc:virtuoso://localhost:1111" ;
+    fuvirtext:jdbcURL             "jdbc:virtuoso://localhost:1111" ;
     fuvirtext:user                "dba" ;
     fuvirtext:password            "dba" ;
 	fuvirtext:graphName           "http://dbpedia.org#" ;

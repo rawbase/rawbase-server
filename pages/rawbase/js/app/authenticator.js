@@ -6,7 +6,9 @@ define( ['jquery'], function ($){
         this.VALIDURL    =   'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=';
         this.SCOPE       =   'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
         this.CLIENTID    =   config.google.clientid;
-        this.REDIRECT    =   config.google.redirect;
+        this.REDIRECT    =   config.google.redirect ? config.google.redirect :  document.location.href;
+        //Remove hash from  redirect url
+        this.REDIRECT    =   this.REDIRECT.substr(0, this.REDIRECT.indexOf('#'));
         this.LOGOUT      =   'http://accounts.google.com/Logout';
         this.TYPE        =   'token';
         this.KEY		 =   'AIzaSyD3XA9W9Sw5ComQ7be7lEBIS2IcAlkHgpM';

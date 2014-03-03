@@ -15,17 +15,19 @@ Next, run the script `install.sh` from `install/`. Be careful, installing R&Wbas
 The install script depends on the environment variable `RAWBASE_HOME` to be set and Virtuoso's `isql` command to be accessible. Both can also be supplied with command parameters.
 
 The following command parameters are optional:
-    *-i The path to the Virtuoso isql application
-    *-h The RAWBASE_HOME folder where the source is found
-    *-a The address Virtuoso ODBC is running on, default localhost:1111
-    *-u The Virtuoso user, default dba
-    *-p The Virtuoso pass, default dba
-
+```
+    -i The path to the Virtuoso isql application
+    -h The RAWBASE_HOME folder where the source is found
+    -a The address Virtuoso ODBC is running on, default localhost:1111
+    -u The Virtuoso user, default dba
+    -p The Virtuoso pass, default dba
+```
 
 Run R&Wbase
 ----------------
 
 After R&Wbase has been intalled, run it with the following command:
+```
     ./rawbase-server.sh 8080
-    
+```
 The argument is optional and determines the port of the server. Default 3030

@@ -81,8 +81,8 @@ then
     echo "[R&Wbase Install] Building Maven project."
     cd $RAWBASE_HOME
 
-    mvn org.apache.maven.plugins:maven-install-plugin:2.5.1:install-file -Dfile=../src/main/resources/virtjdbc4_1.jar -DgroupId=openlink.org -DartifactId=virtjdbc -Dversion=4.1 -Dpackaging=jar
-    mvn org.apache.maven.plugins:maven-install-plugin:2.5.1:install-file -Dfile=../src/main/resources/virt_jena2.jar -DgroupId=openlink.org -DartifactId=virt-jena -Dversion=2.0 -Dpackaging=jar
+    mvn org.apache.maven.plugins:maven-install-plugin:2.5.1:install-file -Dfile=${DIR}/../src/main/resources/virtjdbc4_1.jar -DgroupId=openlink.org -DartifactId=virtjdbc -Dversion=4.1 -Dpackaging=jar
+    mvn org.apache.maven.plugins:maven-install-plugin:2.5.1:install-file -Dfile=${DIR}/../src/main/resources/virt_jena2.jar -DgroupId=openlink.org -DartifactId=virt-jena -Dversion=2.0 -Dpackaging=jar
 
     mvn clean package
 

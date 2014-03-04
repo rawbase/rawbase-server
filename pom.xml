@@ -42,10 +42,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <repository>
-            <id>repo</id>
-            <url>file://${project.basedir}/repo</url>
-        </repository>
     </repositories>
 
     <organization>

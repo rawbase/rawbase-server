@@ -31,3 +31,8 @@ After R&Wbase has been installed, run it with the following command:
     ./rawbase-server.sh 8080
 ```
 The argument is optional and determines the port of the server. Default 3030
+
+To use the web interface, first copy the example configuration and update it as necessary.
+```
+    cp pages/rawbase/js/app/config.example.js pages/rawbase/js/app/config.js
+```

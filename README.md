@@ -26,7 +26,7 @@ The following command parameters are optional:
 Run R&Wbase
 ----------------
 
-After R&Wbase has been intalled, run it with the following command:
+After R&Wbase has been installed, run it with the following command:
 ```
     ./rawbase-server.sh 8080
 ```

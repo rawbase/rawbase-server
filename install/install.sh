@@ -16,6 +16,9 @@ fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# Set the default source path
+RAWBASE_HOME="$(dirname $DIR)"
+
 virtuoso_address="127.0.0.1:1111"
 virtuoso_usr="dba"
 virtuoso_pwd="dba"

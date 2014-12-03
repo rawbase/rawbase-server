@@ -6,7 +6,14 @@
 #
 ############################
 
-isql="isql"
+# Use virtuoso isql-vt if available (e.g. on Ubuntu),
+# else assume isql is installed
+if test $(which isql-vt); then
+  isql="isql-vt"
+else
+  isql="isql"
+fi
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 virtuoso_address="127.0.0.1:1111"
@@ -50,7 +57,7 @@ then
         echo "[R&Wbase Install] RAWBASE_HOME is not set. Please use"
         echo "[R&Wbase Install]         export RAWBASE_HOME=/path/to/rawbase-server"
         exit 1
-else 
+else
    if [ ! -e ${RAWBASE_HOME} ]
    then
        echo "[R&Wbase Install] RAWBASE_HOME is not a valid path."

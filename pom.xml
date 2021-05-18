@@ -73,7 +73,7 @@
         <assembly.soh.name>${this.root}</assembly.soh.name>
         <assembly.zip.name>${this.root}</assembly.zip.name>
 
-        <ver.jetty>8.1.11.v20130520</ver.jetty>
+        <ver.jetty>9.3.27.v20190418</ver.jetty>
         <ver.velocity>1.7</ver.velocity>
 
         <ver.commons-fileupload>1.2.2</ver.commons-fileupload>

@@ -8,7 +8,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-port=8080
+port=3030
 
 if [ ! -z "$1" ]
 then
